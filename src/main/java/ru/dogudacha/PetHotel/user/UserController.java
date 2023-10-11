@@ -1,10 +1,12 @@
 package ru.dogudacha.PetHotel.user;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.dogudacha.PetHotel.user.dto.UpdateUserDto;
 import ru.dogudacha.PetHotel.user.dto.UserDto;
 import ru.dogudacha.PetHotel.user.service.api.UserService;
 
@@ -18,7 +20,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDto> addUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> addUser(@RequestBody @Valid UserDto userDto) {
         log.info("UserController: receive POST request for add new user with body={}", userDto);
         UserDto savedUser =  userService.addUser(userDto);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
@@ -32,10 +34,10 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto,
+    public ResponseEntity<UserDto> updateUser(@RequestBody UpdateUserDto updateUserDto,
                                               @PathVariable(value = "id") long userId) {
-        log.info("receive PATCH request for update user with id={}, requestBody={}", userId, userDto);
-        UserDto updatedUserDto = userService.updateUser(userId, userDto);
+        log.info("receive PATCH request for update user with id={}, requestBody={}", userId, updateUserDto);
+        UserDto updatedUserDto = userService.updateUser(userId, updateUserDto);
         return new ResponseEntity<>(updatedUserDto, HttpStatus.OK);
     }
 

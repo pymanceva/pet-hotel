@@ -12,7 +12,7 @@ services:
       - 'DB_NAME=pethotel'
       - 'POSTGRES_USER=admin'
       - 'POSTGRES_PASSWORD=admin_pwd'
-      - 'DB_HOST=db'
+      - 'DB_HOST=pethotel_db'
       - 'DB_PORT=5432'
 
   db:

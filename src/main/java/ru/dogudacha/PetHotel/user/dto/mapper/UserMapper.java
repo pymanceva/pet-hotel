@@ -2,6 +2,7 @@ package ru.dogudacha.PetHotel.user.dto.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import ru.dogudacha.PetHotel.user.dto.UpdateUserDto;
 import ru.dogudacha.PetHotel.user.dto.UserDto;
 import ru.dogudacha.PetHotel.user.model.User;
 
@@ -13,6 +14,9 @@ public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
     User toUser(UserDto userDto);
+
+    @Mapping(target = "id", ignore = true)
+    User toUser(UpdateUserDto updateUserDto);
 
     List<UserDto> map(List<User> users);
 }

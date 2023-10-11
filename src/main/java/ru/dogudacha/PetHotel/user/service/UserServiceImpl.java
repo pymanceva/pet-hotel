@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
+import ru.dogudacha.PetHotel.user.dto.UpdateUserDto;
 import ru.dogudacha.PetHotel.user.dto.UserDto;
 import ru.dogudacha.PetHotel.user.dto.mapper.UserMapper;
 import ru.dogudacha.PetHotel.user.model.User;
@@ -41,7 +42,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public UserDto updateUser(long userId, UserDto userDto) {
+    public UserDto updateUser(long userId, UpdateUserDto userDto) {
         User oldUser = findUserById(userId);
         User newUser = userMapper.toUser(userDto);
         newUser.setId(userId);
@@ -52,6 +53,10 @@ public class UserServiceImpl implements UserService {
 
         if (Objects.isNull(newUser.getEmail())) {
             newUser.setEmail(oldUser.getEmail());
+        }
+
+        if (Objects.isNull(newUser.getRole())) {
+            newUser.setRole(oldUser.getRole());
         }
 
         User updatedUser = userRepository.save(newUser);
