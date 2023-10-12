@@ -95,54 +95,6 @@ public class ErrorHandler {
         return new ResponseEntity<>(apiError, apiError.getHttpStatus());
     }
 
-    @ExceptionHandler(NotChangeableException.class)
-    public ResponseEntity<ApiError> handleNotChangeableException(final NotChangeableException ex) {
-        log.error("EH: NotChangeableException: {}", ex.getMessage());
-        ApiError apiError = ApiError.builder()
-                .message(ex.getMessage())
-                .reason("Incorrectly made request.")
-                .httpStatus(HttpStatus.CONFLICT)
-                .timeStamp(now())
-                .build();
-        return new ResponseEntity<>(apiError, apiError.getHttpStatus());
-    }
-
-    @ExceptionHandler(InitiatorException.class)
-    public ResponseEntity<ApiError> handleInitiatorException(final InitiatorException ex) {
-        log.error("EH: InitiatorException: {}", ex.getMessage());
-        ApiError apiError = ApiError.builder()
-                .message(ex.getMessage())
-                .reason("Initiator can not be requester.")
-                .httpStatus(HttpStatus.CONFLICT)
-                .timeStamp(now())
-                .build();
-        return new ResponseEntity<>(apiError, apiError.getHttpStatus());
-    }
-
-    @ExceptionHandler(LimitException.class)
-    public ResponseEntity<ApiError> handleLimitException(final LimitException ex) {
-        log.error("EH: LimitException: {}", ex.getMessage());
-        ApiError apiError = ApiError.builder()
-                .message(ex.getMessage())
-                .reason("For the requested operation the conditions are not met.")
-                .httpStatus(HttpStatus.CONFLICT)
-                .timeStamp(now())
-                .build();
-        return new ResponseEntity<>(apiError, apiError.getHttpStatus());
-    }
-
-    @ExceptionHandler(NotPublishedException.class)
-    public ResponseEntity<ApiError> handleNotPublishedException(final NotPublishedException ex) {
-        log.error("EH: NotPublishedException: {}", ex.getMessage());
-        ApiError apiError = ApiError.builder()
-                .message(ex.getMessage())
-                .reason("Event must be published.")
-                .httpStatus(HttpStatus.CONFLICT)
-                .timeStamp(now())
-                .build();
-        return new ResponseEntity<>(apiError, apiError.getHttpStatus());
-    }
-
     @ExceptionHandler(InvalidDateRangeException.class)
     public ResponseEntity<ApiError> handleInvalidDateRangeException(final InvalidDateRangeException ex) {
         log.error("EH: InvalidDateRangeException: {}", ex.getMessage());
@@ -160,7 +112,7 @@ public class ErrorHandler {
         log.error("EH: HttpMessageConversionException: {}", ex.getMessage());
         ApiError apiError = ApiError.builder()
                 .message(ex.getMessage())
-                .reason("Event must be published.")
+                .reason("Request parameters validation error.")
                 .httpStatus(HttpStatus.CONFLICT)
                 .timeStamp(now())
                 .build();

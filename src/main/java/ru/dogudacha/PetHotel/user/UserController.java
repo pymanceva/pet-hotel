@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@RequestBody UpdateUserDto updateUserDto,
+    public ResponseEntity<UserDto> updateUser(@RequestBody @Valid UpdateUserDto updateUserDto,
                                               @PathVariable(value = "id") long userId) {
         log.info("receive PATCH request for update user with id={}, requestBody={}", userId, updateUserDto);
         UserDto updatedUserDto = userService.updateUser(userId, updateUserDto);
@@ -52,6 +52,6 @@ public class UserController {
     public ResponseEntity<HttpStatus> deleteUserById(@PathVariable("id") Long id) {
         log.info("receive DELETE request fo delete user with id= {}", id);
         userService.deleteUserById(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

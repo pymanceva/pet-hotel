@@ -12,6 +12,7 @@ import ru.dogudacha.PetHotel.user.model.User;
 import ru.dogudacha.PetHotel.user.repository.api.UserRepository;
 import ru.dogudacha.PetHotel.user.service.api.UserService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -68,7 +69,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public List<UserDto> getAllUsers() {
-        List<User> allUsers = userRepository.findAll();
+        List<User> allUsers = userRepository.getAllUsers().orElse(Collections.emptyList());
         log.info("userService: returned all {} users", allUsers.size());
         return userMapper.map(allUsers);
     }

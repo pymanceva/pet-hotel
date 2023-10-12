@@ -232,13 +232,13 @@ class UserServiceImplTest {
         UserDto userDto2 = new UserDto(userId + 2, "2" + userName, "2" + email, Roles.USER);
         UserDto userDto3 = new UserDto(userId + 3, "3" + userName, "3" + email, Roles.FINANCIAL);
         List<UserDto> userDtoList = List.of(userDto1, userDto2, userDto3);
-        when(userRepository.findAll()).thenReturn((userList));
+        when(userRepository.getAllUsers()).thenReturn(Optional.of(userList));
         when(userMapper.map(userList)).thenReturn(userDtoList);
 
         List<UserDto> returnedUsersDto = userService.getAllUsers();
 
         assertEquals(userDtoList, returnedUsersDto);
-        verify(userRepository).findAll();
+        verify(userRepository).getAllUsers();
         verify(userMapper).map(userList);
     }
 
