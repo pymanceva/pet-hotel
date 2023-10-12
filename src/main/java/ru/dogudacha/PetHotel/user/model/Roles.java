@@ -5,7 +5,7 @@ import java.util.Optional;
 public enum Roles {
     BOSS,
     ADMIN,
-    NURSE,
+    USER,
     FINANCIAL;
 
     public static Optional<Roles> from(String stringState) {
