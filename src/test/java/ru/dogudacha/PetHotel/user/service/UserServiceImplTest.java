@@ -13,7 +13,7 @@ import ru.dogudacha.PetHotel.user.dto.UserDto;
 import ru.dogudacha.PetHotel.user.dto.mapper.UserMapper;
 import ru.dogudacha.PetHotel.user.model.Roles;
 import ru.dogudacha.PetHotel.user.model.User;
-import ru.dogudacha.PetHotel.user.repository.api.UserRepository;
+import ru.dogudacha.PetHotel.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +37,7 @@ class UserServiceImplTest {
     final long userId = 1L;
     final String userName = "new User";
     final String email = "newUser@mail.com";
-    final Roles role = Roles.ADMIN;
+    final Roles role = Roles.ROLE_ADMIN;
 
     @Captor
     private ArgumentCaptor<User> userArgumentCaptor;
@@ -87,7 +87,7 @@ class UserServiceImplTest {
     @Test
     void updateUser_whenUserFoundAndNewNameAndNewEmailNotNull_thenUpdateNameAndEmailOnly() {
         UpdateUserDto newUserDto =
-                new UpdateUserDto(userId + 1, "new" + userName, "new" + email, Roles.FINANCIAL);
+                new UpdateUserDto(userId + 1, "new" + userName, "new" + email, Roles.ROLE_FINANCIAL);
         User oldUser = new User(userId, userName, email,role);
         User newUser = new User(
                 newUserDto.getId(),
@@ -224,13 +224,13 @@ class UserServiceImplTest {
 
     @Test
     void getAllUsers_whenNeedToReturnAllUsers_returnAllUsers() {
-        User user1 = new User(userId + 1, "1" + userName, "1" + email, Roles.BOSS);
-        User user2 = new User(userId + 2, "2" + userName, "2" + email, Roles.USER);
-        User user3 = new User(userId + 3, "3" + userName, "3" + email, Roles.FINANCIAL);
+        User user1 = new User(userId + 1, "1" + userName, "1" + email, Roles.ROLE_BOSS);
+        User user2 = new User(userId + 2, "2" + userName, "2" + email, Roles.ROLE_USER);
+        User user3 = new User(userId + 3, "3" + userName, "3" + email, Roles.ROLE_FINANCIAL);
         List<User> userList = List.of(user1, user2, user3);
-        UserDto userDto1 = new UserDto(userId + 1, "1" + userName, "1" + email, Roles.BOSS);
-        UserDto userDto2 = new UserDto(userId + 2, "2" + userName, "2" + email, Roles.USER);
-        UserDto userDto3 = new UserDto(userId + 3, "3" + userName, "3" + email, Roles.FINANCIAL);
+        UserDto userDto1 = new UserDto(userId + 1, "1" + userName, "1" + email, Roles.ROLE_BOSS);
+        UserDto userDto2 = new UserDto(userId + 2, "2" + userName, "2" + email, Roles.ROLE_USER);
+        UserDto userDto3 = new UserDto(userId + 3, "3" + userName, "3" + email, Roles.ROLE_FINANCIAL);
         List<UserDto> userDtoList = List.of(userDto1, userDto2, userDto3);
         when(userRepository.getAllUsers()).thenReturn(Optional.of(userList));
         when(userMapper.map(userList)).thenReturn(userDtoList);

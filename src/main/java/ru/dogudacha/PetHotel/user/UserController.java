@@ -4,11 +4,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.dogudacha.PetHotel.user.dto.UpdateUserDto;
 import ru.dogudacha.PetHotel.user.dto.UserDto;
-import ru.dogudacha.PetHotel.user.service.api.UserService;
+import ru.dogudacha.PetHotel.user.service.UserService;
 
 import java.util.Collection;
 
@@ -20,38 +19,38 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDto> addUser(@RequestBody @Valid UserDto userDto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDto addUser(@RequestBody @Valid UserDto userDto) {
         log.info("UserController: receive POST request for add new user with body={}", userDto);
-        UserDto savedUser =  userService.addUser(userDto);
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        return userService.addUser(userDto);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable(value = "id") long id) {
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto getUserById(@PathVariable(value = "id") long id) {
         log.info("receive GET request for return user by id={}", id);
-        UserDto returnedUserDto = userService.getUserById(id);
-        return new ResponseEntity<>(returnedUserDto, HttpStatus.OK);
+        return userService.getUserById(id);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@RequestBody @Valid UpdateUserDto updateUserDto,
-                                              @PathVariable(value = "id") long userId) {
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto updateUser(@RequestBody @Valid UpdateUserDto updateUserDto,
+                              @PathVariable(value = "id") long userId) {
         log.info("receive PATCH request for update user with id={}, requestBody={}", userId, updateUserDto);
-        UserDto updatedUserDto = userService.updateUser(userId, updateUserDto);
-        return new ResponseEntity<>(updatedUserDto, HttpStatus.OK);
+        return userService.updateUser(userId, updateUserDto);
     }
 
     @GetMapping
-    public ResponseEntity<Collection<UserDto>> getAllUsers() {
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<UserDto> getAllUsers() {
         log.info("receive GET request for return all users");
-        Collection<UserDto> usersDto = userService.getAllUsers();
-        return new ResponseEntity<>(usersDto, HttpStatus.OK);
+        return userService.getAllUsers();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteUserById(@PathVariable("id") Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUserById(@PathVariable("id") Long id) {
         log.info("receive DELETE request fo delete user with id= {}", id);
         userService.deleteUserById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
