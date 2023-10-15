@@ -3,10 +3,10 @@ package ru.dogudacha.PetHotel.user.model;
 import java.util.Optional;
 
 public enum Roles {
-    BOSS,
-    ADMIN,
-    USER,
-    FINANCIAL;
+    ROLE_BOSS,
+    ROLE_ADMIN,
+    ROLE_USER,
+    ROLE_FINANCIAL;
 
     public static Optional<Roles> from(String stringState) {
         for (Roles state : values()) {
