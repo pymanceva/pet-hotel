@@ -9,8 +9,7 @@ import ru.dogudacha.PetHotel.user.dto.UpdateUserDto;
 import ru.dogudacha.PetHotel.user.dto.UserDto;
 import ru.dogudacha.PetHotel.user.dto.mapper.UserMapper;
 import ru.dogudacha.PetHotel.user.model.User;
-import ru.dogudacha.PetHotel.user.repository.api.UserRepository;
-import ru.dogudacha.PetHotel.user.service.api.UserService;
+import ru.dogudacha.PetHotel.user.repository.UserRepository;
 
 import java.util.Collections;
 import java.util.List;

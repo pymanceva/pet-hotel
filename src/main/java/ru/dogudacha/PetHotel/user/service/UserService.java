@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.user.service.api;
+package ru.dogudacha.PetHotel.user.service;
 
 import ru.dogudacha.PetHotel.user.dto.UpdateUserDto;
 import ru.dogudacha.PetHotel.user.dto.UserDto;

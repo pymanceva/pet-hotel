@@ -13,7 +13,7 @@ import ru.dogudacha.PetHotel.user.dto.UserDto;
 import ru.dogudacha.PetHotel.user.dto.mapper.UserMapper;
 import ru.dogudacha.PetHotel.user.model.Roles;
 import ru.dogudacha.PetHotel.user.model.User;
-import ru.dogudacha.PetHotel.user.repository.api.UserRepository;
+import ru.dogudacha.PetHotel.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;

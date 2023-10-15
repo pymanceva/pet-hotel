@@ -12,7 +12,7 @@ import ru.dogudacha.PetHotel.exception.NotFoundException;
 import ru.dogudacha.PetHotel.user.dto.UpdateUserDto;
 import ru.dogudacha.PetHotel.user.dto.UserDto;
 import ru.dogudacha.PetHotel.user.model.Roles;
-import ru.dogudacha.PetHotel.user.service.api.UserService;
+import ru.dogudacha.PetHotel.user.service.UserService;
 
 import java.util.List;
 
