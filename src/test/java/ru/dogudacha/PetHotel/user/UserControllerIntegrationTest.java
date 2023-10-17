@@ -36,15 +36,18 @@ class UserControllerIntegrationTest {
     @MockBean
     private UserService userService;
 
-    long userId = 1L;
+    long userId = 2L;
+    long requesterId = 1L;
+    private final String requesterHeader = "X-PetHotel-User-Id";
     UserDto userDto = new UserDto(userId, "userName", "user@mail.ru", Roles.ROLE_ADMIN);
 
     @Test
     @SneakyThrows
     void addUser() {
-        when(userService.addUser(any(UserDto.class))).thenReturn(userDto);
+        when(userService.addUser(anyLong(), any(UserDto.class))).thenReturn(userDto);
 
         mockMvc.perform(post("/users")
+                        .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(userDto)))
@@ -54,7 +57,7 @@ class UserControllerIntegrationTest {
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())))
                 .andExpect(jsonPath("$.role", is(userDto.getRole().toString())));
 
-        verify(userService).addUser(any(UserDto.class));
+        verify(userService).addUser(anyLong(), any(UserDto.class));
 
         mockMvc.perform(post("/users")
                         .accept(MediaType.APPLICATION_JSON)
@@ -62,15 +65,23 @@ class UserControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(new UserDto())))
                 .andExpect(status().isBadRequest());
 
-        verify(userService, times(1)).addUser(any(UserDto.class));
+        mockMvc.perform(post("/users")
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(new UserDto())))
+                .andExpect(status().isBadRequest());
+
+        verify(userService, times(1)).addUser(anyLong(), any(UserDto.class));
     }
 
     @Test
     @SneakyThrows
     void getUserById() {
-        when(userService.getUserById(anyLong())).thenReturn(userDto);
+        when(userService.getUserById(anyLong(), anyLong())).thenReturn(userDto);
 
-        mockMvc.perform(get("/users/{id}", 1)
+        mockMvc.perform(get("/users/{id}", userId)
+                        .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
@@ -78,21 +89,23 @@ class UserControllerIntegrationTest {
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())))
                 .andExpect(jsonPath("$.role", is(userDto.getRole().toString())));
 
-        verify(userService).getUserById(userId);
+        verify(userService).getUserById(requesterId, userId);
 
-        when(userService.getUserById(anyLong())).thenThrow(NotFoundException.class);
-        mockMvc.perform(get("/users/{userId}", 1)
+        when(userService.getUserById(anyLong(), anyLong())).thenThrow(NotFoundException.class);
+        mockMvc.perform(get("/users/{userId}", userId)
+                        .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
-        verify(userService, times(2)).getUserById(userId);
+        verify(userService, times(2)).getUserById(requesterId, userId);
     }
 
     @Test
     @SneakyThrows
     void updateUser() {
-        when(userService.updateUser(anyLong(), any(UpdateUserDto.class))).thenReturn(userDto);
+        when(userService.updateUser(anyLong(), eq(userId), any(UpdateUserDto.class))).thenReturn(userDto);
 
-        mockMvc.perform(patch("/users/{id}", 1)
+        mockMvc.perform(patch("/users/{id}", userId)
+                        .header(requesterHeader, requesterId)
                         .accept(MediaType.ALL_VALUE)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(userDto)))
@@ -103,9 +116,11 @@ class UserControllerIntegrationTest {
                 .andExpect(jsonPath("$.role", is(userDto.getRole().toString())));
 
 
-        when(userService.updateUser(anyLong(), any(UpdateUserDto.class))).thenThrow(NotFoundException.class);
+        when(userService.updateUser(anyLong(), eq(userId), any(UpdateUserDto.class)))
+                .thenThrow(NotFoundException.class);
 
-        mockMvc.perform(patch("/users/{userId}", 0)
+        mockMvc.perform(patch("/users/{userId}", userId)
+                        .header(requesterHeader, requesterId)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isNotFound());
@@ -115,35 +130,37 @@ class UserControllerIntegrationTest {
     @Test
     @SneakyThrows
     void getAllUsers() {
-        when(userService.getAllUsers()).thenReturn(List.of(userDto));
+        when(userService.getAllUsers(anyLong())).thenReturn(List.of(userDto));
 
         mockMvc.perform(get("/users")
+                        .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(userDto.getId()), Long.class))
                 .andExpect(jsonPath("$.[0].name", is(userDto.getName())))
                 .andExpect(jsonPath("$.[0].email", is(userDto.getEmail())))
                 .andExpect(jsonPath("$.[0].role", is(userDto.getRole().toString())));
-
     }
 
     @Test
     @SneakyThrows
     void deleteUserById() {
-        mockMvc.perform(delete("/users/{userId}", 1)
+        mockMvc.perform(delete("/users/{userId}", userId)
+                        .header(requesterHeader, requesterId)
                         .accept(MediaType.ALL_VALUE))
                 .andExpect(status().isNoContent());
 
-        verify(userService).deleteUserById(anyLong());
+        verify(userService).deleteUserById(requesterId, userId);
 
         doThrow(NotFoundException.class)
                 .when(userService)
-                .deleteUserById(anyLong());
+                .deleteUserById(requesterId, userId);
 
-        mockMvc.perform(delete("/users/{userId}", 1)
+        mockMvc.perform(delete("/users/{userId}", userId)
+                        .header(requesterHeader, requesterId)
                         .accept(MediaType.ALL_VALUE))
                 .andExpect(status().isNotFound());
 
-        verify(userService, times(2)).deleteUserById(anyLong());
+        verify(userService, times(2)).deleteUserById(requesterId, userId);
     }
 }
