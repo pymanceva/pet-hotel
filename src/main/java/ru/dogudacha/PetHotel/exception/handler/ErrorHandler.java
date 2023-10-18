@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.exception;
+package ru.dogudacha.PetHotel.exception.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
@@ -6,12 +6,18 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import ru.dogudacha.PetHotel.exception.AccessDeniedException;
+import ru.dogudacha.PetHotel.exception.InvalidDateRangeException;
+import ru.dogudacha.PetHotel.exception.NotFoundException;
+import ru.dogudacha.PetHotel.exception.dto.ApiError;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -21,6 +27,36 @@ import static java.time.LocalDateTime.now;
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
+
+    record Error(String message, String reason, HttpStatus httpStatus, LocalDateTime timeStamp) {
+    }
+
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Error handleMissingRequestHeaderException(final MissingRequestHeaderException ex) {
+        log.error("EH: MissingRequestHeaderException: {}", ex.getMessage(), ex);
+
+        return new Error(
+                ex.getMessage(),
+                "Required request header is not present.",
+                HttpStatus.BAD_REQUEST,
+                now()
+        );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Error handleAccessDeniedException(final AccessDeniedException ex) {
+        log.error("EH: AccessDeniedException: {}", ex.getMessage(), ex);
+
+        return new Error(
+                ex.getMessage(),
+                "Operation is denied for this user.",
+                HttpStatus.FORBIDDEN,
+                now()
+        );
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -129,7 +165,7 @@ public class ErrorHandler {
                         .collect(Collectors.toList()))
                 .message(ex.getMessage())
                 .reason("Internal Server Error.")
-                .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+                .httpStatus(HttpStatus.I_AM_A_TEAPOT)
                 .timeStamp(now())
                 .build();
     }

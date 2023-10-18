@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.exception;
+package ru.dogudacha.PetHotel.exception.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

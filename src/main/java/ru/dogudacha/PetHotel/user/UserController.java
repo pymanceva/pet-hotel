@@ -20,37 +20,48 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto addUser(@RequestBody @Valid UserDto userDto) {
-        log.info("UserController: receive POST request for add new user with body={}", userDto);
-        return userService.addUser(userDto);
+    public UserDto addUser(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
+                           @RequestBody @Valid UserDto userDto
+    ) {
+
+        log.info("UserController: receive POST request from requesterId={} for add new user with body={}",
+                requesterId, userDto);
+        return userService.addUser(requesterId, userDto);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto getUserById(@PathVariable(value = "id") long id) {
+    public UserDto getUserById(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
+                               @PathVariable(value = "id") long id
+    ) {
         log.info("receive GET request for return user by id={}", id);
-        return userService.getUserById(id);
+        return userService.getUserById(requesterId, id);
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto updateUser(@RequestBody @Valid UpdateUserDto updateUserDto,
-                              @PathVariable(value = "id") long userId) {
+    public UserDto updateUser(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
+                              @RequestBody @Valid UpdateUserDto updateUserDto,
+                              @PathVariable(value = "id") Long userId
+    ) {
         log.info("receive PATCH request for update user with id={}, requestBody={}", userId, updateUserDto);
-        return userService.updateUser(userId, updateUserDto);
+        return userService.updateUser(requesterId, userId, updateUserDto);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Collection<UserDto> getAllUsers() {
+    public Collection<UserDto> getAllUsers(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId
+    ) {
         log.info("receive GET request for return all users");
-        return userService.getAllUsers();
+        return userService.getAllUsers(requesterId);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUserById(@PathVariable("id") Long id) {
+    public void deleteUserById(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
+                               @PathVariable("id") Long id
+    ) {
         log.info("receive DELETE request fo delete user with id= {}", id);
-        userService.deleteUserById(id);
+        userService.deleteUserById(requesterId, id);
     }
 }

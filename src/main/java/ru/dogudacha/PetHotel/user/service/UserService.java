@@ -6,13 +6,13 @@ import ru.dogudacha.PetHotel.user.dto.UserDto;
 import java.util.Collection;
 
 public interface UserService {
-    UserDto addUser(UserDto newUserDto);
+    UserDto addUser(Long requesterId, UserDto newUserDto);
 
-    UserDto getUserById(Long id);
+    UserDto getUserById(Long requesterId, Long id);
 
-    UserDto updateUser(long userId, UpdateUserDto userDto);
+    UserDto updateUser(Long requesterId, Long userId, UpdateUserDto userDto);
 
-    Collection<UserDto> getAllUsers();
+    Collection<UserDto> getAllUsers(Long requesterId);
 
-    void deleteUserById(Long id);
+    void deleteUserById(Long id, Long aLong);
 }
