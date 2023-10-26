@@ -6,8 +6,8 @@ import lombok.*;
 @Builder
 @Getter
 @Setter
-@ToString
 @Entity
+@ToString
 @Table(name = "pets")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,19 +23,18 @@ public class Pet {
     @Enumerated(EnumType.STRING)
     private Sex sex;
     @Column(name = "age_pet", nullable = false)
-    private int age;
+    private Integer age;
     @Column(name = "weight_pet", nullable = false)
-    private int weight;
+    private Integer weight;
     @Column(name = "diet_pet", nullable = false)
     @Enumerated(EnumType.STRING)
     private TypeOfDiet diet;
     @Column(name = "medication_pet", nullable = false)
-    private boolean isTakesMedications;
+    private Boolean isTakesMedications;
     @Column(name = "contact_pet", nullable = false)
-    private boolean isContact; //гуляет ли с другими животными
+    private Boolean isContact; //гуляет ли с другими животными
     @Column(name = "photographed_pet", nullable = false)
-    private boolean isPhotographed; // согласие владельца на фото и видео
+    private Boolean isPhotographed; // согласие владельца на фото и видео
     @Column(name = "comments_pet", nullable = false, length = 1000)
     private String comments;
-
 }

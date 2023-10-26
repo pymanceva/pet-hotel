@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS pets
     medication_pet     BOOLEAN                                 NOT NULL,
     contact_pet        BOOLEAN                                 NOT NULL,
     photographed_pet   BOOLEAN                                 NOT NULL,
-    comments_pet       VARCHAR(1000)                           NOT NULL,
+    comments_pet       VARCHAR(1000)                                   ,
     CONSTRAINT pk_pet PRIMARY KEY (id)
 );
+
+-- INSERT INTO users (name, email, role) values ('boss', 'boss@mail.ru', 'ROLE_BOSS');
