@@ -49,3 +49,5 @@ CREATE TABLE IF NOT EXISTS comments
 
 -- INSERT INTO users (name, email, role) values ('boss', 'boss@mail.ru', 'ROLE_BOSS');
 
+
+
