@@ -204,9 +204,9 @@ public class PetControllerTest {
     @Test
     @SneakyThrows
     void getPetById() {
-        when(petService.getPetById(anyLong(), anyLong())).thenReturn(petForAdminDto);
+        when(petService.getPetByIdForAdmin(anyLong(), anyLong())).thenReturn(petForAdminDto);
 
-        mockMvc.perform(get("/pets/{id}", petDto.getId())
+        mockMvc.perform(get("/pets/{id}/admin", petDto.getId())
                         .header(requesterHeader, requesterAdmin.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -225,7 +225,7 @@ public class PetControllerTest {
                 .andExpect(jsonPath("$.historyOfBookings", is(petForAdminDto.getHistoryOfBookings())))
                 .andExpect(jsonPath("$.additionalServices", is(petForAdminDto.getAdditionalServices())));
 
-        mockMvc.perform(get("/pets/{id}", petDto.getId())
+        mockMvc.perform(get("/pets/{id}/admin", petDto.getId())
                         .header(requesterHeader, requesterBoss.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -244,7 +244,7 @@ public class PetControllerTest {
                 .andExpect(jsonPath("$.historyOfBookings", is(petForAdminDto.getHistoryOfBookings())))
                 .andExpect(jsonPath("$.additionalServices", is(petForAdminDto.getAdditionalServices())));
 
-        when(petService.getPetById(anyLong(), anyLong())).thenReturn(petDto);
+        when(petService.getPetByIdForUser(anyLong(), anyLong())).thenReturn(petDto);
 
         mockMvc.perform(get("/pets/{id}", petDto.getId())
                         .header(requesterHeader, requesterUser.getId())
@@ -269,15 +269,15 @@ public class PetControllerTest {
                 .andExpect(status().isBadRequest());
 
         String errorNotFoundPet = String.format("Pet with id = %d not found", petDto.getId());
-        when(petService.getPetById(anyLong(), eq(0L))).thenThrow(new NotFoundException(errorNotFoundPet));
+        when(petService.getPetByIdForAdmin(anyLong(), eq(0L))).thenThrow(new NotFoundException(errorNotFoundPet));
 
-        mockMvc.perform(get("/pets/{id}", 0L)
+        mockMvc.perform(get("/pets/{id}/admin", 0L)
                         .header(requesterHeader, requesterBoss.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());
 
-        verify(petService, times(4)).getPetById(anyLong(), anyLong());
+        verify(petService, times(3)).getPetByIdForAdmin(anyLong(), anyLong());
     }
 
     @Test

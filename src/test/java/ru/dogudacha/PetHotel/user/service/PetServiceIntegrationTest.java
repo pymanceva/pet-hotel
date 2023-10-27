@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
 import ru.dogudacha.PetHotel.pet.dto.NewPetDto;
 import ru.dogudacha.PetHotel.pet.dto.PetDto;
+import ru.dogudacha.PetHotel.pet.dto.PetForAdminDto;
 import ru.dogudacha.PetHotel.pet.dto.UpdatePetDto;
 import ru.dogudacha.PetHotel.pet.model.Pet;
 import ru.dogudacha.PetHotel.pet.model.Sex;
@@ -132,7 +133,7 @@ public class PetServiceIntegrationTest {
         em.persist(requesterAdmin);
         em.persist(pet);
 
-        PetDto actualPet = service.getPetById(requesterAdmin.getId(), pet.getId());
+        PetForAdminDto actualPet = service.getPetByIdForAdmin(requesterAdmin.getId(), pet.getId());
 
         assertThat(actualPet.getId(), notNullValue());
         assertThat(actualPet.getBreed(), equalTo(pet.getBreed()));
@@ -188,7 +189,7 @@ public class PetServiceIntegrationTest {
         String error = String.format("Pet with id = %d not found", pet.getId());
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> service.getPetById(requesterAdmin.getId(), pet.getId())
+                () -> service.getPetByIdForAdmin(requesterAdmin.getId(), pet.getId())
         );
 
         assertEquals(error, exception.getMessage());

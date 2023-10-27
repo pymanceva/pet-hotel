@@ -8,6 +8,7 @@ import ru.dogudacha.PetHotel.exception.AccessDeniedException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
 import ru.dogudacha.PetHotel.pet.dto.NewPetDto;
 import ru.dogudacha.PetHotel.pet.dto.PetDto;
+import ru.dogudacha.PetHotel.pet.dto.PetForAdminDto;
 import ru.dogudacha.PetHotel.pet.dto.UpdatePetDto;
 import ru.dogudacha.PetHotel.pet.mapper.PetMapper;
 import ru.dogudacha.PetHotel.pet.model.Pet;
@@ -31,10 +32,8 @@ public class PetServiceImpl implements PetService {
     @Transactional
     public PetDto addPet(Long requesterId, NewPetDto newPetDto) {
         User requester = findUserById(requesterId);
-        Pet newPet = petMapper.toPet(newPetDto);
-
         checkAccess(requester);
-
+        Pet newPet = petMapper.toPet(newPetDto);
         Pet savedPet = petRepository.save(newPet);
         log.info("PetService: addPet, requesterId={}, petId={}", requesterId, savedPet.getId());
         return petMapper.toPetDto(savedPet);
@@ -42,17 +41,21 @@ public class PetServiceImpl implements PetService {
 
     @Override
     @Transactional(readOnly = true)
-    public PetDto getPetById(Long requesterId, Long petId) {
-        User requester = findUserById(requesterId);
+    public PetDto getPetByIdForUser(Long requesterId, Long petId) {
+        findUserById(requesterId);
         Pet pet = getPetIfExists(petId);
-        if (requester.getRole().ordinal() < 2) {
-            checkAccess(requester);
-            log.info("PetService: getPetById, requesterId={}, petId={}", requesterId, petId);
-            return petMapper.toPetForAdminDto(pet);
-        } else {
-            log.info("PetService: getPetById, requesterId={}, petId={}", requesterId, petId);
-            return petMapper.toPetDto(pet);
-        }
+        log.info("PetService: getPetById, requesterId={}, petId={}", requesterId, petId);
+        return petMapper.toPetDto(pet);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PetForAdminDto getPetByIdForAdmin(Long requesterId, Long petId) {
+        User requester = findUserById(requesterId);
+        checkAccess(requester);
+        Pet pet = getPetIfExists(petId);
+        log.info("PetService: getPetById, requesterId={}, petId={}", requesterId, petId);
+        return petMapper.toPetForAdminDto(pet);
     }
 
     @Override
