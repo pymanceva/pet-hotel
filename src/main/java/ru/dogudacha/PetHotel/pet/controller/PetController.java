@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.dogudacha.PetHotel.pet.dto.NewPetDto;
 import ru.dogudacha.PetHotel.pet.dto.PetDto;
+import ru.dogudacha.PetHotel.pet.dto.PetForAdminDto;
 import ru.dogudacha.PetHotel.pet.dto.UpdatePetDto;
 import ru.dogudacha.PetHotel.pet.service.PetService;
 
@@ -28,11 +29,18 @@ public class PetController {
         return petService.addPet(requesterId, newPetDto);
     }
 
-    @GetMapping("/{id}")
-    public PetDto getPetById(@RequestHeader(USER_ID) Long requesterId,
-                             @PathVariable(value = "id") Long petId) {
+    @GetMapping("/{id}/admin")
+    public PetForAdminDto getPetByIdForAdmin(@RequestHeader(USER_ID) Long requesterId,
+                                             @PathVariable(value = "id") Long petId) {
         log.info("PetController: GET/getPetById, requesterId={}, petId={}", requesterId, petId);
-        return petService.getPetById(requesterId, petId);
+        return petService.getPetByIdForAdmin(requesterId, petId);
+    }
+
+    @GetMapping("/{id}")
+    public PetDto getPetByIdForUser(@RequestHeader(USER_ID) Long requesterId,
+                                    @PathVariable(value = "id") Long petId) {
+        log.info("PetController: GET/getPetById, requesterId={}, petId={}", requesterId, petId);
+        return petService.getPetByIdForUser(requesterId, petId);
     }
 
     @PatchMapping("/{id}")

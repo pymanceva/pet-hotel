@@ -11,7 +11,9 @@ import ru.dogudacha.PetHotel.exception.AccessDeniedException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
 import ru.dogudacha.PetHotel.pet.dto.NewPetDto;
 import ru.dogudacha.PetHotel.pet.dto.PetDto;
+import ru.dogudacha.PetHotel.pet.dto.PetForAdminDto;
 import ru.dogudacha.PetHotel.pet.dto.UpdatePetDto;
+import ru.dogudacha.PetHotel.pet.mapper.PetMapper;
 import ru.dogudacha.PetHotel.pet.model.Pet;
 import ru.dogudacha.PetHotel.pet.model.Sex;
 import ru.dogudacha.PetHotel.pet.model.TypeOfDiet;
@@ -42,6 +44,9 @@ public class PetServiceImplTest {
 
     @Mock
     private PetRepository mockPetRepository;
+
+    @Mock
+    private PetMapper mockPetMapper;
 
     final User requesterBoss = User.builder()
             .email("boss@mail.ru")
@@ -89,6 +94,22 @@ public class PetServiceImplTest {
             .isContact(true)
             .isPhotographed(true)
             .comments("Like play with ball.")
+            .build();
+
+    final PetForAdminDto petForAdminDto = PetForAdminDto.builder()
+            .id(1L)
+            .typeOfPet("Dog")
+            .breed("Spaniel")
+            .sex(Sex.FEMALE)
+            .age(2)
+            .weight(7)
+            .diet(TypeOfDiet.READY_INDUSTRIAL_FOOD)
+            .isTakesMedications(false)
+            .isContact(true)
+            .isPhotographed(true)
+            .comments("Like play with ball.")
+            .historyOfBookings(null)
+            .additionalServices(null)
             .build();
 
     final Pet pet = Pet.builder()
@@ -146,10 +167,26 @@ public class PetServiceImplTest {
             .comments("Like play with small ball.")
             .build();
 
+    final PetDto updatedPetDto = PetDto.builder()
+            .id(1L)
+            .typeOfPet("Dog small")
+            .breed("Spaniel span")
+            .sex(Sex.MALE)
+            .age(12)
+            .weight(8)
+            .diet(TypeOfDiet.NATURAL_RAW_FOOD)
+            .isTakesMedications(true)
+            .isContact(false)
+            .isPhotographed(false)
+            .comments("Like play with small ball.")
+            .build();
+
     @Test
     void addPet_whenAddPetByAdmin_thenPetAdded() {
         when(mockUserRepository.findById(requesterAdmin.getId())).thenReturn(Optional.of(requesterAdmin));
+        when(mockPetMapper.toPet(newPetDto)).thenReturn(pet);
         when(mockPetRepository.save(any())).thenReturn(pet);
+        when(mockPetMapper.toPetDto(pet)).thenReturn(petDto);
 
         PetDto actualPetDto = petService.addPet(requesterAdmin.getId(), newPetDto);
 
@@ -171,7 +208,9 @@ public class PetServiceImplTest {
     @Test
     void addPet_whenAddPetByBoss_thenPetAdded() {
         when(mockUserRepository.findById(requesterBoss.getId())).thenReturn(Optional.of(requesterBoss));
+        when(mockPetMapper.toPet(newPetDto)).thenReturn(pet);
         when(mockPetRepository.save(any())).thenReturn(pet);
+        when(mockPetMapper.toPetDto(pet)).thenReturn(petDto);
 
         PetDto actualPetDto = petService.addPet(requesterBoss.getId(), newPetDto);
 
@@ -193,6 +232,8 @@ public class PetServiceImplTest {
     @Test
     void addPet_whenAddPetByUser_thenAccessDeniedExceptionThrown() {
         when(mockUserRepository.findById(requesterUser.getId())).thenReturn(Optional.of(requesterUser));
+        when(mockPetMapper.toPet(newPetDto)).thenReturn(pet);
+        when(mockPetMapper.toPetDto(pet)).thenReturn(petDto);
         String error = String.format("User with role = %s, can't access for this action",
                 requesterUser.getRole());
 
@@ -224,54 +265,57 @@ public class PetServiceImplTest {
     void getPetById_whenGetPetByAdmin_thenReturnPetForAdminDto() {
         when(mockUserRepository.findById(requesterAdmin.getId())).thenReturn(Optional.of(requesterAdmin));
         when(mockPetRepository.findById(any())).thenReturn(Optional.of(pet));
+        when(mockPetMapper.toPetForAdminDto(pet)).thenReturn(petForAdminDto);
 
-        PetDto actualPetDto = petService.getPetById(requesterAdmin.getId(), pet.getId());
+        PetForAdminDto actualPetDto = petService.getPetByIdForAdmin(requesterAdmin.getId(), pet.getId());
 
         assertNotNull(actualPetDto);
         assertThat(actualPetDto.getId(), equalTo(pet.getId()));
-        assertThat(actualPetDto.getTypeOfPet(), equalTo(petDto.getTypeOfPet()));
-        assertThat(actualPetDto.getBreed(), equalTo(petDto.getBreed()));
-        assertThat(actualPetDto.getSex(), equalTo(petDto.getSex()));
-        assertThat(actualPetDto.getAge(), equalTo(petDto.getAge()));
-        assertThat(actualPetDto.getWeight(), equalTo(petDto.getWeight()));
-        assertThat(actualPetDto.getDiet(), equalTo(petDto.getDiet()));
-        assertThat(actualPetDto.getIsTakesMedications(), equalTo(petDto.getIsTakesMedications()));
-        assertThat(actualPetDto.getIsContact(), equalTo(petDto.getIsContact()));
-        assertThat(actualPetDto.getIsPhotographed(), equalTo(petDto.getIsPhotographed()));
-        assertThat(actualPetDto.getComments(), equalTo(petDto.getComments()));
-//        assertThat(actualPetDto.getHistoryOfBookings(), equalTo(null));
-//        assertThat(actualPetDto.getAdditionalServices(), equalTo(null));
+        assertThat(actualPetDto.getTypeOfPet(), equalTo(petForAdminDto.getTypeOfPet()));
+        assertThat(actualPetDto.getBreed(), equalTo(petForAdminDto.getBreed()));
+        assertThat(actualPetDto.getSex(), equalTo(petForAdminDto.getSex()));
+        assertThat(actualPetDto.getAge(), equalTo(petForAdminDto.getAge()));
+        assertThat(actualPetDto.getWeight(), equalTo(petForAdminDto.getWeight()));
+        assertThat(actualPetDto.getDiet(), equalTo(petForAdminDto.getDiet()));
+        assertThat(actualPetDto.getIsTakesMedications(), equalTo(petForAdminDto.getIsTakesMedications()));
+        assertThat(actualPetDto.getIsContact(), equalTo(petForAdminDto.getIsContact()));
+        assertThat(actualPetDto.getIsPhotographed(), equalTo(petForAdminDto.getIsPhotographed()));
+        assertThat(actualPetDto.getComments(), equalTo(petForAdminDto.getComments()));
+        assertThat(actualPetDto.getHistoryOfBookings(), equalTo(petForAdminDto.getHistoryOfBookings()));
+        assertThat(actualPetDto.getAdditionalServices(), equalTo(petForAdminDto.getAdditionalServices()));
     }
 
     @Test
     void getPetById_whenGetPetByBoss_thenReturnPetForAdminDto() {
         when(mockUserRepository.findById(requesterBoss.getId())).thenReturn(Optional.of(requesterBoss));
         when(mockPetRepository.findById(any())).thenReturn(Optional.of(pet));
+        when(mockPetMapper.toPetForAdminDto(pet)).thenReturn(petForAdminDto);
 
-        PetDto actualPetDto = petService.getPetById(requesterBoss.getId(), pet.getId());
+        PetForAdminDto actualPetDto = petService.getPetByIdForAdmin(requesterBoss.getId(), pet.getId());
 
         assertNotNull(actualPetDto);
         assertThat(actualPetDto.getId(), equalTo(pet.getId()));
-        assertThat(actualPetDto.getTypeOfPet(), equalTo(petDto.getTypeOfPet()));
-        assertThat(actualPetDto.getBreed(), equalTo(petDto.getBreed()));
-        assertThat(actualPetDto.getSex(), equalTo(petDto.getSex()));
-        assertThat(actualPetDto.getAge(), equalTo(petDto.getAge()));
-        assertThat(actualPetDto.getWeight(), equalTo(petDto.getWeight()));
-        assertThat(actualPetDto.getDiet(), equalTo(petDto.getDiet()));
-        assertThat(actualPetDto.getIsTakesMedications(), equalTo(petDto.getIsTakesMedications()));
-        assertThat(actualPetDto.getIsContact(), equalTo(petDto.getIsContact()));
-        assertThat(actualPetDto.getIsPhotographed(), equalTo(petDto.getIsPhotographed()));
-        assertThat(actualPetDto.getComments(), equalTo(petDto.getComments()));
-//        assertThat(actualPetDto.getHistoryOfBookings(), equalTo(null));
-//        assertThat(actualPetDto.getAdditionalServices(), equalTo(null));
+        assertThat(actualPetDto.getTypeOfPet(), equalTo(petForAdminDto.getTypeOfPet()));
+        assertThat(actualPetDto.getBreed(), equalTo(petForAdminDto.getBreed()));
+        assertThat(actualPetDto.getSex(), equalTo(petForAdminDto.getSex()));
+        assertThat(actualPetDto.getAge(), equalTo(petForAdminDto.getAge()));
+        assertThat(actualPetDto.getWeight(), equalTo(petForAdminDto.getWeight()));
+        assertThat(actualPetDto.getDiet(), equalTo(petForAdminDto.getDiet()));
+        assertThat(actualPetDto.getIsTakesMedications(), equalTo(petForAdminDto.getIsTakesMedications()));
+        assertThat(actualPetDto.getIsContact(), equalTo(petForAdminDto.getIsContact()));
+        assertThat(actualPetDto.getIsPhotographed(), equalTo(petForAdminDto.getIsPhotographed()));
+        assertThat(actualPetDto.getComments(), equalTo(petForAdminDto.getComments()));
+        assertThat(actualPetDto.getHistoryOfBookings(), equalTo(petForAdminDto.getHistoryOfBookings()));
+        assertThat(actualPetDto.getAdditionalServices(), equalTo(petForAdminDto.getAdditionalServices()));
     }
 
     @Test
     void getPetById_whenGetPetByUser_thenReturnPetDto() {
         when(mockUserRepository.findById(requesterUser.getId())).thenReturn(Optional.of(requesterUser));
         when(mockPetRepository.findById(any())).thenReturn(Optional.of(pet));
+        when(mockPetMapper.toPetDto(pet)).thenReturn(petDto);
 
-        PetDto actualPetDto = petService.getPetById(requesterUser.getId(), pet.getId());
+        PetDto actualPetDto = petService.getPetByIdForUser(requesterUser.getId(), pet.getId());
 
         assertNotNull(actualPetDto);
         assertThat(actualPetDto.getId(), equalTo(pet.getId()));
@@ -295,7 +339,7 @@ public class PetServiceImplTest {
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> petService.getPetById(requesterBoss.getId(), 0L)
+                () -> petService.getPetByIdForAdmin(requesterBoss.getId(), 0L)
         );
 
         assertEquals(error, exception.getMessage());
@@ -309,7 +353,7 @@ public class PetServiceImplTest {
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> petService.getPetById(requesterAdmin.getId(), 0L)
+                () -> petService.getPetByIdForAdmin(requesterAdmin.getId(), 0L)
         );
 
         assertEquals(error, exception.getMessage());
@@ -323,7 +367,7 @@ public class PetServiceImplTest {
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> petService.getPetById(requesterUser.getId(), 0L)
+                () -> petService.getPetByIdForUser(requesterUser.getId(), 0L)
         );
 
         assertEquals(error, exception.getMessage());
@@ -337,7 +381,7 @@ public class PetServiceImplTest {
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> petService.getPetById(userNotFoundId, pet.getId())
+                () -> petService.getPetByIdForUser(userNotFoundId, pet.getId())
         );
 
         assertEquals(error, exception.getMessage());
@@ -349,6 +393,8 @@ public class PetServiceImplTest {
         when(mockUserRepository.findById(requesterBoss.getId())).thenReturn(Optional.of(requesterBoss));
         when(mockPetRepository.findById(any())).thenReturn(Optional.of(pet));
         when(mockPetRepository.save(any())).thenReturn(updatedPet);
+        when(mockPetMapper.toPetDto(updatedPet)).thenReturn(updatedPetDto);
+
 
         PetDto actualPetDto = petService.updatePet(requesterBoss.getId(), pet.getId(), updatePet);
 
@@ -388,6 +434,7 @@ public class PetServiceImplTest {
         when(mockUserRepository.findById(requesterAdmin.getId())).thenReturn(Optional.of(requesterAdmin));
         when(mockPetRepository.findById(any())).thenReturn(Optional.of(pet));
         when(mockPetRepository.save(any())).thenReturn(updatedPet);
+        when(mockPetMapper.toPetDto(updatedPet)).thenReturn(updatedPetDto);
 
         PetDto actualPetDto = petService.updatePet(requesterAdmin.getId(), pet.getId(), updatePet);
 
@@ -499,6 +546,7 @@ public class PetServiceImplTest {
     @Test
     void deletePetById_whenDeletePetByBoss_thenDeletedPet() {
         when(mockUserRepository.findById(requesterBoss.getId())).thenReturn(Optional.of(requesterBoss));
+        when(mockPetRepository.findById(any())).thenReturn(Optional.of(pet));
         doNothing().when(mockPetRepository).deleteById(any());
 
         petService.deletePetById(requesterBoss.getId(), pet.getId());
@@ -509,6 +557,7 @@ public class PetServiceImplTest {
     @Test
     void deletePetById_whenDeletePetByAdmin_thenDeletedPet() {
         when(mockUserRepository.findById(requesterAdmin.getId())).thenReturn(Optional.of(requesterAdmin));
+        when(mockPetRepository.findById(any())).thenReturn(Optional.of(pet));
         doNothing().when(mockPetRepository).deleteById(any());
 
         petService.deletePetById(requesterAdmin.getId(), pet.getId());
