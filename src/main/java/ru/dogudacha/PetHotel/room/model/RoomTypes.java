@@ -2,7 +2,7 @@ package ru.dogudacha.PetHotel.room.model;
 
 public enum RoomTypes {
     BABY_SIZE,
-    STANDART,
+    STANDARD,
     LUX,
     CATS,
     EXOTS,

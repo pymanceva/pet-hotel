@@ -21,7 +21,7 @@ public class Room {
     private Double size;
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    RoomTypes type;
+    private RoomTypes type;
     @Column(name = "price")
     private Double price;
     @Column(name = "available")

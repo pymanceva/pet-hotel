@@ -8,6 +8,7 @@ import ru.dogudacha.PetHotel.exception.AccessDeniedException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
 import ru.dogudacha.PetHotel.room.dto.RoomDto;
 import ru.dogudacha.PetHotel.room.dto.RoomWithoutPriceDto;
+import ru.dogudacha.PetHotel.room.dto.UpdateRoomDto;
 import ru.dogudacha.PetHotel.room.dto.mapper.RoomMapper;
 import ru.dogudacha.PetHotel.room.model.Room;
 import ru.dogudacha.PetHotel.room.repository.RoomRepository;
@@ -34,7 +35,7 @@ public class RoomServiceImpl implements RoomService {
 
         Room newRoom = roomMapper.toRoom(roomDto);
         Room addedRoom = roomRepository.save(newRoom);
-        log.info("roomService: was add room={}", addedRoom);
+        log.info("RoomService: addRoom, userId={}, roomDto={}", userId, addedRoom);
         return roomMapper.toRoomDto(addedRoom);
     }
 
@@ -44,7 +45,7 @@ public class RoomServiceImpl implements RoomService {
         checkPriceAccess(userId);
 
         Room room = findRoomById(roomId);
-        log.info("roomService: was returned room={}, by user with id={}", room, userId);
+        log.info("RoomService: getRoomById, userId={}, roomId={}", userId, roomId);
 
         return roomMapper.toRoomDto(room);
     }
@@ -52,15 +53,16 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(readOnly = true)
     @Override
     public RoomWithoutPriceDto getRoomWithoutPriceById(Long userId, Long roomId) {
+        checkLoginAccess(userId);
         Room room = findRoomById(roomId);
-        log.info("roomService: was returned room={}, by user with id={}", room, userId);
+        log.info("RoomService: getRoomWithoutPriceById, userId={}, roomId={}", userId, roomId);
 
         return roomMapper.toRoomDtoWithoutPrice(room);
     }
 
     @Transactional
     @Override
-    public RoomDto updateRoom(Long userId, Long roomId, RoomDto roomDto) {
+    public RoomDto updateRoom(Long userId, Long roomId, UpdateRoomDto roomDto) {
         checkAdminAccess(userId);
         Room oldRoom = findRoomById(roomId);
         Room newRoom = roomMapper.toRoom(roomDto);
@@ -87,7 +89,7 @@ public class RoomServiceImpl implements RoomService {
         }
 
         Room updatedRoom = roomRepository.save(newRoom);
-        log.info("roomService: old room={} update to new room={}", oldRoom, updatedRoom);
+        log.info("RoomService: updateRoom, userId={}, roomId={}, roomDto={}", userId, roomId, roomDto);
 
         return roomMapper.toRoomDto(updatedRoom);
     }
@@ -98,7 +100,7 @@ public class RoomServiceImpl implements RoomService {
         checkPriceAccess(userId);
 
         List<Room> allRooms = roomRepository.getAllRooms().orElse(Collections.emptyList());
-        log.info("roomService: returned all {} rooms", allRooms.size());
+        log.info("RoomService: getAllRooms, userId={}, list size={}", userId, allRooms.size());
 
         return roomMapper.toListRoomDto(allRooms);
     }
@@ -106,8 +108,9 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(readOnly = true)
     @Override
     public Collection<RoomWithoutPriceDto> getAllRoomsWithoutPrice(Long userId) {
+        checkLoginAccess(userId);
         List<Room> allRooms = roomRepository.getAllRooms().orElse(Collections.emptyList());
-        log.info("roomService: returned all {} rooms", allRooms.size());
+        log.info("RoomService: getAllRoomsWithoutPrice, userId={}, list size={}", userId, allRooms.size());
 
         return roomMapper.toListRoomWithoutPriceDto(allRooms);
     }
@@ -123,17 +126,21 @@ public class RoomServiceImpl implements RoomService {
             throw new NotFoundException(String.format("room with id=%d not found", roomId));
         }
 
-        log.info("roomService: delete room with id={}", roomId);
+        log.info("RoomService: deleteRoomById, userId={}, roomId={}", userId, roomId);
     }
 
     private Room findRoomById(Long id) {
         return roomRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("room with id=%d not found", id)));
+                new NotFoundException(String.format("room with id=%d is not found", id)));
+    }
+
+    private User findUserById(long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException(String.format("user with id=%d is not found", userId)));
     }
 
     private void checkAdminAccess(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("user with id=%d not found", userId)));
+        User user = findUserById(userId);
 
         if (user.getRole().ordinal() >= 2) {
             throw new AccessDeniedException(String.format("User with role=%s, can't access for this action",
@@ -142,12 +149,15 @@ public class RoomServiceImpl implements RoomService {
     }
 
     private void checkPriceAccess(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("user with id=%d not found", userId)));
+        User user = findUserById(userId);
 
         if (user.getRole().ordinal() == 2) {
             throw new AccessDeniedException(String.format("User with role=%s, can't access for this information",
                     user.getRole()));
         }
+    }
+
+    private void checkLoginAccess(Long userId) {
+        User user = findUserById(userId);
     }
 }

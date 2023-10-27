@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.dogudacha.PetHotel.room.dto.RoomDto;
 import ru.dogudacha.PetHotel.room.dto.RoomWithoutPriceDto;
+import ru.dogudacha.PetHotel.room.dto.UpdateRoomDto;
 import ru.dogudacha.PetHotel.room.service.RoomService;
 
 import java.util.Collection;
@@ -22,7 +23,7 @@ public class RoomController {
     @ResponseStatus(HttpStatus.CREATED)
     public RoomDto addRoom(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
                            @RequestBody @Valid RoomDto roomDto) {
-        log.info("RoomController: receive POST request for add new room with body={}", roomDto);
+        log.info("RoomController: POST/addRoom, requesterId={}, room={}", requesterId, roomDto);
         return roomService.addRoom(requesterId, roomDto);
     }
 
@@ -30,7 +31,7 @@ public class RoomController {
     @ResponseStatus(HttpStatus.OK)
     public RoomWithoutPriceDto getRoomWithoutPriceById(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
                                                        @PathVariable(value = "id") long roomId) {
-        log.info("receive GET request for return room without price by id={}", roomId);
+        log.info("RoomController: GET/getRoomWithoutPriceById, requesterId={}, roomId={}", requesterId, roomId);
         return roomService.getRoomWithoutPriceById(requesterId, roomId);
     }
 
@@ -38,30 +39,31 @@ public class RoomController {
     @ResponseStatus(HttpStatus.OK)
     public RoomDto getRoomById(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
                                @PathVariable(value = "id") long roomId) {
-        log.info("receive GET request for return room by id={}", roomId);
+        log.info("RoomController: GET/getRoomById, requesterId={}, roomId={}", requesterId, roomId);
         return roomService.getRoomById(requesterId, roomId);
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public RoomDto updateUser(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
-                              @RequestBody @Valid RoomDto roomDto,
+    public RoomDto updateRoom(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
+                              @RequestBody UpdateRoomDto roomDto,
                               @PathVariable(value = "id") long roomId) {
-        log.info("receive PATCH request for update room with id={}, requestBody={}", roomId, roomDto);
+        log.info("RoomController: PATCH/updateRoom, requesterId={}, roomId={}, requestBody={}",
+                requesterId, roomId, roomDto);
         return roomService.updateRoom(requesterId, roomId, roomDto);
     }
 
     @GetMapping("/withPrice")
     @ResponseStatus(HttpStatus.OK)
     public Collection<RoomDto> getAllRooms(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId) {
-        log.info("receive GET request for return all rooms");
+        log.info("RoomController: GET/getAllRooms, requesterId={}", requesterId);
         return roomService.getAllRooms(requesterId);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<RoomWithoutPriceDto> getAllRoomsWithoutPrice(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId) {
-        log.info("receive GET request for return all rooms without price");
+        log.info("RoomController: GET/getAllRoomsWithoutPrice, requesterId={}", requesterId);
         return roomService.getAllRoomsWithoutPrice(requesterId);
     }
 
@@ -69,7 +71,7 @@ public class RoomController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteRoomById(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
                                @PathVariable("id") Long roomId) {
-        log.info("receive DELETE request fo delete room with id= {}", roomId);
+        log.info("RoomController: DELETE/deleteRoomById, requesterId={}, roomId={}", requesterId, roomId);
         roomService.deleteRoomById(requesterId, roomId);
     }
 }

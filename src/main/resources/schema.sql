@@ -18,3 +18,4 @@ CREATE TABLE IF NOT EXISTS rooms
     available BOOLEAN DEFAULT TRUE,
     CONSTRAINT pk_room PRIMARY KEY (id)
 );
+
