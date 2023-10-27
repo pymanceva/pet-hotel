@@ -42,6 +42,5 @@ class UpdatePetDtoTest {
         assertThat(result).extractingJsonPathValue("$.isTakesMedications").isNotNull();
         assertThat(result).extractingJsonPathValue("$.isContact").isNotNull();
         assertThat(result).extractingJsonPathValue("$.isPhotographed").isNotNull();
-
     }
 }

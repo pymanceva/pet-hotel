@@ -25,18 +25,19 @@ import java.util.stream.Collectors;
 public class PetServiceImpl implements PetService {
     private final PetRepository petRepository;
     private final UserRepository userRepository;
+    private final PetMapper petMapper;
 
     @Override
     @Transactional
     public PetDto addPet(Long requesterId, NewPetDto newPetDto) {
         User requester = findUserById(requesterId);
-        Pet newPet = PetMapper.toPet(newPetDto);
+        Pet newPet = petMapper.toPet(newPetDto);
 
         checkAccess(requester);
 
         Pet savedPet = petRepository.save(newPet);
         log.info("PetService: addPet, requesterId={}, petId={}", requesterId, savedPet.getId());
-        return PetMapper.toPetDto(savedPet);
+        return petMapper.toPetDto(savedPet);
     }
 
     @Override
@@ -47,10 +48,10 @@ public class PetServiceImpl implements PetService {
         if (requester.getRole().ordinal() < 2) {
             checkAccess(requester);
             log.info("PetService: getPetById, requesterId={}, petId={}", requesterId, petId);
-            return PetMapper.toPetForAdminDto(pet);
+            return petMapper.toPetForAdminDto(pet);
         } else {
             log.info("PetService: getPetById, requesterId={}, petId={}", requesterId, petId);
-            return PetMapper.toPetDto(pet);
+            return petMapper.toPetDto(pet);
         }
     }
 
@@ -92,7 +93,7 @@ public class PetServiceImpl implements PetService {
         }
         Pet savedPet = petRepository.save(pet);
         log.info("PetService: updatePet, requesterId={}, petId={}, updatePetDto={}", requesterId, petId, updatePetDto);
-        return PetMapper.toPetDto(savedPet);
+        return petMapper.toPetDto(savedPet);
 
     }
 
@@ -104,7 +105,7 @@ public class PetServiceImpl implements PetService {
         List<Pet> pets = petRepository.findAll();
         log.info("PetService: getAllPetsForAdmin, requesterId={}", requesterId);
         return pets.stream()
-                .map(PetMapper::toPetForAdminDto)
+                .map(petMapper::toPetForAdminDto)
                 .collect(Collectors.toList());
     }
 
