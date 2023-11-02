@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.user;
+package ru.dogudacha.PetHotel.pet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;

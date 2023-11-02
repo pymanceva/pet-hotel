@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.user.service;
+package ru.dogudacha.PetHotel.pet.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

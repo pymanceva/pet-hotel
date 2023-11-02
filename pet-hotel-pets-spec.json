@@ -1,0 +1,1103 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "description": "API для работы с питомцами",
+      "name": "pet-controller"
+    }
+  ],
+  "paths": {
+    "/pets": {
+      "post": {
+        "tags": [
+          "pet-controller"
+        ],
+        "description": "Обратите внимание: добавить нового питомца может пользователь с ролью admin или boss",
+        "operationId": "Добавление нового питомца",
+        "parameters": [
+          {
+            "name": "X-PetHotel-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewPetDto"
+              }
+            }
+          },
+          "description": "данные добавляемого питомца",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Питомец добавлен",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Запрос составлен некорректно",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещён",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Питомец или пользователь не найден",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Нарушение целостности данных",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "pet-controller"
+        ],
+        "description": "Обратите внимание: получить список всех питомцев может пользователь с ролью admin или boss",
+        "operationId": "Получение списка всех питомцев",
+        "parameters": [
+          {
+            "name": "X-PetHotel-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PetDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Запрос составлен некорректно",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещён",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Питомец илм пользователь не найден",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pets/{id}": {
+      "get": {
+        "tags": [
+          "pet-controller"
+        ],
+        "description": "Обратите внимание: получение питомца по его идентификатору для зооняни",
+        "operationId": "Получение питомца по его идентификатору",
+        "parameters": [
+          {
+            "name": "X-PetHotel-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "description": "id питомца",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Запрос составлен некорректно",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещён",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Питомец или пользователь не найден",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "pet-controller"
+        ],
+        "description": "Обратите внимание: удалить питомца может пользователь с ролью admin или boss",
+        "operationId": "Удаление питомца",
+        "parameters": [
+          {
+            "name": "X-PetHotel-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "description": "id питомца",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Питомец удалён"
+          },
+          "400": {
+            "description": "Запрос составлен некорректно",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещён",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Питомец или пользователь не найден",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "pet-controller"
+        ],
+        "description": "Обратите внимание: изменить данные о питомце может пользователь с ролью admin или boss",
+        "operationId": "Изменение данных о питомце",
+        "parameters": [
+          {
+            "name": "X-PetHotel-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "description": "id питомца",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePetDto"
+              }
+            }
+          },
+          "required": true,
+          "description": "данные изменяемого питомца"
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Запрос составлен некорректно",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещён",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Питомец илм пользователь не найден",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Нарушение целостности данных",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pets/{id}/admin": {
+      "get": {
+        "tags": [
+          "pet-controller"
+        ],
+        "description": "Обратите внимание: получение данных о питомце для пользователей с ролью admin или boss",
+        "operationId": "Получение данных о питомце по его идентификатору для админов",
+        "parameters": [
+          {
+            "name": "X-PetHotel-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "description": "id питомца",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetForAdminDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Запрос составлен некорректно",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещён",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Питомец илм пользователь не найден",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "description": "Список стектрейсов или описания ошибок",
+            "example": [],
+            "items": {
+              "type": "string",
+              "description": "Список стектрейсов или описания ошибок",
+              "example": "[]"
+            }
+          },
+          "message": {
+            "type": "string",
+            "description": "Сообщение об ошибке",
+            "example": "Only pending or canceled events can be changed"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Общее описание причины ошибки",
+            "example": "For the requested operation the conditions are not met."
+          },
+          "status": {
+            "type": "string",
+            "description": "Код статуса HTTP-ответа",
+            "example": "FORBIDDEN",
+            "enum": [
+              "100 CONTINUE",
+              "101 SWITCHING_PROTOCOLS",
+              "102 PROCESSING",
+              "103 CHECKPOINT",
+              "200 OK",
+              "201 CREATED",
+              "202 ACCEPTED",
+              "203 NON_AUTHORITATIVE_INFORMATION",
+              "204 NO_CONTENT",
+              "205 RESET_CONTENT",
+              "206 PARTIAL_CONTENT",
+              "207 MULTI_STATUS",
+              "208 ALREADY_REPORTED",
+              "226 IM_USED",
+              "300 MULTIPLE_CHOICES",
+              "301 MOVED_PERMANENTLY",
+              "302 FOUND",
+              "302 MOVED_TEMPORARILY",
+              "303 SEE_OTHER",
+              "304 NOT_MODIFIED",
+              "305 USE_PROXY",
+              "307 TEMPORARY_REDIRECT",
+              "308 PERMANENT_REDIRECT",
+              "400 BAD_REQUEST",
+              "401 UNAUTHORIZED",
+              "402 PAYMENT_REQUIRED",
+              "403 FORBIDDEN",
+              "404 NOT_FOUND",
+              "405 METHOD_NOT_ALLOWED",
+              "406 NOT_ACCEPTABLE",
+              "407 PROXY_AUTHENTICATION_REQUIRED",
+              "408 REQUEST_TIMEOUT",
+              "409 CONFLICT",
+              "410 GONE",
+              "411 LENGTH_REQUIRED",
+              "412 PRECONDITION_FAILED",
+              "413 PAYLOAD_TOO_LARGE",
+              "413 REQUEST_ENTITY_TOO_LARGE",
+              "414 URI_TOO_LONG",
+              "414 REQUEST_URI_TOO_LONG",
+              "415 UNSUPPORTED_MEDIA_TYPE",
+              "416 REQUESTED_RANGE_NOT_SATISFIABLE",
+              "417 EXPECTATION_FAILED",
+              "418 I_AM_A_TEAPOT",
+              "419 INSUFFICIENT_SPACE_ON_RESOURCE",
+              "420 METHOD_FAILURE",
+              "421 DESTINATION_LOCKED",
+              "422 UNPROCESSABLE_ENTITY",
+              "423 LOCKED",
+              "424 FAILED_DEPENDENCY",
+              "425 TOO_EARLY",
+              "426 UPGRADE_REQUIRED",
+              "428 PRECONDITION_REQUIRED",
+              "429 TOO_MANY_REQUESTS",
+              "431 REQUEST_HEADER_FIELDS_TOO_LARGE",
+              "451 UNAVAILABLE_FOR_LEGAL_REASONS",
+              "500 INTERNAL_SERVER_ERROR",
+              "501 NOT_IMPLEMENTED",
+              "502 BAD_GATEWAY",
+              "503 SERVICE_UNAVAILABLE",
+              "504 GATEWAY_TIMEOUT",
+              "505 HTTP_VERSION_NOT_SUPPORTED",
+              "506 VARIANT_ALSO_NEGOTIATES",
+              "507 INSUFFICIENT_STORAGE",
+              "508 LOOP_DETECTED",
+              "509 BANDWIDTH_LIMIT_EXCEEDED",
+              "510 NOT_EXTENDED",
+              "511 NETWORK_AUTHENTICATION_REQUIRED"
+            ]
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "Дата и время когда произошла ошибка (в формате \"yyyy-MM-dd HH:mm:ss\")",
+            "example": "2022-06-09 06:27:23"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "httpStatus": {
+            "type": "string",
+            "enum": [
+              "100 CONTINUE",
+              "101 SWITCHING_PROTOCOLS",
+              "102 PROCESSING",
+              "103 EARLY_HINTS",
+              "103 CHECKPOINT",
+              "200 OK",
+              "201 CREATED",
+              "202 ACCEPTED",
+              "203 NON_AUTHORITATIVE_INFORMATION",
+              "204 NO_CONTENT",
+              "205 RESET_CONTENT",
+              "206 PARTIAL_CONTENT",
+              "207 MULTI_STATUS",
+              "208 ALREADY_REPORTED",
+              "226 IM_USED",
+              "300 MULTIPLE_CHOICES",
+              "301 MOVED_PERMANENTLY",
+              "302 FOUND",
+              "302 MOVED_TEMPORARILY",
+              "303 SEE_OTHER",
+              "304 NOT_MODIFIED",
+              "305 USE_PROXY",
+              "307 TEMPORARY_REDIRECT",
+              "308 PERMANENT_REDIRECT",
+              "400 BAD_REQUEST",
+              "401 UNAUTHORIZED",
+              "402 PAYMENT_REQUIRED",
+              "403 FORBIDDEN",
+              "404 NOT_FOUND",
+              "405 METHOD_NOT_ALLOWED",
+              "406 NOT_ACCEPTABLE",
+              "407 PROXY_AUTHENTICATION_REQUIRED",
+              "408 REQUEST_TIMEOUT",
+              "409 CONFLICT",
+              "410 GONE",
+              "411 LENGTH_REQUIRED",
+              "412 PRECONDITION_FAILED",
+              "413 PAYLOAD_TOO_LARGE",
+              "413 REQUEST_ENTITY_TOO_LARGE",
+              "414 URI_TOO_LONG",
+              "414 REQUEST_URI_TOO_LONG",
+              "415 UNSUPPORTED_MEDIA_TYPE",
+              "416 REQUESTED_RANGE_NOT_SATISFIABLE",
+              "417 EXPECTATION_FAILED",
+              "418 I_AM_A_TEAPOT",
+              "419 INSUFFICIENT_SPACE_ON_RESOURCE",
+              "420 METHOD_FAILURE",
+              "421 DESTINATION_LOCKED",
+              "422 UNPROCESSABLE_ENTITY",
+              "423 LOCKED",
+              "424 FAILED_DEPENDENCY",
+              "425 TOO_EARLY",
+              "426 UPGRADE_REQUIRED",
+              "428 PRECONDITION_REQUIRED",
+              "429 TOO_MANY_REQUESTS",
+              "431 REQUEST_HEADER_FIELDS_TOO_LARGE",
+              "451 UNAVAILABLE_FOR_LEGAL_REASONS",
+              "500 INTERNAL_SERVER_ERROR",
+              "501 NOT_IMPLEMENTED",
+              "502 BAD_GATEWAY",
+              "503 SERVICE_UNAVAILABLE",
+              "504 GATEWAY_TIMEOUT",
+              "505 HTTP_VERSION_NOT_SUPPORTED",
+              "506 VARIANT_ALSO_NEGOTIATES",
+              "507 INSUFFICIENT_STORAGE",
+              "508 LOOP_DETECTED",
+              "509 BANDWIDTH_LIMIT_EXCEEDED",
+              "510 NOT_EXTENDED",
+              "511 NETWORK_AUTHENTICATION_REQUIRED"
+            ]
+          },
+          "timeStamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "NewPetDto": {
+        "required": [
+          "age",
+          "breed",
+          "diet",
+          "isContact",
+          "isPhotographed",
+          "isTakesMedications",
+          "sex",
+          "typeOfPet",
+          "weight"
+        ],
+        "type": "object",
+        "properties": {
+          "typeOfPet": {
+            "maxLength": 250,
+            "minLength": 1,
+            "type": "string",
+            "description": "Вид питомца",
+            "example": "Собаки (малые и средне-крупные), кошки, экзоты (птицы, рептилии, грызуны, свиньи, пауки и т.д.)."
+          },
+          "breed": {
+            "maxLength": 250,
+            "minLength": 1,
+            "type": "string",
+            "description": "Порода питомца",
+            "example": "Спаниель."
+          },
+          "sex": {
+            "type": "string",
+            "enum": [
+              "FEMALE",
+              "MALE",
+              "HERMAPHRODITE"
+            ]
+          },
+          "age": {
+            "type": "integer",
+            "format": "int32",
+            "minLength": 1,
+            "description": "Возраст питомца",
+            "example": 3
+          },
+          "weight": {
+            "type": "integer",
+            "format": "int32",
+            "minLength": 1,
+            "description": "Вес питомца",
+            "example": 3
+          },
+          "diet": {
+            "type": "string",
+            "enum": [
+              "NATURAL_RAW_FOOD",
+              "NATURAL_COOKED_FOOD",
+              "READY_INDUSTRIAL_FOOD"
+            ]
+          },
+          "isTakesMedications": {
+            "type": "boolean",
+            "description": "Нужно ли давать питомцу лекарства",
+            "example": true,
+            "default": false
+          },
+          "isContact": {
+            "type": "boolean",
+            "description": "Можно ли питомцу контактировать с другими животными",
+            "example": true,
+            "default": false
+          },
+          "isPhotographed": {
+            "type": "boolean",
+            "description": "Можно ли фотографировать питомца",
+            "example": true,
+            "default": false
+          }
+        }
+      },
+      "PetDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "typeOfPet": {
+            "type": "string",
+            "description": "Вид питомца",
+            "example": "Собаки (малые и средне-крупные), кошки, экзоты (птицы, рептилии, грызуны, свиньи, пауки и т.д.)."
+          },
+          "breed": {
+            "type": "string",
+            "description": "Порода питомца",
+            "example": "Спаниель."
+          },
+          "sex": {
+            "type": "string",
+            "enum": [
+              "FEMALE",
+              "MALE",
+              "HERMAPHRODITE"
+            ]
+          },
+          "age": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Возраст питомца",
+            "example": 3
+          },
+          "weight": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Вес питомца",
+            "example": 3
+          },
+          "diet": {
+            "type": "string",
+            "enum": [
+              "NATURAL_RAW_FOOD",
+              "NATURAL_COOKED_FOOD",
+              "READY_INDUSTRIAL_FOOD"
+            ]
+          },
+          "isTakesMedications": {
+            "type": "boolean",
+            "description": "Нужно ли давать питомцу лекарства",
+            "example": true
+          },
+          "isContact": {
+            "type": "boolean",
+            "description": "Можно ли питомцу контактировать с другими животными",
+            "example": true
+          },
+          "isPhotographed": {
+            "type": "boolean",
+            "description": "Можно ли фотографировать питомца",
+            "example": true
+          },
+          "comments": {
+            "type": "array",
+            "description": "Список комментариев",
+            "example": [],
+            "items": {
+              "type": "CommentDto",
+              "description": "Комментарий",
+              "example": "[]"
+            }
+          }
+        }
+      },
+      "UpdatePetDto": {
+        "required": [
+          "age",
+          "breed",
+          "diet",
+          "isContact",
+          "isPhotographed",
+          "isTakesMedications",
+          "sex",
+          "typeOfPet",
+          "weight"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "typeOfPet": {
+            "maxLength": 250,
+            "minLength": 1,
+            "type": "string",
+            "description": "Вид питомца",
+            "example": "Собаки (малые и средне-крупные), кошки, экзоты (птицы, рептилии, грызуны, свиньи, пауки и т.д.)."
+          },
+          "breed": {
+            "maxLength": 250,
+            "minLength": 1,
+            "type": "string",
+            "description": "Порода питомца",
+            "example": "Спаниель."
+          },
+          "sex": {
+            "type": "string",
+            "enum": [
+              "FEMALE",
+              "MALE",
+              "HERMAPHRODITE"
+            ]
+          },
+          "age": {
+            "type": "integer",
+            "format": "int32",
+            "minLength": 1,
+            "description": "Возраст питомца",
+            "example": 3
+          },
+          "weight": {
+            "type": "integer",
+            "format": "int32",
+            "minLength": 1,
+            "description": "Вес питомца",
+            "example": 3
+          },
+          "diet": {
+            "type": "string",
+            "enum": [
+              "NATURAL_RAW_FOOD",
+              "NATURAL_COOKED_FOOD",
+              "READY_INDUSTRIAL_FOOD"
+            ]
+          },
+          "isTakesMedications": {
+            "type": "boolean",
+            "description": "Нужно ли давать питомцу лекарства",
+            "example": true,
+            "default": false
+          },
+          "isContact": {
+            "type": "boolean",
+            "description": "Можно ли питомцу контактировать с другими животными",
+            "example": true,
+            "default": false
+          },
+          "isPhotographed": {
+            "type": "boolean",
+            "description": "Можно ли фотографировать питомца",
+            "example": true,
+            "default": false
+          }
+        }
+      },
+      "PetForAdminDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "typeOfPet": {
+            "type": "string",
+            "description": "Вид питомца",
+            "example": "Собаки (малые и средне-крупные), кошки, экзоты (птицы, рептилии, грызуны, свиньи, пауки и т.д.)."
+          },
+          "breed": {
+            "type": "string",
+            "description": "Порода питомца",
+            "example": "Спаниель."
+          },
+          "sex": {
+            "type": "string",
+            "enum": [
+              "FEMALE",
+              "MALE",
+              "HERMAPHRODITE"
+            ]
+          },
+          "age": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Возраст питомца",
+            "example": 3
+          },
+          "weight": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Вес питомца",
+            "example": 3
+          },
+          "diet": {
+            "type": "string",
+            "enum": [
+              "NATURAL_RAW_FOOD",
+              "NATURAL_COOKED_FOOD",
+              "READY_INDUSTRIAL_FOOD"
+            ]
+          },
+          "isTakesMedications": {
+            "type": "boolean",
+            "description": "Нужно ли давать питомцу лекарства",
+            "example": true
+          },
+          "isContact": {
+            "type": "boolean",
+            "description": "Можно ли питомцу контактировать с другими животными",
+            "example": true
+          },
+          "isPhotographed": {
+            "type": "boolean",
+            "description": "Можно ли фотографировать питомца",
+            "example": true
+          },
+          "comments": {
+            "type": "array",
+            "description": "Список комментариев",
+            "example": [],
+            "items": {
+              "type": "CommentDto",
+              "description": "Комментарий",
+              "example": "[]"
+            }
+          },
+          "historyOfBookings": {
+            "type": "array",
+            "description": "История бронирования",
+            "example": [],
+            "items": {
+              "type": "BookingDto",
+              "description": "Бронирование",
+              "example": "[]"
+            }
+          },
+          "additionalServices": {
+            "type": "string",
+            "description": "Дополнительные услуги"
+          }
+        }
+      }
+    }
+  }
+}

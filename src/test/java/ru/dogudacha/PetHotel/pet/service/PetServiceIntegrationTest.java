@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.user.service;
+package ru.dogudacha.PetHotel.pet.service;
 
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;

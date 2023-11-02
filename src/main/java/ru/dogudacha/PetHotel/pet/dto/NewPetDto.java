@@ -2,18 +2,15 @@ package ru.dogudacha.PetHotel.pet.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 import ru.dogudacha.PetHotel.pet.model.Sex;
 import ru.dogudacha.PetHotel.pet.model.TypeOfDiet;
 
-@Getter
-@Setter
 @Builder
-@ToString
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class NewPetDto {
     @Length(max = 250)
     @NotBlank(message = "Field: typeOfPet. Error: must not be blank.")
