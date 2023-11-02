@@ -17,6 +17,7 @@ import ru.dogudacha.PetHotel.room.dto.mapper.RoomMapper;
 import ru.dogudacha.PetHotel.room.model.Room;
 import ru.dogudacha.PetHotel.room.model.RoomTypes;
 import ru.dogudacha.PetHotel.room.repository.RoomRepository;
+import ru.dogudacha.PetHotel.room.service.RoomServiceImpl;
 import ru.dogudacha.PetHotel.user.model.Roles;
 import ru.dogudacha.PetHotel.user.model.User;
 import ru.dogudacha.PetHotel.user.repository.UserRepository;
