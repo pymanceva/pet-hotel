@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.user.dto;
+package ru.dogudacha.PetHotel.pet.dto;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
