@@ -129,6 +129,7 @@ public class PetControllerTest {
             .comments("Like play with small ball.")
             .build();
 
+
     @Test
     @SneakyThrows
     void addPet() {
@@ -280,6 +281,7 @@ public class PetControllerTest {
         verify(petService, times(3)).getPetByIdForAdmin(anyLong(), anyLong());
     }
 
+
     @Test
     @SneakyThrows
     void updatePet() {
@@ -364,6 +366,7 @@ public class PetControllerTest {
 
         verify(petService, times(4)).updatePet(anyLong(), anyLong(), any(UpdatePetDto.class));
     }
+
 
     @Test
     @SneakyThrows
