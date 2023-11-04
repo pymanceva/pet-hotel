@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
+import ru.dogudacha.PetHotel.user.UserController;
 import ru.dogudacha.PetHotel.user.dto.UpdateUserDto;
 import ru.dogudacha.PetHotel.user.dto.UserDto;
 import ru.dogudacha.PetHotel.user.model.Roles;

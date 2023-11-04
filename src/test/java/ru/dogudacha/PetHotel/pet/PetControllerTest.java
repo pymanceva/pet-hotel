@@ -129,77 +129,78 @@ public class PetControllerTest {
             .comments("Like play with small ball.")
             .build();
 
-//    @Test
-//    @SneakyThrows
-//    void addPet() {
-//        when(petService.addPet(any(), any(NewPetDto.class))).thenReturn(petDto);
-//
-//        mockMvc.perform(post("/pets")
-//                        .header(requesterHeader, requesterBoss.getId())
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                        .content(objectMapper.writeValueAsString(petDto)))
-//                .andDo(print())
-//                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("$.id", notNullValue()))
-//                .andExpect(jsonPath("$.typeOfPet", is(petForAdminDto.getTypeOfPet())))
-//                .andExpect(jsonPath("$.breed", is(petForAdminDto.getBreed())))
-//                .andExpect(jsonPath("$.sex", is(petForAdminDto.getSex().toString())))
-//                .andExpect(jsonPath("$.age", is(petForAdminDto.getAge())))
-//                .andExpect(jsonPath("$.weight", is(petForAdminDto.getWeight())))
-//                .andExpect(jsonPath("$.diet", is(petForAdminDto.getDiet().toString())))
-//                .andExpect(jsonPath("$.isTakesMedications", is(petForAdminDto.getIsTakesMedications())))
-//                .andExpect(jsonPath("$.isContact", is(petForAdminDto.getIsContact())))
-//                .andExpect(jsonPath("$.isPhotographed", is(petForAdminDto.getIsPhotographed())))
-//                .andExpect(jsonPath("$.comments", is(petForAdminDto.getComments())));
-//
-//        mockMvc.perform(post("/pets")
-//                        .header(requesterHeader, requesterAdmin.getId())
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                        .content(objectMapper.writeValueAsString(petDto)))
-//                .andDo(print())
-//                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("$.id", notNullValue()))
-//                .andExpect(jsonPath("$.typeOfPet", is(petForAdminDto.getTypeOfPet())))
-//                .andExpect(jsonPath("$.breed", is(petForAdminDto.getBreed())))
-//                .andExpect(jsonPath("$.sex", is(petForAdminDto.getSex().toString())))
-//                .andExpect(jsonPath("$.age", is(petForAdminDto.getAge())))
-//                .andExpect(jsonPath("$.weight", is(petForAdminDto.getWeight())))
-//                .andExpect(jsonPath("$.diet", is(petForAdminDto.getDiet().toString())))
-//                .andExpect(jsonPath("$.isTakesMedications", is(petForAdminDto.getIsTakesMedications())))
-//                .andExpect(jsonPath("$.isContact", is(petForAdminDto.getIsContact())))
-//                .andExpect(jsonPath("$.isPhotographed", is(petForAdminDto.getIsPhotographed())))
-//                .andExpect(jsonPath("$.comments", is(petForAdminDto.getComments())));
-//
-//
-//        String errorAccessDenied = String.format("User with role = %s, can't access for this action",
-//                requesterUser.getRole());
-//        when(petService.addPet(anyLong(), any())).thenThrow(new AccessDeniedException(errorAccessDenied));
-//
-//        mockMvc.perform(post("/pets")
-//                        .header(requesterHeader, requesterUser.getId())
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                        .content(objectMapper.writeValueAsString(petDto)))
-//                .andDo(print())
-//                .andExpect(status().isForbidden());
-//
-//        mockMvc.perform(post("/pets")
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                        .content(objectMapper.writeValueAsString(petDto)))
-//                .andExpect(status().isBadRequest());
-//
-//        mockMvc.perform(post("/pets")
-//                        .header(requesterHeader, requesterBoss.getId())
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                        .content(objectMapper.writeValueAsString(new PetDto())))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(petService, times(3)).addPet(anyLong(), any(NewPetDto.class));
-//    }
+
+    @Test
+    @SneakyThrows
+    void addPet() {
+        when(petService.addPet(any(), any(NewPetDto.class))).thenReturn(petDto);
+
+        mockMvc.perform(post("/pets")
+                        .header(requesterHeader, requesterBoss.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(petDto)))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.typeOfPet", is(petForAdminDto.getTypeOfPet())))
+                .andExpect(jsonPath("$.breed", is(petForAdminDto.getBreed())))
+                .andExpect(jsonPath("$.sex", is(petForAdminDto.getSex().toString())))
+                .andExpect(jsonPath("$.age", is(petForAdminDto.getAge())))
+                .andExpect(jsonPath("$.weight", is(petForAdminDto.getWeight())))
+                .andExpect(jsonPath("$.diet", is(petForAdminDto.getDiet().toString())))
+                .andExpect(jsonPath("$.isTakesMedications", is(petForAdminDto.getIsTakesMedications())))
+                .andExpect(jsonPath("$.isContact", is(petForAdminDto.getIsContact())))
+                .andExpect(jsonPath("$.isPhotographed", is(petForAdminDto.getIsPhotographed())))
+                .andExpect(jsonPath("$.comments", is(petForAdminDto.getComments())));
+
+        mockMvc.perform(post("/pets")
+                        .header(requesterHeader, requesterAdmin.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(petDto)))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.typeOfPet", is(petForAdminDto.getTypeOfPet())))
+                .andExpect(jsonPath("$.breed", is(petForAdminDto.getBreed())))
+                .andExpect(jsonPath("$.sex", is(petForAdminDto.getSex().toString())))
+                .andExpect(jsonPath("$.age", is(petForAdminDto.getAge())))
+                .andExpect(jsonPath("$.weight", is(petForAdminDto.getWeight())))
+                .andExpect(jsonPath("$.diet", is(petForAdminDto.getDiet().toString())))
+                .andExpect(jsonPath("$.isTakesMedications", is(petForAdminDto.getIsTakesMedications())))
+                .andExpect(jsonPath("$.isContact", is(petForAdminDto.getIsContact())))
+                .andExpect(jsonPath("$.isPhotographed", is(petForAdminDto.getIsPhotographed())))
+                .andExpect(jsonPath("$.comments", is(petForAdminDto.getComments())));
+
+
+        String errorAccessDenied = String.format("User with role = %s, can't access for this action",
+                requesterUser.getRole());
+        when(petService.addPet(anyLong(), any())).thenThrow(new AccessDeniedException(errorAccessDenied));
+
+        mockMvc.perform(post("/pets")
+                        .header(requesterHeader, requesterUser.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(petDto)))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(post("/pets")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(petDto)))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post("/pets")
+                        .header(requesterHeader, requesterBoss.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(new PetDto())))
+                .andExpect(status().isBadRequest());
+
+        verify(petService, times(3)).addPet(anyLong(), any(NewPetDto.class));
+    }
 
     @Test
     @SneakyThrows
@@ -280,90 +281,92 @@ public class PetControllerTest {
         verify(petService, times(3)).getPetByIdForAdmin(anyLong(), anyLong());
     }
 
-//    @Test
-//    @SneakyThrows
-//    void updatePet() {
-//        when(petService.updatePet(anyLong(), anyLong(), any())).thenReturn(updatedPet);
-//
-//        mockMvc.perform(patch("/pets/{id}", petDto.getId())
-//                        .header(requesterHeader, requesterAdmin.getId())
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                        .content(objectMapper.writeValueAsString(updatePet)))
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.id", notNullValue()))
-//                .andExpect(jsonPath("$.typeOfPet", is(updatePet.getTypeOfPet())))
-//                .andExpect(jsonPath("$.breed", is(updatePet.getBreed())))
-//                .andExpect(jsonPath("$.sex", is(updatePet.getSex().toString())))
-//                .andExpect(jsonPath("$.age", is(updatePet.getAge())))
-//                .andExpect(jsonPath("$.weight", is(updatePet.getWeight())))
-//                .andExpect(jsonPath("$.diet", is(updatePet.getDiet().toString())))
-//                .andExpect(jsonPath("$.isTakesMedications", is(updatePet.getIsTakesMedications())))
-//                .andExpect(jsonPath("$.isContact", is(updatePet.getIsContact())))
-//                .andExpect(jsonPath("$.isPhotographed", is(updatePet.getIsPhotographed())))
-//                .andExpect(jsonPath("$.comments", is(updatePet.getComments())));
-//
-//        mockMvc.perform(patch("/pets/{id}", petDto.getId())
-//                        .header(requesterHeader, requesterBoss.getId())
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                        .content(objectMapper.writeValueAsString(updatePet)))
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.id", notNullValue()))
-//                .andExpect(jsonPath("$.typeOfPet", is(updatePet.getTypeOfPet())))
-//                .andExpect(jsonPath("$.breed", is(updatePet.getBreed())))
-//                .andExpect(jsonPath("$.sex", is(updatePet.getSex().toString())))
-//                .andExpect(jsonPath("$.age", is(updatePet.getAge())))
-//                .andExpect(jsonPath("$.weight", is(updatePet.getWeight())))
-//                .andExpect(jsonPath("$.diet", is(updatePet.getDiet().toString())))
-//                .andExpect(jsonPath("$.isTakesMedications", is(updatePet.getIsTakesMedications())))
-//                .andExpect(jsonPath("$.isContact", is(updatePet.getIsContact())))
-//                .andExpect(jsonPath("$.isPhotographed", is(updatePet.getIsPhotographed())))
-//                .andExpect(jsonPath("$.comments", is(updatePet.getComments())));
-//
-//
-//        String errorAccessDenied = String.format("User with role = %s, can't access for this action",
-//                requesterUser.getRole());
-//        when(petService.updatePet(anyLong(), eq(petDto.getId()), any())).thenThrow(new AccessDeniedException(errorAccessDenied));
-//
-//        mockMvc.perform(patch("/pets/{id}", petDto.getId())
-//                        .header(requesterHeader, requesterUser.getId())
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                        .content(objectMapper.writeValueAsString(updatePet)))
-//                .andDo(print())
-//                .andExpect(status().isForbidden());
-//
-//        String errorNotFoundPet = String.format("Pet with id = %d not found", petDto.getId());
-//        when(petService.updatePet(anyLong(), eq(0L), any())).thenThrow(new NotFoundException(errorNotFoundPet));
-//
-//        mockMvc.perform(patch("/pets/{id}", 0L)
-//                        .header(requesterHeader, requesterBoss.getId())
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                        .content(objectMapper.writeValueAsString(updatePet)))
-//                .andDo(print())
-//                .andExpect(status().isNotFound());
-//
-//        mockMvc.perform(patch("/pets/{id}", petDto.getId())
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                        .content(objectMapper.writeValueAsString(updatePet)))
-//                .andDo(print())
-//                .andExpect(status().isBadRequest());
-//
-//        mockMvc.perform(patch("/pets/{id}", petDto.getId())
-//                        .header(requesterHeader, requesterBoss.getId())
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                        .content(objectMapper.writeValueAsString(new PetDto())))
-//                .andDo(print())
-//                .andExpect(status().isBadRequest());
-//
-//        verify(petService, times(4)).updatePet(anyLong(), anyLong(), any(UpdatePetDto.class));
-//    }
+
+    @Test
+    @SneakyThrows
+    void updatePet() {
+        when(petService.updatePet(anyLong(), anyLong(), any())).thenReturn(updatedPet);
+
+        mockMvc.perform(patch("/pets/{id}", petDto.getId())
+                        .header(requesterHeader, requesterAdmin.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(updatePet)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.typeOfPet", is(updatePet.getTypeOfPet())))
+                .andExpect(jsonPath("$.breed", is(updatePet.getBreed())))
+                .andExpect(jsonPath("$.sex", is(updatePet.getSex().toString())))
+                .andExpect(jsonPath("$.age", is(updatePet.getAge())))
+                .andExpect(jsonPath("$.weight", is(updatePet.getWeight())))
+                .andExpect(jsonPath("$.diet", is(updatePet.getDiet().toString())))
+                .andExpect(jsonPath("$.isTakesMedications", is(updatePet.getIsTakesMedications())))
+                .andExpect(jsonPath("$.isContact", is(updatePet.getIsContact())))
+                .andExpect(jsonPath("$.isPhotographed", is(updatePet.getIsPhotographed())))
+                .andExpect(jsonPath("$.comments", is(updatePet.getComments())));
+
+        mockMvc.perform(patch("/pets/{id}", petDto.getId())
+                        .header(requesterHeader, requesterBoss.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(updatePet)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.typeOfPet", is(updatePet.getTypeOfPet())))
+                .andExpect(jsonPath("$.breed", is(updatePet.getBreed())))
+                .andExpect(jsonPath("$.sex", is(updatePet.getSex().toString())))
+                .andExpect(jsonPath("$.age", is(updatePet.getAge())))
+                .andExpect(jsonPath("$.weight", is(updatePet.getWeight())))
+                .andExpect(jsonPath("$.diet", is(updatePet.getDiet().toString())))
+                .andExpect(jsonPath("$.isTakesMedications", is(updatePet.getIsTakesMedications())))
+                .andExpect(jsonPath("$.isContact", is(updatePet.getIsContact())))
+                .andExpect(jsonPath("$.isPhotographed", is(updatePet.getIsPhotographed())))
+                .andExpect(jsonPath("$.comments", is(updatePet.getComments())));
+
+
+        String errorAccessDenied = String.format("User with role = %s, can't access for this action",
+                requesterUser.getRole());
+        when(petService.updatePet(anyLong(), eq(petDto.getId()), any())).thenThrow(new AccessDeniedException(errorAccessDenied));
+
+        mockMvc.perform(patch("/pets/{id}", petDto.getId())
+                        .header(requesterHeader, requesterUser.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(updatePet)))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+
+        String errorNotFoundPet = String.format("Pet with id = %d not found", petDto.getId());
+        when(petService.updatePet(anyLong(), eq(0L), any())).thenThrow(new NotFoundException(errorNotFoundPet));
+
+        mockMvc.perform(patch("/pets/{id}", 0L)
+                        .header(requesterHeader, requesterBoss.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(updatePet)))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(patch("/pets/{id}", petDto.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(updatePet)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(patch("/pets/{id}", petDto.getId())
+                        .header(requesterHeader, requesterBoss.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(new PetDto())))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        verify(petService, times(4)).updatePet(anyLong(), anyLong(), any(UpdatePetDto.class));
+    }
+
 
     @Test
     @SneakyThrows

@@ -17,6 +17,7 @@ import ru.dogudacha.PetHotel.user.dto.mapper.UserMapper;
 import ru.dogudacha.PetHotel.user.model.Roles;
 import ru.dogudacha.PetHotel.user.model.User;
 import ru.dogudacha.PetHotel.user.repository.UserRepository;
+import ru.dogudacha.PetHotel.user.service.UserServiceImpl;
 
 import java.util.Arrays;
 import java.util.List;
