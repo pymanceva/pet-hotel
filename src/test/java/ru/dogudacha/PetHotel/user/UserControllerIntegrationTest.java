@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
+import ru.dogudacha.PetHotel.user.UserController;
 import ru.dogudacha.PetHotel.user.dto.UpdateUserDto;
 import ru.dogudacha.PetHotel.user.dto.UserDto;
 import ru.dogudacha.PetHotel.user.model.Roles;
@@ -21,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -95,6 +97,7 @@ class UserControllerIntegrationTest {
         mockMvc.perform(get("/users/{userId}", userId)
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isNotFound());
         verify(userService, times(2)).getUserById(requesterId, userId);
     }
