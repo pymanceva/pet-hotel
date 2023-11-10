@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dogudacha.PetHotel.exception.AccessDeniedException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
+import ru.dogudacha.PetHotel.owner.dto.NewOwnerDto;
+import ru.dogudacha.PetHotel.owner.dto.OwnerShortDto;
 import ru.dogudacha.PetHotel.owner.dto.UpdateOwnerDto;
 import ru.dogudacha.PetHotel.owner.dto.OwnerDto;
 import ru.dogudacha.PetHotel.owner.dto.mapper.OwnerMapper;
@@ -30,15 +32,34 @@ public class OwnerServiceImpl implements OwnerService {
 
     @Transactional()
     @Override
-    public OwnerDto addOwner(Long requesterId, OwnerDto newOwnerDto) {
+    public OwnerDto addOwner(Long requesterId, NewOwnerDto newOwnerDto) {
         User requester = findUserById(requesterId);
         checkAccessForEdit(requester);
         Owner newOwner = ownerMapper.toOwner(newOwnerDto);
 
-
         Owner addedOwner = ownerRepository.save(newOwner);
         log.info("ownerService: has been added owner={}", addedOwner);
         return ownerMapper.toOwnerDto(addedOwner);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public OwnerShortDto getShortOwnerById(Long requesterId, Long ownerId) {
+        User requester = findUserById(requesterId);
+        checkAccessForBrowse(requester);
+        Owner owner = findOwnerById(ownerId);
+
+        log.info("ownerService: has been returned ownerShortDto={}, by id={}", owner, ownerId);
+        OwnerShortDto ownerShortDto = ownerMapper.toOwnerShortDto(owner);
+        switch (owner.getPreferCommunication()) {
+            case MAIN_PHONE -> ownerShortDto.setContact(owner.getMainPhone());
+            case OPTIONAL_PHONE -> ownerShortDto.setContact( owner.getOptionalPhone());
+            case TELEGRAM -> ownerShortDto.setContact(owner.getTelegram());
+            case WHATSAPP -> ownerShortDto.setContact(owner.getWhatsapp());
+            case VIBER -> ownerShortDto.setContact(owner.getViber());
+            case VK -> ownerShortDto.setContact(owner.getVk());
+        }
+        return ownerShortDto;
     }
 
     @Transactional(readOnly = true)
@@ -48,7 +69,7 @@ public class OwnerServiceImpl implements OwnerService {
         checkAccessForBrowse(requester);
         Owner owner = findOwnerById(ownerId);
 
-        log.info("ownerService: has been returned owner={}, by id={}", owner, ownerId);
+        log.info("ownerService: has been returned ownerDto={}, by id={}", owner, ownerId);
         return ownerMapper.toOwnerDto(owner);
     }
 
@@ -101,38 +122,17 @@ public class OwnerServiceImpl implements OwnerService {
                 new NotFoundException(String.format("user with id=%d not found", userId)));
     }
 
-    private void checkAccessForEdit(User requester, User newUser) {
-
-        if (requester.getRole().ordinal() < 2 &&
-                (newUser.getRole() == null ||
-                        (requester.getRole().ordinal() < newUser.getRole().ordinal()))
-        ) {
-            return;
-        }
-        throw new AccessDeniedException(String.format("User with role=%s, hasn't access for edit this information",
-                requester.getRole()));
-    }
-
     private void checkAccessForEdit(User requester) {
 
-        if (requester.getRole().ordinal() >= 2) {
+        if (requester.getRole().ordinal() > 1) {
 
             throw new AccessDeniedException(String.format("User with role=%s, hasn't access for edit this information",
                     requester.getRole()));
         }
     }
 
-    private void checkAccessForBrowse(User requester, User user) {
-        if (requester.getRole().ordinal() < 2 &&
-                requester.getRole().ordinal() <= user.getRole().ordinal()) {
-            return;
-        }
-        throw new AccessDeniedException(String.format("User with role=%s, hasn't access for browsing this information",
-                requester.getRole()));
-    }
-
     private void checkAccessForBrowse(User requester) {
-        if (requester.getRole().ordinal() >= 2) {
+        if (requester.getRole().ordinal() > 2) {
             throw new AccessDeniedException(String.format("User with role=%s, hasn't access for browsing this information",
                     requester.getRole()));
         }

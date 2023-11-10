@@ -1,12 +1,16 @@
 package ru.dogudacha.PetHotel.owner.service;
 
+import ru.dogudacha.PetHotel.owner.dto.NewOwnerDto;
 import ru.dogudacha.PetHotel.owner.dto.OwnerDto;
+import ru.dogudacha.PetHotel.owner.dto.OwnerShortDto;
 import ru.dogudacha.PetHotel.owner.dto.UpdateOwnerDto;
 
 import java.util.Collection;
 
 public interface OwnerService {
-    OwnerDto addOwner(Long requesterId, OwnerDto ownerDto);
+    OwnerDto addOwner(Long requesterId, NewOwnerDto ownerDto);
+
+    OwnerShortDto getShortOwnerById(Long requesterId, Long id);
 
     OwnerDto getOwnerById(Long requesterId, Long id);
 
