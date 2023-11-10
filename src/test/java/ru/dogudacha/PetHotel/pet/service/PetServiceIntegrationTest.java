@@ -1,10 +1,12 @@
 package ru.dogudacha.PetHotel.pet.service;
 
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.RequiredArgsConstructor;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
 import ru.dogudacha.PetHotel.pet.dto.NewPetDto;
 import ru.dogudacha.PetHotel.pet.dto.PetDto;
@@ -13,8 +15,6 @@ import ru.dogudacha.PetHotel.pet.dto.UpdatePetDto;
 import ru.dogudacha.PetHotel.pet.model.Pet;
 import ru.dogudacha.PetHotel.pet.model.Sex;
 import ru.dogudacha.PetHotel.pet.model.TypeOfDiet;
-import ru.dogudacha.PetHotel.pet.service.PetService;
-import org.junit.jupiter.api.Test;
 import ru.dogudacha.PetHotel.user.model.Roles;
 import ru.dogudacha.PetHotel.user.model.User;
 
@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest
+@ActiveProfiles("test")
 public class PetServiceIntegrationTest {
     private final EntityManager em;
     private final PetService service;
