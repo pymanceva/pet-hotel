@@ -3,6 +3,7 @@ package ru.dogudacha.PetHotel.pet.service;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
@@ -30,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest
+@ActiveProfiles("test")
 public class PetServiceIntegrationTest {
     private final EntityManager em;
     private final PetService service;
