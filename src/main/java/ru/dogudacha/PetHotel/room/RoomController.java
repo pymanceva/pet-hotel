@@ -12,6 +12,7 @@ import ru.dogudacha.PetHotel.room.service.RoomService;
 
 import java.util.Collection;
 
+@CrossOrigin
 @Slf4j
 @RestController
 @RequestMapping(path = "/rooms")

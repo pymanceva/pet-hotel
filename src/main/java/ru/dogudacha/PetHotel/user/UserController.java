@@ -11,6 +11,7 @@ import ru.dogudacha.PetHotel.user.service.UserService;
 
 import java.util.Collection;
 
+@CrossOrigin
 @Slf4j
 @RestController
 @RequestMapping(path = "/users")
