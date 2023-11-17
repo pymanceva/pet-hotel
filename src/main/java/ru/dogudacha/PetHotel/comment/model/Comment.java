@@ -22,7 +22,7 @@ public class Comment {
     private Long id;
     @Column(name = "text", nullable = false, length = 1024)
     private String text;
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_id", nullable = false)
     private Pet pet;
     @ManyToOne()

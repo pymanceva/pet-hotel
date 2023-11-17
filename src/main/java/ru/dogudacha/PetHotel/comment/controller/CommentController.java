@@ -23,36 +23,34 @@ public class CommentController {
     private static final String USER_ID = "X-PetHotel-User-Id";
     private final CommentService commentService;
 
-    @PostMapping
+    @PostMapping("/pets/{petId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public CommentDto createComment(@RequestHeader(USER_ID) Long requesterId,
-                                    @RequestBody @Valid NewCommentDto newCommentDto) {
-        log.info("Получен POST-запрос к эндпоинту: '/users/{userId}/comments' на добавление комментария " +
-                "пользователем с ID={}", requesterId);
-        return commentService.createComment(requesterId, newCommentDto);
+    public CommentDto addComment(@RequestHeader(USER_ID) Long requesterId,
+                                 @RequestBody @Valid NewCommentDto newCommentDto,
+                                 @PathVariable Long petId) {
+        log.info("CommentController: POST/addComment, requesterId={}", requesterId);
+        return commentService.createComment(requesterId, newCommentDto, petId);
     }
 
-    @GetMapping
-    public List<CommentDto> getAllCommentsByUserId(@RequestHeader(USER_ID) Long requesterId) {
-        log.info("Получен GET-запрос к эндпоинту: '/users/{userId}/comments' на получение всех комментариев " +
-                "пользователя с ID={}", requesterId);
-        return commentService.getAllCommentsByUserId(requesterId);
+    @GetMapping("/pets/{petId}")
+    public List<CommentDto> getAllCommentsByPetId(@RequestHeader(USER_ID) Long requesterId,
+                                                  @PathVariable Long petId) {
+        log.info("CommentController: GET/getCommentsByPetId, requesterId={}, petId={}", requesterId, petId);
+        return commentService.getAllCommentsByPetId(requesterId, petId);
     }
 
     @GetMapping("/{commentId}")
     public CommentDto getCommentById(@RequestHeader(USER_ID) Long requesterId,
                                      @PathVariable Long commentId) {
-        log.info("Получен GET-запрос к эндпоинту: '/users/{userId}/comments/{commentId}' на получение " +
-                "комментария с ID={}", commentId);
+        log.info("CommentController: GET/getCommentById, requesterId={}, commentId={}", requesterId, commentId);
         return commentService.getCommentById(requesterId, commentId);
     }
 
     @PatchMapping("/{commentId}")
     public CommentDto updateComment(@RequestHeader(USER_ID) Long requesterId,
-                                    @PathVariable Long commentId,
-                                    @RequestBody @Valid UpdateCommentDto updateCommentDto) {
-        log.info("Получен PATCH-запрос к эндпоинту: '/users/{userId}/comments/{commentId}/events/{eventId}' на изменение комментария " +
-                "с ID={} пользователем с ID={}", commentId, requesterId);
+                                    @RequestBody @Valid UpdateCommentDto updateCommentDto,
+                                    @PathVariable Long commentId) {
+        log.info("PetController: PATCH/updateComment, requesterId={}, commentId={}", requesterId, commentId);
         return commentService.updateComment(requesterId, commentId, updateCommentDto);
     }
 
@@ -60,8 +58,7 @@ public class CommentController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteComment(@RequestHeader(USER_ID) Long requesterId,
                               @PathVariable Long commentId) {
-        log.info("Получен DELETE-запрос к эндпоинту: '/users/{userId}/comments/{commentId}' на удаление комментария " +
-                "с ID={} пользователем с ID={}", commentId, requesterId);
+        log.info("CommentController: DELETE/deleteComment, requesterId= {}, commentId={}", requesterId, commentId);
         commentService.deleteComment(requesterId, commentId);
     }
 }

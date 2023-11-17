@@ -7,13 +7,13 @@ import ru.dogudacha.PetHotel.comment.dto.UpdateCommentDto;
 import java.util.List;
 
 public interface CommentService {
-    CommentDto createComment(Long requesterId, NewCommentDto newCommentDto);
+    CommentDto createComment(Long requesterId, NewCommentDto newCommentDto, Long petId);
 
-    List<CommentDto> getAllCommentsByUserId(Long userId);
+    List<CommentDto> getAllCommentsByPetId(Long requesterId, Long petId);
 
-    CommentDto getCommentById(Long userId, Long commentId);
+    CommentDto getCommentById(Long requesterId, Long commentId);
 
     CommentDto updateComment(Long requesterId, Long commentId, UpdateCommentDto updateCommentDto);
 
-    void deleteComment(Long userId, Long commentId);
+    void deleteComment(Long requesterId, Long commentId);
 }

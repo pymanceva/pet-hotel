@@ -13,7 +13,6 @@ import ru.dogudacha.PetHotel.pet.dto.UpdatePetDto;
 import ru.dogudacha.PetHotel.pet.model.Pet;
 import ru.dogudacha.PetHotel.pet.model.Sex;
 import ru.dogudacha.PetHotel.pet.model.TypeOfDiet;
-import ru.dogudacha.PetHotel.pet.service.PetService;
 import org.junit.jupiter.api.Test;
 import ru.dogudacha.PetHotel.user.model.Roles;
 import ru.dogudacha.PetHotel.user.model.User;
@@ -50,7 +49,6 @@ public class PetServiceIntegrationTest {
             .isTakesMedications(false)
             .isContact(true)
             .isPhotographed(true)
-            .comments("Like play with ball.")
             .build();
 
     final Pet pet = Pet.builder()
@@ -63,7 +61,6 @@ public class PetServiceIntegrationTest {
             .isTakesMedications(false)
             .isContact(true)
             .isPhotographed(true)
-            .comments("Like play with ball.")
             .build();
 
     final Pet pet2 = Pet.builder()
@@ -76,7 +73,6 @@ public class PetServiceIntegrationTest {
             .isTakesMedications(false)
             .isContact(true)
             .isPhotographed(true)
-            .comments("Like play with mouse.")
             .build();
 
     final UpdatePetDto updatePetDto = UpdatePetDto.builder()
@@ -89,7 +85,6 @@ public class PetServiceIntegrationTest {
             .isTakesMedications(true)
             .isContact(false)
             .isPhotographed(false)
-            .comments("Like play with small ball.")
             .build();
 
     @Test

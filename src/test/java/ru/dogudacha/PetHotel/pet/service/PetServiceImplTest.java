@@ -18,7 +18,6 @@ import ru.dogudacha.PetHotel.pet.model.Pet;
 import ru.dogudacha.PetHotel.pet.model.Sex;
 import ru.dogudacha.PetHotel.pet.model.TypeOfDiet;
 import ru.dogudacha.PetHotel.pet.repository.PetRepository;
-import ru.dogudacha.PetHotel.pet.service.PetServiceImpl;
 import ru.dogudacha.PetHotel.user.model.Roles;
 import ru.dogudacha.PetHotel.user.model.User;
 import ru.dogudacha.PetHotel.user.repository.UserRepository;
@@ -35,7 +34,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class PetServiceImplTest {
-
     @Mock
     private UserRepository mockUserRepository;
 
@@ -79,7 +77,6 @@ public class PetServiceImplTest {
             .isTakesMedications(false)
             .isContact(true)
             .isPhotographed(true)
-            .comments("Like play with ball.")
             .build();
 
     final PetDto petDto = PetDto.builder()
@@ -93,7 +90,6 @@ public class PetServiceImplTest {
             .isTakesMedications(false)
             .isContact(true)
             .isPhotographed(true)
-            .comments("Like play with ball.")
             .build();
 
     final PetForAdminDto petForAdminDto = PetForAdminDto.builder()
@@ -107,7 +103,6 @@ public class PetServiceImplTest {
             .isTakesMedications(false)
             .isContact(true)
             .isPhotographed(true)
-            .comments("Like play with ball.")
             .historyOfBookings(null)
             .additionalServices(null)
             .build();
@@ -123,7 +118,6 @@ public class PetServiceImplTest {
             .isTakesMedications(false)
             .isContact(true)
             .isPhotographed(true)
-            .comments("Like play with ball.")
             .build();
 
     final Pet pet2 = Pet.builder()
@@ -137,7 +131,6 @@ public class PetServiceImplTest {
             .isTakesMedications(false)
             .isContact(true)
             .isPhotographed(true)
-            .comments("Like play with mouse.")
             .build();
 
     final UpdatePetDto updatePet = UpdatePetDto.builder()
@@ -150,7 +143,6 @@ public class PetServiceImplTest {
             .isTakesMedications(true)
             .isContact(false)
             .isPhotographed(false)
-            .comments("Like play with small ball.")
             .build();
 
     final Pet updatedPet = Pet.builder()
@@ -164,7 +156,6 @@ public class PetServiceImplTest {
             .isTakesMedications(true)
             .isContact(false)
             .isPhotographed(false)
-            .comments("Like play with small ball.")
             .build();
 
     final PetDto updatedPetDto = PetDto.builder()
@@ -178,7 +169,6 @@ public class PetServiceImplTest {
             .isTakesMedications(true)
             .isContact(false)
             .isPhotographed(false)
-            .comments("Like play with small ball.")
             .build();
 
     @Test
@@ -201,7 +191,6 @@ public class PetServiceImplTest {
         assertThat(actualPetDto.getIsTakesMedications(), equalTo(petDto.getIsTakesMedications()));
         assertThat(actualPetDto.getIsContact(), equalTo(petDto.getIsContact()));
         assertThat(actualPetDto.getIsPhotographed(), equalTo(petDto.getIsPhotographed()));
-        assertThat(actualPetDto.getComments(), equalTo(petDto.getComments()));
         verify(mockPetRepository, times(1)).save(any());
     }
 
@@ -225,7 +214,6 @@ public class PetServiceImplTest {
         assertThat(actualPetDto.getIsTakesMedications(), equalTo(petDto.getIsTakesMedications()));
         assertThat(actualPetDto.getIsContact(), equalTo(petDto.getIsContact()));
         assertThat(actualPetDto.getIsPhotographed(), equalTo(petDto.getIsPhotographed()));
-        assertThat(actualPetDto.getComments(), equalTo(petDto.getComments()));
         verify(mockPetRepository, times(1)).save(any());
     }
 
@@ -280,7 +268,6 @@ public class PetServiceImplTest {
         assertThat(actualPetDto.getIsTakesMedications(), equalTo(petForAdminDto.getIsTakesMedications()));
         assertThat(actualPetDto.getIsContact(), equalTo(petForAdminDto.getIsContact()));
         assertThat(actualPetDto.getIsPhotographed(), equalTo(petForAdminDto.getIsPhotographed()));
-        assertThat(actualPetDto.getComments(), equalTo(petForAdminDto.getComments()));
         assertThat(actualPetDto.getHistoryOfBookings(), equalTo(petForAdminDto.getHistoryOfBookings()));
         assertThat(actualPetDto.getAdditionalServices(), equalTo(petForAdminDto.getAdditionalServices()));
     }
@@ -304,7 +291,6 @@ public class PetServiceImplTest {
         assertThat(actualPetDto.getIsTakesMedications(), equalTo(petForAdminDto.getIsTakesMedications()));
         assertThat(actualPetDto.getIsContact(), equalTo(petForAdminDto.getIsContact()));
         assertThat(actualPetDto.getIsPhotographed(), equalTo(petForAdminDto.getIsPhotographed()));
-        assertThat(actualPetDto.getComments(), equalTo(petForAdminDto.getComments()));
         assertThat(actualPetDto.getHistoryOfBookings(), equalTo(petForAdminDto.getHistoryOfBookings()));
         assertThat(actualPetDto.getAdditionalServices(), equalTo(petForAdminDto.getAdditionalServices()));
     }
@@ -328,7 +314,6 @@ public class PetServiceImplTest {
         assertThat(actualPetDto.getIsTakesMedications(), equalTo(petDto.getIsTakesMedications()));
         assertThat(actualPetDto.getIsContact(), equalTo(petDto.getIsContact()));
         assertThat(actualPetDto.getIsPhotographed(), equalTo(petDto.getIsPhotographed()));
-        assertThat(actualPetDto.getComments(), equalTo(petDto.getComments()));
     }
 
     @Test
@@ -385,7 +370,6 @@ public class PetServiceImplTest {
         );
 
         assertEquals(error, exception.getMessage());
-        verify(mockPetRepository, times(0)).save(any());
     }
 
     @Test
@@ -409,7 +393,6 @@ public class PetServiceImplTest {
         assertThat(actualPetDto.getIsTakesMedications(), equalTo(updatePet.getIsTakesMedications()));
         assertThat(actualPetDto.getIsContact(), equalTo(updatePet.getIsContact()));
         assertThat(actualPetDto.getIsPhotographed(), equalTo(updatePet.getIsPhotographed()));
-        assertThat(actualPetDto.getComments(), equalTo(updatePet.getComments()));
     }
 
     @Test
@@ -449,7 +432,6 @@ public class PetServiceImplTest {
         assertThat(actualPetDto.getIsTakesMedications(), equalTo(updatePet.getIsTakesMedications()));
         assertThat(actualPetDto.getIsContact(), equalTo(updatePet.getIsContact()));
         assertThat(actualPetDto.getIsPhotographed(), equalTo(updatePet.getIsPhotographed()));
-        assertThat(actualPetDto.getComments(), equalTo(updatePet.getComments()));
     }
 
     @Test

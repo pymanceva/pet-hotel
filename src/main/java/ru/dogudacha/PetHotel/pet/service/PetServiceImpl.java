@@ -91,9 +91,6 @@ public class PetServiceImpl implements PetService {
         if (Objects.nonNull(updatePetDto.getIsPhotographed())) {
             pet.setIsPhotographed(updatePetDto.getIsPhotographed());
         }
-        if (Objects.nonNull(updatePetDto.getComments())) {
-            pet.setComments(updatePetDto.getComments());
-        }
         Pet savedPet = petRepository.save(pet);
         log.info("PetService: updatePet, requesterId={}, petId={}, updatePetDto={}", requesterId, petId, updatePetDto);
         return petMapper.toPetDto(savedPet);

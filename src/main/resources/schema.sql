@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS pets;
 DROP TABLE IF EXISTS rooms;
+DROP TABLE IF EXISTS comments;
 
 CREATE TABLE IF NOT EXISTS users
 (
@@ -26,7 +27,6 @@ CREATE TABLE IF NOT EXISTS pets
     medication_pet     BOOLEAN                                 NOT NULL,
     contact_pet        BOOLEAN                                 NOT NULL,
     photographed_pet   BOOLEAN                                 NOT NULL,
-    comments_pet       VARCHAR(1000)                                   ,
     CONSTRAINT pk_pet PRIMARY KEY (id)
 );
 
@@ -48,12 +48,10 @@ CREATE TABLE IF NOT EXISTS comments
     author_id BIGINT                                  NOT NULL,
     pet_id    BIGINT                                  NOT NULL,
     created   TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
-    CONSTRAINT pk_pet PRIMARY KEY (id),
+    CONSTRAINT pk_comment PRIMARY KEY (id),
     CONSTRAINT fk_comments_to_users FOREIGN KEY (author_id) REFERENCES users (id) ON DELETE CASCADE,
     CONSTRAINT fk_comments_to_pets FOREIGN KEY (pet_id) REFERENCES pets (id) ON DELETE CASCADE
 );
-
--- INSERT INTO users (name, email, role) values ('boss', 'boss@mail.ru', 'ROLE_BOSS');
 
 
 

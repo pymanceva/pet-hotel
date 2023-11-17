@@ -1,8 +1,6 @@
 package ru.dogudacha.PetHotel.comment.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import ru.dogudacha.PetHotel.pet.dto.PetDto;
 import ru.dogudacha.PetHotel.user.dto.UserDto;
 
@@ -10,6 +8,8 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class CommentDto {
     private Long id;

@@ -26,7 +26,6 @@ class UpdatePetDtoTest {
             .isTakesMedications(true)
             .isContact(false)
             .isPhotographed(false)
-            .comments("Like play with small ball.")
             .build();
 
     @Test

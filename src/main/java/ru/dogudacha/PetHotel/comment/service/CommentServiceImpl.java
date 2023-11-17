@@ -10,8 +10,8 @@ import ru.dogudacha.PetHotel.comment.dto.UpdateCommentDto;
 import ru.dogudacha.PetHotel.comment.mapper.CommentMapper;
 import ru.dogudacha.PetHotel.comment.model.Comment;
 import ru.dogudacha.PetHotel.comment.repository.CommentRepository;
+import ru.dogudacha.PetHotel.exception.AccessDeniedException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
-import ru.dogudacha.PetHotel.exception.ValidationException;
 import ru.dogudacha.PetHotel.pet.model.Pet;
 import ru.dogudacha.PetHotel.pet.repository.PetRepository;
 import ru.dogudacha.PetHotel.user.model.User;
@@ -34,23 +34,24 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentDto createComment(Long requesterId, NewCommentDto newCommentDto) {
+    public CommentDto createComment(Long requesterId, NewCommentDto newCommentDto, Long petId) {
         User user = findUserById(requesterId);
-        Pet pet = findPetById(newCommentDto.getPet());
+        Pet pet = findPetById(petId);
         Comment comment = new Comment();
         comment.setAuthor(user);
         comment.setPet(pet);
         comment.setCreated(LocalDateTime.now());
         comment.setText(newCommentDto.getText());
-        return commentMapper.toCommentDto(commentRepository.save(comment));
+        Comment sevedComment = commentRepository.save(comment);
+        return commentMapper.toCommentDto(sevedComment);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CommentDto> getAllCommentsByUserId(Long requesterId) {
+    public List<CommentDto> getAllCommentsByPetId(Long requesterId, Long petId) {
         findUserById(requesterId);
-        List<Comment> comments = commentRepository.findByAuthorId(requesterId);
-
+        findPetById(petId);
+        List<Comment> comments = commentRepository.findByPetId(petId);
         return comments.stream()
                 .map(commentMapper::toCommentDto)
                 .collect(Collectors.toList());
@@ -70,7 +71,7 @@ public class CommentServiceImpl implements CommentService {
         findUserById(requesterId);
         Comment comment = getCommentIfExists(commentId);
         if (!comment.getAuthor().getId().equals(requesterId)) {
-            throw new ValidationException("Only the author of the comment can change it.");
+            throw new AccessDeniedException("Only the author of the comment can change it.");
         }
         if (Objects.nonNull(updateCommentDto.getText()) && !updateCommentDto.getText().isBlank()) {
             comment.setText(updateCommentDto.getText());
@@ -84,10 +85,10 @@ public class CommentServiceImpl implements CommentService {
     public void deleteComment(Long requesterId, Long commentId) {
         User user = findUserById(requesterId);
         Comment comment = getCommentIfExists(commentId);
-        if (comment.getAuthor().getId().equals(user.getId())) {
+        if (comment.getAuthor().getId().equals(user.getId()) || user.getRole().ordinal() == 0) {
             commentRepository.deleteById(commentId);
         } else {
-            throw new ValidationException("Only the author of the comment can delete it.");
+            throw new AccessDeniedException("Only the author of the comment or boss can delete it.");
         }
     }
 

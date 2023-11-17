@@ -1,18 +1,14 @@
 package ru.dogudacha.PetHotel.comment.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
+import lombok.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 
-@Getter
-@Setter
+@Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class NewCommentDto {
-    @NotBlank(message = "Текст комментария не может быть пустым")
-    @Length(min = 1, max = 1024, message = "Длина текста комментария должна быть от 1 до 1024 символов")
+    @NotBlank(message = "Field: text. Error: must not be blank.")
     private String text;
-    @NotNull
-    private Long pet;
 }

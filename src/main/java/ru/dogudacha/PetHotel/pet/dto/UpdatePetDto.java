@@ -33,6 +33,4 @@ public class UpdatePetDto {
     private Boolean isContact; //гуляет ли с другими животными
     @NotNull(message = "Field: isPhotographed. Error: must not be null.")
     private Boolean isPhotographed; // согласие владельца на фото и видео
-    @Length(max = 1000)
-    private String comments;
 }

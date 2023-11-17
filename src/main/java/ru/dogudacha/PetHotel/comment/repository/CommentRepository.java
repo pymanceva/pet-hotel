@@ -6,6 +6,6 @@ import ru.dogudacha.PetHotel.comment.model.Comment;
 import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    List<Comment> findByAuthorId(Long userId);
+    List<Comment> findByPetId(Long petId);
 }
 
