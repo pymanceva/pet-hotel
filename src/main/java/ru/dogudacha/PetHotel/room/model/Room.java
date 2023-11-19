@@ -17,13 +17,13 @@ public class Room {
     private Long id;
     @Column(name = "number", nullable = false)
     private String number;
-    @Column(name = "size")
-    private Double size;
+    @Column(name = "area")
+    private Double area;
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     private RoomTypes type;
-    @Column(name = "price")
-    private Double price;
+    @Column(name = "description")
+    private String description;
     @Column(name = "available")
     private Boolean isAvailable;
 }

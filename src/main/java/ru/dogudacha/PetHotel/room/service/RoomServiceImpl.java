@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.dogudacha.PetHotel.exception.AccessDeniedException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
 import ru.dogudacha.PetHotel.room.dto.RoomDto;
-import ru.dogudacha.PetHotel.room.dto.RoomWithoutPriceDto;
 import ru.dogudacha.PetHotel.room.dto.UpdateRoomDto;
 import ru.dogudacha.PetHotel.room.dto.mapper.RoomMapper;
 import ru.dogudacha.PetHotel.room.model.Room;
@@ -50,16 +49,6 @@ public class RoomServiceImpl implements RoomService {
         return roomMapper.toRoomDto(room);
     }
 
-    @Transactional(readOnly = true)
-    @Override
-    public RoomWithoutPriceDto getRoomWithoutPriceById(Long userId, Long roomId) {
-        checkLoginAccess(userId);
-        Room room = findRoomById(roomId);
-        log.info("RoomService: getRoomWithoutPriceById, userId={}, roomId={}", userId, roomId);
-
-        return roomMapper.toRoomDtoWithoutPrice(room);
-    }
-
     @Transactional
     @Override
     public RoomDto updateRoom(Long userId, Long roomId, UpdateRoomDto roomDto) {
@@ -72,12 +61,8 @@ public class RoomServiceImpl implements RoomService {
             newRoom.setType(oldRoom.getType());
         }
 
-        if (Objects.isNull(newRoom.getSize())) {
-            newRoom.setSize(oldRoom.getSize());
-        }
-
-        if (Objects.isNull(newRoom.getPrice())) {
-            newRoom.setPrice(oldRoom.getPrice());
+        if (Objects.isNull(newRoom.getArea())) {
+            newRoom.setArea(oldRoom.getArea());
         }
 
         if (Objects.isNull(newRoom.getNumber())) {
@@ -103,16 +88,6 @@ public class RoomServiceImpl implements RoomService {
         log.info("RoomService: getAllRooms, userId={}, list size={}", userId, allRooms.size());
 
         return roomMapper.toListRoomDto(allRooms);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public Collection<RoomWithoutPriceDto> getAllRoomsWithoutPrice(Long userId) {
-        checkLoginAccess(userId);
-        List<Room> allRooms = roomRepository.getAllRooms().orElse(Collections.emptyList());
-        log.info("RoomService: getAllRoomsWithoutPrice, userId={}, list size={}", userId, allRooms.size());
-
-        return roomMapper.toListRoomWithoutPriceDto(allRooms);
     }
 
     @Transactional
@@ -155,9 +130,5 @@ public class RoomServiceImpl implements RoomService {
             throw new AccessDeniedException(String.format("User with role=%s, can't access for this information",
                     user.getRole()));
         }
-    }
-
-    private void checkLoginAccess(Long userId) {
-        User user = findUserById(userId);
     }
 }

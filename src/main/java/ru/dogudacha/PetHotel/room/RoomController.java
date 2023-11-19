@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.dogudacha.PetHotel.room.dto.RoomDto;
-import ru.dogudacha.PetHotel.room.dto.RoomWithoutPriceDto;
 import ru.dogudacha.PetHotel.room.dto.UpdateRoomDto;
 import ru.dogudacha.PetHotel.room.service.RoomService;
 
@@ -30,14 +29,6 @@ public class RoomController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public RoomWithoutPriceDto getRoomWithoutPriceById(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
-                                                       @PathVariable(value = "id") long roomId) {
-        log.info("RoomController: GET/getRoomWithoutPriceById, requesterId={}, roomId={}", requesterId, roomId);
-        return roomService.getRoomWithoutPriceById(requesterId, roomId);
-    }
-
-    @GetMapping("/{id}/withPrice")
-    @ResponseStatus(HttpStatus.OK)
     public RoomDto getRoomById(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
                                @PathVariable(value = "id") long roomId) {
         log.info("RoomController: GET/getRoomById, requesterId={}, roomId={}", requesterId, roomId);
@@ -54,18 +45,11 @@ public class RoomController {
         return roomService.updateRoom(requesterId, roomId, roomDto);
     }
 
-    @GetMapping("/withPrice")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<RoomDto> getAllRooms(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId) {
         log.info("RoomController: GET/getAllRooms, requesterId={}", requesterId);
         return roomService.getAllRooms(requesterId);
-    }
-
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public Collection<RoomWithoutPriceDto> getAllRoomsWithoutPrice(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId) {
-        log.info("RoomController: GET/getAllRoomsWithoutPrice, requesterId={}", requesterId);
-        return roomService.getAllRoomsWithoutPrice(requesterId);
     }
 
     @DeleteMapping("/{id}")

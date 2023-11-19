@@ -9,9 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
-import ru.dogudacha.PetHotel.room.RoomController;
 import ru.dogudacha.PetHotel.room.dto.RoomDto;
-import ru.dogudacha.PetHotel.room.dto.RoomWithoutPriceDto;
 import ru.dogudacha.PetHotel.room.dto.UpdateRoomDto;
 import ru.dogudacha.PetHotel.room.model.RoomTypes;
 import ru.dogudacha.PetHotel.room.service.RoomService;
@@ -34,16 +32,8 @@ public class RoomControllerIntegrationTest {
     private final RoomDto roomDto = RoomDto.builder()
             .id(roomId)
             .size(5.0)
-            .price(1000.0)
             .number("standard room")
-            .type(RoomTypes.STANDARD)
-            .isAvailable(true)
-            .build();
-    private final RoomWithoutPriceDto roomWithoutPriceDto = RoomWithoutPriceDto.builder()
-            .id(roomId)
-            .size(5.0)
-            .number("standard room")
-            .type(RoomTypes.STANDARD)
+            .type(RoomTypes.SMALL)
             .isAvailable(true)
             .build();
     @Autowired
@@ -66,7 +56,6 @@ public class RoomControllerIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", is(roomDto.getId()), Long.class))
                 .andExpect(jsonPath("$.size", is(roomDto.getSize()), Double.class))
-                .andExpect(jsonPath("$.price", is(roomDto.getPrice()), Double.class))
                 .andExpect(jsonPath("$.number", is(roomDto.getNumber())))
                 .andExpect(jsonPath("$.type", is(roomDto.getType().toString())))
                 .andExpect(jsonPath("$.isAvailable", is(roomDto.getIsAvailable())));
@@ -91,41 +80,15 @@ public class RoomControllerIntegrationTest {
 
     @Test
     @SneakyThrows
-    void getRoomWithoutPriceById() {
-        when(roomService.getRoomWithoutPriceById(anyLong(), anyLong())).thenReturn(roomWithoutPriceDto);
-
-        mockMvc.perform(get("/rooms/{id}", roomId)
-                        .header(requesterHeader, requesterId)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(roomDto.getId()), Long.class))
-                .andExpect(jsonPath("$.size", is(roomDto.getSize()), Double.class))
-                .andExpect(jsonPath("$.number", is(roomDto.getNumber())))
-                .andExpect(jsonPath("$.type", is(roomDto.getType().toString())))
-                .andExpect(jsonPath("$.isAvailable", is(roomDto.getIsAvailable())));
-
-        verify(roomService).getRoomWithoutPriceById(requesterId, roomId);
-
-        when(roomService.getRoomWithoutPriceById(anyLong(), anyLong())).thenThrow(NotFoundException.class);
-        mockMvc.perform(get("/rooms/{id}", roomId)
-                        .header(requesterHeader, requesterId)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-        verify(roomService, times(2)).getRoomWithoutPriceById(requesterId, roomId);
-    }
-
-    @Test
-    @SneakyThrows
     void getRoomById() {
         when(roomService.getRoomById(anyLong(), anyLong())).thenReturn(roomDto);
 
-        mockMvc.perform(get("/rooms/{id}/withPrice", roomId)
+        mockMvc.perform(get("/rooms/{id}", roomId)
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(roomDto.getId()), Long.class))
                 .andExpect(jsonPath("$.size", is(roomDto.getSize()), Double.class))
-                .andExpect(jsonPath("$.price", is(roomDto.getPrice()), Double.class))
                 .andExpect(jsonPath("$.number", is(roomDto.getNumber())))
                 .andExpect(jsonPath("$.type", is(roomDto.getType().toString())))
                 .andExpect(jsonPath("$.isAvailable", is(roomDto.getIsAvailable())));
@@ -133,7 +96,7 @@ public class RoomControllerIntegrationTest {
         verify(roomService).getRoomById(requesterId, roomId);
 
         when(roomService.getRoomById(anyLong(), anyLong())).thenThrow(NotFoundException.class);
-        mockMvc.perform(get("/rooms/{id}/withPrice", roomId)
+        mockMvc.perform(get("/rooms/{id}", roomId)
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -153,7 +116,6 @@ public class RoomControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(roomDto.getId()), Long.class))
                 .andExpect(jsonPath("$.size", is(roomDto.getSize()), Double.class))
-                .andExpect(jsonPath("$.price", is(roomDto.getPrice()), Double.class))
                 .andExpect(jsonPath("$.number", is(roomDto.getNumber())))
                 .andExpect(jsonPath("$.type", is(roomDto.getType().toString())))
                 .andExpect(jsonPath("$.isAvailable", is(roomDto.getIsAvailable())));
@@ -173,23 +135,6 @@ public class RoomControllerIntegrationTest {
     @SneakyThrows
     void getAllRooms() {
         when(roomService.getAllRooms(anyLong())).thenReturn(List.of(roomDto));
-
-        mockMvc.perform(get("/rooms/withPrice")
-                        .header(requesterHeader, requesterId)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id", is(roomDto.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].size", is(roomDto.getSize()), Double.class))
-                .andExpect(jsonPath("$.[0].price", is(roomDto.getPrice()), Double.class))
-                .andExpect(jsonPath("$.[0].number", is(roomDto.getNumber())))
-                .andExpect(jsonPath("$.[0].type", is(roomDto.getType().toString())))
-                .andExpect(jsonPath("$.[0].isAvailable", is(roomDto.getIsAvailable())));
-    }
-
-    @Test
-    @SneakyThrows
-    void getAllRoomsWithoutPrice() {
-        when(roomService.getAllRoomsWithoutPrice(anyLong())).thenReturn(List.of(roomWithoutPriceDto));
 
         mockMvc.perform(get("/rooms")
                         .header(requesterHeader, requesterId)
