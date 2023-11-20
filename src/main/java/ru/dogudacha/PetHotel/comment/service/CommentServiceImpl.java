@@ -42,8 +42,9 @@ public class CommentServiceImpl implements CommentService {
         comment.setPet(pet);
         comment.setCreated(LocalDateTime.now());
         comment.setText(newCommentDto.getText());
-        Comment sevedComment = commentRepository.save(comment);
-        return commentMapper.toCommentDto(sevedComment);
+        Comment savedComment = commentRepository.save(comment);
+        log.info("CommentService: crateComment, requesterId={}, commentId={}", requesterId, savedComment.getId());
+        return commentMapper.toCommentDto(savedComment);
     }
 
     @Override
@@ -52,6 +53,7 @@ public class CommentServiceImpl implements CommentService {
         findUserById(requesterId);
         findPetById(petId);
         List<Comment> comments = commentRepository.findByPetId(petId);
+        log.info("CommentService: getAllCommentsByPetId, requesterId={}, petId={}", requesterId, petId);
         return comments.stream()
                 .map(commentMapper::toCommentDto)
                 .collect(Collectors.toList());
@@ -62,6 +64,7 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto getCommentById(Long requesterId, Long commentId) {
         findUserById(requesterId);
         Comment comment = getCommentIfExists(commentId);
+        log.info("CommentService: getCommentById, requesterId={}, commentId={}", requesterId, commentId);
         return commentMapper.toCommentDto(comment);
     }
 
@@ -76,7 +79,7 @@ public class CommentServiceImpl implements CommentService {
         if (Objects.nonNull(updateCommentDto.getText()) && !updateCommentDto.getText().isBlank()) {
             comment.setText(updateCommentDto.getText());
         }
-
+        log.info("CommentService: updateComment, requesterId={}, commentId={}, updateCommentDto={}", requesterId, commentId, updateCommentDto);
         return commentMapper.toCommentDto(comment);
     }
 
@@ -86,6 +89,7 @@ public class CommentServiceImpl implements CommentService {
         User user = findUserById(requesterId);
         Comment comment = getCommentIfExists(commentId);
         if (comment.getAuthor().getId().equals(user.getId()) || user.getRole().ordinal() == 0) {
+            log.info("CommentService: deleteComment, requesterId={}, commentId={}", requesterId, commentId);
             commentRepository.deleteById(commentId);
         } else {
             throw new AccessDeniedException("Only the author of the comment or boss can delete it.");
