@@ -69,8 +69,8 @@ public class RoomServiceImpl implements RoomService {
             newRoom.setNumber(oldRoom.getNumber());
         }
 
-        if (Objects.isNull(newRoom.getIsAvailable())) {
-            newRoom.setIsAvailable(oldRoom.getIsAvailable());
+        if (Objects.isNull(newRoom.getIsVisible())) {
+            newRoom.setIsVisible(oldRoom.getIsVisible());
         }
 
         Room updatedRoom = roomRepository.save(newRoom);

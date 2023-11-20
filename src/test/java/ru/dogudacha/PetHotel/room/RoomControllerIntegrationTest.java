@@ -34,7 +34,7 @@ public class RoomControllerIntegrationTest {
             .size(5.0)
             .number("standard room")
             .type(RoomTypes.SMALL)
-            .isAvailable(true)
+            .isVisible(true)
             .build();
     @Autowired
     private ObjectMapper objectMapper;
@@ -58,7 +58,7 @@ public class RoomControllerIntegrationTest {
                 .andExpect(jsonPath("$.size", is(roomDto.getSize()), Double.class))
                 .andExpect(jsonPath("$.number", is(roomDto.getNumber())))
                 .andExpect(jsonPath("$.type", is(roomDto.getType().toString())))
-                .andExpect(jsonPath("$.isAvailable", is(roomDto.getIsAvailable())));
+                .andExpect(jsonPath("$.isVisible", is(roomDto.getIsVisible())));
 
         verify(roomService).addRoom(anyLong(), any(RoomDto.class));
 
@@ -91,7 +91,7 @@ public class RoomControllerIntegrationTest {
                 .andExpect(jsonPath("$.size", is(roomDto.getSize()), Double.class))
                 .andExpect(jsonPath("$.number", is(roomDto.getNumber())))
                 .andExpect(jsonPath("$.type", is(roomDto.getType().toString())))
-                .andExpect(jsonPath("$.isAvailable", is(roomDto.getIsAvailable())));
+                .andExpect(jsonPath("$.isVisible", is(roomDto.getIsVisible())));
 
         verify(roomService).getRoomById(requesterId, roomId);
 
@@ -118,7 +118,7 @@ public class RoomControllerIntegrationTest {
                 .andExpect(jsonPath("$.size", is(roomDto.getSize()), Double.class))
                 .andExpect(jsonPath("$.number", is(roomDto.getNumber())))
                 .andExpect(jsonPath("$.type", is(roomDto.getType().toString())))
-                .andExpect(jsonPath("$.isAvailable", is(roomDto.getIsAvailable())));
+                .andExpect(jsonPath("$.isVisible", is(roomDto.getIsVisible())));
 
 
         when(roomService.updateRoom(anyLong(), eq(roomId), any(UpdateRoomDto.class)))
@@ -144,7 +144,7 @@ public class RoomControllerIntegrationTest {
                 .andExpect(jsonPath("$.[0].size", is(roomDto.getSize()), Double.class))
                 .andExpect(jsonPath("$.[0].number", is(roomDto.getNumber())))
                 .andExpect(jsonPath("$.[0].type", is(roomDto.getType().toString())))
-                .andExpect(jsonPath("$.[0].isAvailable", is(roomDto.getIsAvailable())));
+                .andExpect(jsonPath("$.[0].isVisible", is(roomDto.getIsVisible())));
     }
 
     @Test

@@ -715,7 +715,7 @@
           "description": {
             "type": "string"
           },
-          "isAvailable": {
+          "isVisible": {
             "type": "boolean"
           }
         }
@@ -748,7 +748,7 @@
           "description": {
             "type": "string"
           },
-          "isAvailable": {
+          "isVisible": {
             "type": "boolean"
           }
         }

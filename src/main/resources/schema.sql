@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS rooms
     area_room        REAL                                            ,
     type_room        VARCHAR(20)                             NOT NULL,
     description_room VARCHAR(150)                                    ,
-    available_room   BOOLEAN DEFAULT TRUE                            ,
+    visible_room   BOOLEAN DEFAULT TRUE                              ,
     CONSTRAINT pk_room PRIMARY KEY (id_room),
     CONSTRAINT UQ_ROOM_NUMBER UNIQUE(number_room),
     CONSTRAINT positive_room_area CHECK (area_room > 0)

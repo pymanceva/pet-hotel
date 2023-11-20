@@ -24,5 +24,5 @@ public class RoomDto {
     @NotNull(message = "Field: type. Error: must not be null.")
     private RoomTypes type;
     private String description;
-    private Boolean isAvailable;
+    private Boolean isVisible;
 }

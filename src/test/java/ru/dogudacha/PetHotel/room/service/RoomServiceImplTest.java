@@ -63,7 +63,7 @@ public class RoomServiceImplTest {
             .area(5.0)
             .number("standard room")
             .type(RoomTypes.SMALL)
-            .isAvailable(true)
+            .isVisible(true)
             .build();
 
     private final RoomDto roomDto = RoomDto.builder()
@@ -71,7 +71,7 @@ public class RoomServiceImplTest {
             .size(5.0)
             .number("standard room")
             .type(RoomTypes.SMALL)
-            .isAvailable(true)
+            .isVisible(true)
             .build();
 
     @InjectMocks
@@ -97,7 +97,7 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(roomDto.getType(), result.getType());
         Assertions.assertEquals(roomDto.getSize(), result.getSize());
-        Assertions.assertTrue(result.getIsAvailable());
+        Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
 
         verify(roomRepository, times(1)).save(any(Room.class));
@@ -117,7 +117,7 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(roomDto.getType(), result.getType());
         Assertions.assertEquals(roomDto.getSize(), result.getSize());
-        Assertions.assertTrue(result.getIsAvailable());
+        Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
 
         verify(roomRepository, times(1)).save(any(Room.class));
@@ -153,7 +153,7 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(roomDto.getType(), result.getType());
         Assertions.assertEquals(roomDto.getSize(), result.getSize());
-        Assertions.assertTrue(result.getIsAvailable());
+        Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
 
         verify(roomRepository, times(1)).findById(anyLong());
@@ -173,7 +173,7 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(roomDto.getType(), result.getType());
         Assertions.assertEquals(roomDto.getSize(), result.getSize());
-        Assertions.assertTrue(result.getIsAvailable());
+        Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
 
         verify(roomRepository, times(1)).findById(anyLong());
@@ -193,7 +193,7 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(roomDto.getType(), result.getType());
         Assertions.assertEquals(roomDto.getSize(), result.getSize());
-        Assertions.assertTrue(result.getIsAvailable());
+        Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
 
         verify(roomRepository, times(1)).findById(anyLong());
@@ -223,7 +223,7 @@ public class RoomServiceImplTest {
                 .size(10.0)
                 .number("new standard room")
                 .type(RoomTypes.SMALL)
-                .isAvailable(false)
+                .isVisible(false)
                 .build();
 
         RoomDto updatedRoomDto = RoomDto.builder()
@@ -231,14 +231,14 @@ public class RoomServiceImplTest {
                 .size(10.0)
                 .number("new standard room")
                 .type(RoomTypes.SMALL)
-                .isAvailable(false)
+                .isVisible(false)
                 .build();
 
         Room newRoom = Room.builder()
                 .area(10.0)
                 .number("new standard room")
                 .type(RoomTypes.SMALL)
-                .isAvailable(false)
+                .isVisible(false)
                 .build();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
@@ -253,7 +253,7 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(updatedRoomDto.getType(), result.getType());
         Assertions.assertEquals(updatedRoomDto.getSize(), result.getSize());
-        Assertions.assertFalse(result.getIsAvailable());
+        Assertions.assertFalse(result.getIsVisible());
         Assertions.assertEquals(updatedRoomDto.getNumber(), result.getNumber());
 
         verify(roomRepository, times(1)).save(any(Room.class));
@@ -269,7 +269,7 @@ public class RoomServiceImplTest {
                 .size(5.0)
                 .number("standard room")
                 .type(RoomTypes.SMALL)
-                .isAvailable(true)
+                .isVisible(true)
                 .build();
 
         Room updatedRoom = Room.builder()
@@ -279,7 +279,7 @@ public class RoomServiceImplTest {
                 .area(5.0)
                 .number("standard room")
                 .type(RoomTypes.SMALL)
-                .isAvailable(true)
+                .isVisible(true)
                 .build();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
@@ -294,7 +294,7 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(updatedRoomDto.getType(), result.getType());
         Assertions.assertEquals(updatedRoomDto.getSize(), result.getSize());
-        Assertions.assertTrue(result.getIsAvailable());
+        Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(updatedRoomDto.getNumber(), result.getNumber());
 
         verify(roomRepository, times(1)).save(any(Room.class));
@@ -303,7 +303,7 @@ public class RoomServiceImplTest {
     @Test
     void updateRoom_whenRequesterBossAndRoomFoundAndAvailableNewFieldNotNull_thenUpdateAllFieldsThanId() {
         UpdateRoomDto newRoomDto = UpdateRoomDto.builder()
-                .isAvailable(false)
+                .isVisible(false)
                 .build();
 
         RoomDto updatedRoomDto = RoomDto.builder()
@@ -311,18 +311,18 @@ public class RoomServiceImplTest {
                 .size(5.0)
                 .number("standard room")
                 .type(RoomTypes.SMALL)
-                .isAvailable(false)
+                .isVisible(false)
                 .build();
 
         Room updatedRoom = Room.builder()
-                .isAvailable(false)
+                .isVisible(false)
                 .build();
 
         Room newRoom = Room.builder()
                 .area(5.0)
                 .number("standard room")
                 .type(RoomTypes.SMALL)
-                .isAvailable(false)
+                .isVisible(false)
                 .build();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
@@ -337,7 +337,7 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(updatedRoomDto.getType(), result.getType());
         Assertions.assertEquals(updatedRoomDto.getSize(), result.getSize());
-        Assertions.assertFalse(result.getIsAvailable());
+        Assertions.assertFalse(result.getIsVisible());
         Assertions.assertEquals(updatedRoomDto.getNumber(), result.getNumber());
 
         verify(roomRepository, times(1)).save(any(Room.class));
@@ -350,7 +350,7 @@ public class RoomServiceImplTest {
                 .size(10.0)
                 .number("new standard room")
                 .type(RoomTypes.SMALL)
-                .isAvailable(false)
+                .isVisible(false)
                 .build();
 
         RoomDto updatedRoomDto = RoomDto.builder()
@@ -358,14 +358,14 @@ public class RoomServiceImplTest {
                 .size(10.0)
                 .number("new standard room")
                 .type(RoomTypes.SMALL)
-                .isAvailable(false)
+                .isVisible(false)
                 .build();
 
         Room newRoom = Room.builder()
                 .area(10.0)
                 .number("new standard room")
                 .type(RoomTypes.SMALL)
-                .isAvailable(false)
+                .isVisible(false)
                 .build();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
@@ -380,7 +380,7 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(updatedRoomDto.getType(), result.getType());
         Assertions.assertEquals(updatedRoomDto.getSize(), result.getSize());
-        Assertions.assertFalse(result.getIsAvailable());
+        Assertions.assertFalse(result.getIsVisible());
         Assertions.assertEquals(updatedRoomDto.getNumber(), result.getNumber());
 
         verify(roomRepository, times(1)).save(any(Room.class));
@@ -433,7 +433,7 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(1L, result.get(0).getId());
         Assertions.assertEquals(roomDto.getType(), result.get(0).getType());
         Assertions.assertEquals(roomDto.getSize(), result.get(0).getSize());
-        Assertions.assertTrue(result.get(0).getIsAvailable());
+        Assertions.assertTrue(result.get(0).getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.get(0).getNumber());
 
         verify(roomRepository, times(1)).getAllRooms();
@@ -454,7 +454,7 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(1L, result.get(0).getId());
         Assertions.assertEquals(roomDto.getType(), result.get(0).getType());
         Assertions.assertEquals(roomDto.getSize(), result.get(0).getSize());
-        Assertions.assertTrue(result.get(0).getIsAvailable());
+        Assertions.assertTrue(result.get(0).getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.get(0).getNumber());
 
         verify(roomRepository, times(1)).getAllRooms();
@@ -475,7 +475,7 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(1L, result.get(0).getId());
         Assertions.assertEquals(roomDto.getType(), result.get(0).getType());
         Assertions.assertEquals(roomDto.getSize(), result.get(0).getSize());
-        Assertions.assertTrue(result.get(0).getIsAvailable());
+        Assertions.assertTrue(result.get(0).getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.get(0).getNumber());
 
         verify(roomRepository, times(1)).getAllRooms();
