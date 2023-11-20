@@ -17,11 +17,12 @@ import java.util.Collection;
 @RequestMapping(path = "/rooms")
 @RequiredArgsConstructor
 public class RoomController {
+    private static final String USER_ID = "X-PetHotel-User-Id";
     private final RoomService roomService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RoomDto addRoom(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
+    public RoomDto addRoom(@RequestHeader(USER_ID) Long requesterId,
                            @RequestBody @Valid RoomDto roomDto) {
         log.info("RoomController: POST/addRoom, requesterId={}, room={}", requesterId, roomDto);
         return roomService.addRoom(requesterId, roomDto);
@@ -29,17 +30,17 @@ public class RoomController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public RoomDto getRoomById(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
-                               @PathVariable(value = "id") long roomId) {
+    public RoomDto getRoomById(@RequestHeader(USER_ID) Long requesterId,
+                               @PathVariable("id") long roomId) {
         log.info("RoomController: GET/getRoomById, requesterId={}, roomId={}", requesterId, roomId);
         return roomService.getRoomById(requesterId, roomId);
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public RoomDto updateRoom(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
+    public RoomDto updateRoom(@RequestHeader(USER_ID) Long requesterId,
                               @RequestBody UpdateRoomDto roomDto,
-                              @PathVariable(value = "id") long roomId) {
+                              @PathVariable("id") long roomId) {
         log.info("RoomController: PATCH/updateRoom, requesterId={}, roomId={}, requestBody={}",
                 requesterId, roomId, roomDto);
         return roomService.updateRoom(requesterId, roomId, roomDto);
@@ -47,14 +48,14 @@ public class RoomController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Collection<RoomDto> getAllRooms(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId) {
+    public Collection<RoomDto> getAllRooms(@RequestHeader(USER_ID) Long requesterId) {
         log.info("RoomController: GET/getAllRooms, requesterId={}", requesterId);
         return roomService.getAllRooms(requesterId);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteRoomById(@RequestHeader(value = "X-PetHotel-User-Id") Long requesterId,
+    public void deleteRoomById(@RequestHeader(USER_ID) Long requesterId,
                                @PathVariable("id") Long roomId) {
         log.info("RoomController: DELETE/deleteRoomById, requesterId={}, roomId={}", requesterId, roomId);
         roomService.deleteRoomById(requesterId, roomId);
