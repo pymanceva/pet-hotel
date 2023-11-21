@@ -1,7 +1,6 @@
 package ru.dogudacha.PetHotel.owner.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 @Builder
@@ -16,35 +15,35 @@ public class Owner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "name", nullable = false)
+    @Column(name = "name_owners", nullable = false)
     private String name;
-    @Column(name = "email", nullable = false)
+    @Column(name = "email_owners", nullable = false)
     private String email;
-    @Column(name = "main_phone", nullable = false)
+    @Column(name = "main_phone_owners", nullable = false)
     private String mainPhone;
-    @Column(name = "optional_phone")
+    @Column(name = "optional_phone_owners")
     private String optionalPhone;
-    @Column(name = "instagram")
+    @Column(name = "instagram_owners")
     private String instagram;
-    @Column(name = "youtube")
+    @Column(name = "youtube_owners")
     private String youtube;
-    @Column(name = "facebook")
+    @Column(name = "facebook_owners")
     private String facebook;
-    @Column(name = "tiktok")
+    @Column(name = "tiktok_owners")
     private String tiktok;
-    @Column(name = "twitter")
+    @Column(name = "twitter_owners")
     private String twitter;
-    @Column(name = "telegram")
+    @Column(name = "telegram_owners")
     private String telegram;
-    @Column(name = "whatsapp")
+    @Column(name = "whatsapp_owners")
     private String whatsapp;
-    @Column(name = "viber")
+    @Column(name = "viber_owners")
     private String viber;
-    @Column(name = "vk")
+    @Column(name = "vk_owners")
     private String vk;
-    @Column(name = "prefer_communication", nullable = false)
+    @Column(name = "prefer_communication_owners", nullable = false)
     @Enumerated(EnumType.STRING)
     private MethodsOfCommunication preferCommunication;
-    @Column(name = "car_registration_number")
+    @Column(name = "car_registration_number_owners")
     private String carRegistrationNumber;
 }

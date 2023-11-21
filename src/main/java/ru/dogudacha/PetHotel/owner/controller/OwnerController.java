@@ -33,7 +33,6 @@ public class OwnerController {
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public OwnerDto getOwnerById(@RequestHeader(value = USER_ID) Long requesterId,
                                          @PathVariable(value = "id") Long id
     ) {
@@ -42,7 +41,6 @@ public class OwnerController {
     }
 
     @GetMapping("/{id}/short")
-    @ResponseStatus(HttpStatus.OK)
     public OwnerShortDto getShortOwnerById(@RequestHeader(value = USER_ID) Long requesterId,
                                       @PathVariable(value = "id") Long id
     ) {
@@ -51,7 +49,6 @@ public class OwnerController {
     }
 
     @PatchMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public OwnerDto updateOwner(@RequestHeader(value = USER_ID) Long requesterId,
                                 @RequestBody @Valid UpdateOwnerDto updateOwnerDto,
                                 @PathVariable(value = "id") Long ownerId
@@ -62,7 +59,6 @@ public class OwnerController {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public Collection<OwnerDto> getAllOwners(@RequestHeader(value = USER_ID) Long requesterId
     ) {
         log.info("OwnerController: requesterId={} GET/getAllOwners", requesterId);

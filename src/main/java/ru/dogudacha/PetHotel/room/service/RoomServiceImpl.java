@@ -24,8 +24,8 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService {
-    final private RoomRepository roomRepository;
-    final private RoomMapper roomMapper;
+    private final RoomRepository roomRepository;
+    private final RoomMapper roomMapper;
     private final UserRepository userRepository;
 
     @Transactional

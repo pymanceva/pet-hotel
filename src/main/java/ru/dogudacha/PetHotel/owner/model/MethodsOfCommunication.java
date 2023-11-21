@@ -1,7 +1,5 @@
 package ru.dogudacha.PetHotel.owner.model;
 
-import ru.dogudacha.PetHotel.user.model.Roles;
-
 import java.util.Optional;
 
 public enum MethodsOfCommunication {

@@ -1,6 +1,5 @@
 package ru.dogudacha.PetHotel.owner.dto;
 
-import ch.qos.logback.classic.pattern.MethodOfCallerConverter;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

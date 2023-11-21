@@ -17,9 +17,6 @@ public interface OwnerMapper {
 
     OwnerShortDto toOwnerShortDto(Owner owner);
 
-    @Mapping(target = "id", ignore = true)
-    Owner toOwner(OwnerDto ownerDto);
-
     Owner toOwner(NewOwnerDto newOwnerDto);
 
     @Mapping(target = "id", ignore = true)

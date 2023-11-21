@@ -15,12 +15,7 @@ import ru.dogudacha.PetHotel.owner.dto.OwnerDto;
 import ru.dogudacha.PetHotel.owner.dto.OwnerShortDto;
 import ru.dogudacha.PetHotel.owner.dto.UpdateOwnerDto;
 import ru.dogudacha.PetHotel.owner.model.MethodsOfCommunication;
-import ru.dogudacha.PetHotel.owner.model.Owner;
 import ru.dogudacha.PetHotel.owner.service.OwnerService;
-import ru.dogudacha.PetHotel.user.UserController;
-import ru.dogudacha.PetHotel.user.dto.UpdateUserDto;
-import ru.dogudacha.PetHotel.user.dto.UserDto;
-import ru.dogudacha.PetHotel.user.model.Roles;
 import ru.dogudacha.PetHotel.user.service.UserService;
 
 import java.util.List;
@@ -41,9 +36,6 @@ class OwnerControllerIntegrationTest {
     private ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
-
-    @MockBean
-    private UserService userService;
     @MockBean
     private OwnerService ownerService;
 

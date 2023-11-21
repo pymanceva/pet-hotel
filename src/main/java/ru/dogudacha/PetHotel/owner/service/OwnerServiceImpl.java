@@ -7,18 +7,15 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.dogudacha.PetHotel.exception.AccessDeniedException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
 import ru.dogudacha.PetHotel.owner.dto.NewOwnerDto;
+import ru.dogudacha.PetHotel.owner.dto.OwnerDto;
 import ru.dogudacha.PetHotel.owner.dto.OwnerShortDto;
 import ru.dogudacha.PetHotel.owner.dto.UpdateOwnerDto;
-import ru.dogudacha.PetHotel.owner.dto.OwnerDto;
 import ru.dogudacha.PetHotel.owner.dto.mapper.OwnerMapper;
 import ru.dogudacha.PetHotel.owner.model.Owner;
 import ru.dogudacha.PetHotel.owner.repository.OwnerRepository;
-import ru.dogudacha.PetHotel.user.model.Roles;
 import ru.dogudacha.PetHotel.user.model.User;
 import ru.dogudacha.PetHotel.user.repository.UserRepository;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,7 +35,7 @@ public class OwnerServiceImpl implements OwnerService {
         Owner newOwner = ownerMapper.toOwner(newOwnerDto);
 
         Owner addedOwner = ownerRepository.save(newOwner);
-        log.info("ownerService: has been added owner={}", addedOwner);
+        log.info("ownerService: addOwner, requesterId={}, owner={}", requesterId, addedOwner);
         return ownerMapper.toOwnerDto(addedOwner);
     }
 
@@ -49,11 +46,12 @@ public class OwnerServiceImpl implements OwnerService {
         checkAccessForBrowse(requester);
         Owner owner = findOwnerById(ownerId);
 
-        log.info("ownerService: has been returned ownerShortDto={}, by id={}", owner, ownerId);
+        log.info("ownerService: getShortOwnerById, requesterId={}, ownerShortDto={}, ownerId={}",
+                requesterId, owner, ownerId);
         OwnerShortDto ownerShortDto = ownerMapper.toOwnerShortDto(owner);
         switch (owner.getPreferCommunication()) {
             case MAIN_PHONE -> ownerShortDto.setContact(owner.getMainPhone());
-            case OPTIONAL_PHONE -> ownerShortDto.setContact( owner.getOptionalPhone());
+            case OPTIONAL_PHONE -> ownerShortDto.setContact(owner.getOptionalPhone());
             case TELEGRAM -> ownerShortDto.setContact(owner.getTelegram());
             case WHATSAPP -> ownerShortDto.setContact(owner.getWhatsapp());
             case VIBER -> ownerShortDto.setContact(owner.getViber());
@@ -69,7 +67,7 @@ public class OwnerServiceImpl implements OwnerService {
         checkAccessForEdit(requester);
         Owner owner = findOwnerById(ownerId);
 
-        log.info("ownerService: has been returned ownerDto={}, by id={}", owner, ownerId);
+        log.info("ownerService: getOwnerById, requesterId={}, ownerDto={}, ownerId={}", requesterId, owner, ownerId);
         return ownerMapper.toOwnerDto(owner);
     }
 
@@ -143,7 +141,8 @@ public class OwnerServiceImpl implements OwnerService {
         }
 
         Owner updatedOwner = ownerRepository.save(newOwner);
-        log.info("ownerService: old owner={} has been updated to new owner={}", oldOwner, updatedOwner);
+        log.info("ownerService: updateOwner, requesterId={}, old owner={}, updatedOwner={}",
+                requesterId, oldOwner, updatedOwner);
 
         return ownerMapper.toOwnerDto(updatedOwner);
     }
@@ -155,7 +154,7 @@ public class OwnerServiceImpl implements OwnerService {
         checkAccessForEdit(requester);
         List<Owner> allOwners = ownerRepository.findAll();
 
-        log.info("ownerService: has been returned all {} owners", allOwners.size());
+        log.info("ownerService: getAllOwners, requesterId={}, num of owners={}", requesterId, allOwners.size());
         return ownerMapper.map(allOwners);
     }
 
@@ -164,9 +163,10 @@ public class OwnerServiceImpl implements OwnerService {
     public void deleteOwnerById(Long requesterId, Long ownerId) {
         User requester = findUserById(requesterId);
         checkAccessForEdit(requester);
+        findOwnerById(ownerId);
 
         ownerRepository.deleteById(ownerId);
-        log.info("ownerService: has been delete owner with id={}", ownerId);
+        log.info("ownerService: deleteOwnerById, requesterId={}, ownerId={}", requesterId, ownerId);
     }
 
     private User findUserById(long userId) {
