@@ -14,6 +14,7 @@ import ru.dogudacha.PetHotel.comment.service.CommentService;
 import java.util.List;
 
 
+@CrossOrigin
 @RestController
 @RequestMapping(path = "/comments")
 @RequiredArgsConstructor
