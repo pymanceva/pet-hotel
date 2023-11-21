@@ -12,7 +12,7 @@ import ru.dogudacha.PetHotel.pet.dto.UpdatePetDto;
 import ru.dogudacha.PetHotel.pet.service.PetService;
 
 import java.util.List;
-
+@CrossOrigin
 @RestController
 @RequestMapping(path = "/pets")
 @RequiredArgsConstructor

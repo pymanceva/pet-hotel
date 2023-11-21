@@ -1,3 +1,4 @@
+
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS pets CASCADE;
 DROP TABLE IF EXISTS rooms;
@@ -52,4 +53,5 @@ CREATE TABLE IF NOT EXISTS comments
     CONSTRAINT fk_comments_to_users FOREIGN KEY (author_id) REFERENCES users (id) ON DELETE CASCADE,
     CONSTRAINT fk_comments_to_pets FOREIGN KEY (pet_id) REFERENCES pets (id) ON DELETE CASCADE
 );
+
 
