@@ -171,6 +171,7 @@ public class PetServiceImplTest {
             .isPhotographed(false)
             .build();
 
+
     @Test
     void addPet_whenAddPetByAdmin_thenPetAdded() {
         when(mockUserRepository.findById(requesterAdmin.getId())).thenReturn(Optional.of(requesterAdmin));

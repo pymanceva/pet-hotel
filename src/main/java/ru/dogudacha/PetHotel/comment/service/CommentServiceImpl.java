@@ -43,7 +43,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setCreated(LocalDateTime.now());
         comment.setText(newCommentDto.getText());
         Comment savedComment = commentRepository.save(comment);
-        log.info("CommentService: crateComment, requesterId={}, commentId={}", requesterId, savedComment.getId());
+        log.info("CommentService: createComment, requesterId={}, commentId={}", requesterId, savedComment.getId());
         return commentMapper.toCommentDto(savedComment);
     }
 

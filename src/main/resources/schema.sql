@@ -53,5 +53,3 @@ CREATE TABLE IF NOT EXISTS comments
     CONSTRAINT fk_comments_to_pets FOREIGN KEY (pet_id) REFERENCES pets (id) ON DELETE CASCADE
 );
 
-
-
