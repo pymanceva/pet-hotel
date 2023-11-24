@@ -29,7 +29,6 @@ public class RoomController {
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public RoomDto getRoomById(@RequestHeader(USER_ID) Long requesterId,
                                @PathVariable("id") long roomId) {
         log.info("RoomController: GET/getRoomById, requesterId={}, roomId={}", requesterId, roomId);
@@ -37,7 +36,6 @@ public class RoomController {
     }
 
     @PatchMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public RoomDto updateRoom(@RequestHeader(USER_ID) Long requesterId,
                               @RequestBody UpdateRoomDto roomDto,
                               @PathVariable("id") long roomId) {
@@ -47,7 +45,6 @@ public class RoomController {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public Collection<RoomDto> getAllRooms(@RequestHeader(USER_ID) Long requesterId) {
         log.info("RoomController: GET/getAllRooms, requesterId={}", requesterId);
         return roomService.getAllRooms(requesterId);

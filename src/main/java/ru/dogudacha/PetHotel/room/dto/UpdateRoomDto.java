@@ -16,8 +16,8 @@ public class UpdateRoomDto {
     private Long id;
     @Size(min = 1, max = 100)
     private String number;
-    @Min(value = 0, message = "Field: size. Error: must not be negative.")
-    private Double size;
+    @Min(value = 0, message = "Field: area. Error: must not be negative.")
+    private Double area;
     private RoomTypes type;
     private String description;
     private Boolean isVisible;

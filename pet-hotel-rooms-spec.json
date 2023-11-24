@@ -699,7 +699,7 @@
             "minLength": 1,
             "type": "string"
           },
-          "size": {
+          "area": {
             "minimum": 0,
             "type": "number",
             "format": "double"
@@ -732,7 +732,7 @@
             "minLength": 1,
             "type": "string"
           },
-          "size": {
+          "area": {
             "minimum": 0,
             "type": "number",
             "format": "double"

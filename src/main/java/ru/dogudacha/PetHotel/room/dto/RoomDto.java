@@ -19,8 +19,8 @@ public class RoomDto {
     @NotBlank(message = "Field: number. Error: must not be blank.")
     @Size(min = 1, max = 100)
     private String number;
-    @Min(value = 0, message = "Field: size. Error: must not be negative.")
-    private Double size;
+    @Min(value = 0, message = "Field: area. Error: must not be negative.")
+    private Double area;
     @NotNull(message = "Field: type. Error: must not be null.")
     private RoomTypes type;
     private String description;

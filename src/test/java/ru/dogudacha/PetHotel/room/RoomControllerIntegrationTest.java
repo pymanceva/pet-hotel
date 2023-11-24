@@ -31,7 +31,7 @@ public class RoomControllerIntegrationTest {
     long roomId = 1L;
     private final RoomDto roomDto = RoomDto.builder()
             .id(roomId)
-            .size(5.0)
+            .area(5.0)
             .number("standard room")
             .type(RoomTypes.SMALL)
             .isVisible(true)
@@ -55,7 +55,7 @@ public class RoomControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(roomDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", is(roomDto.getId()), Long.class))
-                .andExpect(jsonPath("$.size", is(roomDto.getSize()), Double.class))
+                .andExpect(jsonPath("$.area", is(roomDto.getArea()), Double.class))
                 .andExpect(jsonPath("$.number", is(roomDto.getNumber())))
                 .andExpect(jsonPath("$.type", is(roomDto.getType().toString())))
                 .andExpect(jsonPath("$.isVisible", is(roomDto.getIsVisible())));
@@ -88,7 +88,7 @@ public class RoomControllerIntegrationTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(roomDto.getId()), Long.class))
-                .andExpect(jsonPath("$.size", is(roomDto.getSize()), Double.class))
+                .andExpect(jsonPath("$.area", is(roomDto.getArea()), Double.class))
                 .andExpect(jsonPath("$.number", is(roomDto.getNumber())))
                 .andExpect(jsonPath("$.type", is(roomDto.getType().toString())))
                 .andExpect(jsonPath("$.isVisible", is(roomDto.getIsVisible())));
@@ -115,7 +115,7 @@ public class RoomControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(roomDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(roomDto.getId()), Long.class))
-                .andExpect(jsonPath("$.size", is(roomDto.getSize()), Double.class))
+                .andExpect(jsonPath("$.area", is(roomDto.getArea()), Double.class))
                 .andExpect(jsonPath("$.number", is(roomDto.getNumber())))
                 .andExpect(jsonPath("$.type", is(roomDto.getType().toString())))
                 .andExpect(jsonPath("$.isVisible", is(roomDto.getIsVisible())));
@@ -141,7 +141,7 @@ public class RoomControllerIntegrationTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(roomDto.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].size", is(roomDto.getSize()), Double.class))
+                .andExpect(jsonPath("$.[0].area", is(roomDto.getArea()), Double.class))
                 .andExpect(jsonPath("$.[0].number", is(roomDto.getNumber())))
                 .andExpect(jsonPath("$.[0].type", is(roomDto.getType().toString())))
                 .andExpect(jsonPath("$.[0].isVisible", is(roomDto.getIsVisible())));

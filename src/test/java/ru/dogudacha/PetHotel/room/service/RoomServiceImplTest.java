@@ -68,7 +68,7 @@ public class RoomServiceImplTest {
 
     private final RoomDto roomDto = RoomDto.builder()
             .id(1L)
-            .size(5.0)
+            .area(5.0)
             .number("standard room")
             .type(RoomTypes.SMALL)
             .isVisible(true)
@@ -96,7 +96,7 @@ public class RoomServiceImplTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(roomDto.getType(), result.getType());
-        Assertions.assertEquals(roomDto.getSize(), result.getSize());
+        Assertions.assertEquals(roomDto.getArea(), result.getArea());
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
 
@@ -116,7 +116,7 @@ public class RoomServiceImplTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(roomDto.getType(), result.getType());
-        Assertions.assertEquals(roomDto.getSize(), result.getSize());
+        Assertions.assertEquals(roomDto.getArea(), result.getArea());
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
 
@@ -152,7 +152,7 @@ public class RoomServiceImplTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(roomDto.getType(), result.getType());
-        Assertions.assertEquals(roomDto.getSize(), result.getSize());
+        Assertions.assertEquals(roomDto.getArea(), result.getArea());
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
 
@@ -172,7 +172,7 @@ public class RoomServiceImplTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(roomDto.getType(), result.getType());
-        Assertions.assertEquals(roomDto.getSize(), result.getSize());
+        Assertions.assertEquals(roomDto.getArea(), result.getArea());
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
 
@@ -192,7 +192,7 @@ public class RoomServiceImplTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(roomDto.getType(), result.getType());
-        Assertions.assertEquals(roomDto.getSize(), result.getSize());
+        Assertions.assertEquals(roomDto.getArea(), result.getArea());
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
 
@@ -220,7 +220,7 @@ public class RoomServiceImplTest {
     void updateRoom_whenRequesterBossAndRoomFoundAndAllNewFieldsNotNull_thenUpdateAllFieldsThanId() {
         UpdateRoomDto newRoomDto = UpdateRoomDto.builder()
                 .id(1L)
-                .size(10.0)
+                .area(10.0)
                 .number("new standard room")
                 .type(RoomTypes.SMALL)
                 .isVisible(false)
@@ -228,7 +228,7 @@ public class RoomServiceImplTest {
 
         RoomDto updatedRoomDto = RoomDto.builder()
                 .id(1L)
-                .size(10.0)
+                .area(10.0)
                 .number("new standard room")
                 .type(RoomTypes.SMALL)
                 .isVisible(false)
@@ -252,7 +252,7 @@ public class RoomServiceImplTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(updatedRoomDto.getType(), result.getType());
-        Assertions.assertEquals(updatedRoomDto.getSize(), result.getSize());
+        Assertions.assertEquals(updatedRoomDto.getArea(), result.getArea());
         Assertions.assertFalse(result.getIsVisible());
         Assertions.assertEquals(updatedRoomDto.getNumber(), result.getNumber());
 
@@ -266,7 +266,7 @@ public class RoomServiceImplTest {
 
         RoomDto updatedRoomDto = RoomDto.builder()
                 .id(1L)
-                .size(5.0)
+                .area(5.0)
                 .number("standard room")
                 .type(RoomTypes.SMALL)
                 .isVisible(true)
@@ -293,7 +293,7 @@ public class RoomServiceImplTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(updatedRoomDto.getType(), result.getType());
-        Assertions.assertEquals(updatedRoomDto.getSize(), result.getSize());
+        Assertions.assertEquals(updatedRoomDto.getArea(), result.getArea());
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(updatedRoomDto.getNumber(), result.getNumber());
 
@@ -308,7 +308,7 @@ public class RoomServiceImplTest {
 
         RoomDto updatedRoomDto = RoomDto.builder()
                 .id(1L)
-                .size(5.0)
+                .area(5.0)
                 .number("standard room")
                 .type(RoomTypes.SMALL)
                 .isVisible(false)
@@ -336,7 +336,7 @@ public class RoomServiceImplTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(updatedRoomDto.getType(), result.getType());
-        Assertions.assertEquals(updatedRoomDto.getSize(), result.getSize());
+        Assertions.assertEquals(updatedRoomDto.getArea(), result.getArea());
         Assertions.assertFalse(result.getIsVisible());
         Assertions.assertEquals(updatedRoomDto.getNumber(), result.getNumber());
 
@@ -347,7 +347,7 @@ public class RoomServiceImplTest {
     void updateRoom_whenRequesterAdminAndRoomFoundAndAllNewFieldsNotNull_thenUpdateAllFieldsThanId() {
         UpdateRoomDto newRoomDto = UpdateRoomDto.builder()
                 .id(1L)
-                .size(10.0)
+                .area(10.0)
                 .number("new standard room")
                 .type(RoomTypes.SMALL)
                 .isVisible(false)
@@ -355,7 +355,7 @@ public class RoomServiceImplTest {
 
         RoomDto updatedRoomDto = RoomDto.builder()
                 .id(1L)
-                .size(10.0)
+                .area(10.0)
                 .number("new standard room")
                 .type(RoomTypes.SMALL)
                 .isVisible(false)
@@ -379,7 +379,7 @@ public class RoomServiceImplTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
         Assertions.assertEquals(updatedRoomDto.getType(), result.getType());
-        Assertions.assertEquals(updatedRoomDto.getSize(), result.getSize());
+        Assertions.assertEquals(updatedRoomDto.getArea(), result.getArea());
         Assertions.assertFalse(result.getIsVisible());
         Assertions.assertEquals(updatedRoomDto.getNumber(), result.getNumber());
 
@@ -432,7 +432,7 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(1, result.size());
         Assertions.assertEquals(1L, result.get(0).getId());
         Assertions.assertEquals(roomDto.getType(), result.get(0).getType());
-        Assertions.assertEquals(roomDto.getSize(), result.get(0).getSize());
+        Assertions.assertEquals(roomDto.getArea(), result.get(0).getArea());
         Assertions.assertTrue(result.get(0).getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.get(0).getNumber());
 
@@ -453,7 +453,7 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(1, result.size());
         Assertions.assertEquals(1L, result.get(0).getId());
         Assertions.assertEquals(roomDto.getType(), result.get(0).getType());
-        Assertions.assertEquals(roomDto.getSize(), result.get(0).getSize());
+        Assertions.assertEquals(roomDto.getArea(), result.get(0).getArea());
         Assertions.assertTrue(result.get(0).getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.get(0).getNumber());
 
@@ -474,7 +474,7 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(1, result.size());
         Assertions.assertEquals(1L, result.get(0).getId());
         Assertions.assertEquals(roomDto.getType(), result.get(0).getType());
-        Assertions.assertEquals(roomDto.getSize(), result.get(0).getSize());
+        Assertions.assertEquals(roomDto.getArea(), result.get(0).getArea());
         Assertions.assertTrue(result.get(0).getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.get(0).getNumber());
 
