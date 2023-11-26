@@ -53,6 +53,14 @@ public class RoomServiceIntegrationTest {
             .isVisible(true)
             .build();
 
+    final Room hiddenRoom = Room.builder()
+            .number("room number")
+            .area(10.0)
+            .type(RoomTypes.BIG)
+            .description("room description")
+            .isVisible(false)
+            .build();
+
     final UpdateRoomDto updateRoomDto = UpdateRoomDto.builder()
             .number("update room number")
             .area(10.0)
@@ -107,7 +115,7 @@ public class RoomServiceIntegrationTest {
         em.persist(requesterAdmin);
         em.persist(room);
 
-        List<RoomDto> result = service.getAllRooms(requesterAdmin.getId()).stream().toList();
+        List<RoomDto> result = service.getAllRooms(requesterAdmin.getId(), room.getIsVisible()).stream().toList();
 
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getId(), notNullValue());
@@ -119,11 +127,41 @@ public class RoomServiceIntegrationTest {
     }
 
     @Test
-    void deleteRoomById() {
+    void hideRoom() {
         em.persist(requesterAdmin);
         em.persist(room);
 
-        service.deleteRoomById(requesterAdmin.getId(), room.getId());
+        RoomDto result = service.hideRoomById(requesterAdmin.getId(), room.getId());
+
+        assertThat(result.getId(), notNullValue());
+        assertThat(result.getNumber(), equalTo(roomDto.getNumber()));
+        assertThat(result.getArea(), equalTo(roomDto.getArea()));
+        assertThat(result.getType(), equalTo(roomDto.getType()));
+        assertThat(result.getDescription(), equalTo(roomDto.getDescription()));
+        assertFalse(result.getIsVisible());
+    }
+
+    @Test
+    void unhideRoom() {
+        em.persist(requesterAdmin);
+        em.persist(hiddenRoom);
+
+        RoomDto result = service.unhideRoomById(requesterAdmin.getId(), hiddenRoom.getId());
+
+        assertThat(result.getId(), notNullValue());
+        assertThat(result.getNumber(), equalTo(roomDto.getNumber()));
+        assertThat(result.getArea(), equalTo(roomDto.getArea()));
+        assertThat(result.getType(), equalTo(roomDto.getType()));
+        assertThat(result.getDescription(), equalTo(roomDto.getDescription()));
+        assertTrue(result.getIsVisible());
+    }
+
+    @Test
+    void permanentlyDeleteRoomById() {
+        em.persist(requesterAdmin);
+        em.persist(room);
+
+        service.permanentlyDeleteRoomById(requesterAdmin.getId(), room.getId());
 
         String error = String.format("room with id=%d is not found", room.getId());
         NotFoundException exception = assertThrows(

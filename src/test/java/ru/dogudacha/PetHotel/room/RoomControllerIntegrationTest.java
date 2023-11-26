@@ -36,6 +36,13 @@ public class RoomControllerIntegrationTest {
             .type(RoomTypes.SMALL)
             .isVisible(true)
             .build();
+    private final RoomDto hiddenRoomDto = RoomDto.builder()
+            .id(roomId)
+            .area(5.0)
+            .number("standard room")
+            .type(RoomTypes.SMALL)
+            .isVisible(false)
+            .build();
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -134,11 +141,13 @@ public class RoomControllerIntegrationTest {
     @Test
     @SneakyThrows
     void getAllRooms() {
-        when(roomService.getAllRooms(anyLong())).thenReturn(List.of(roomDto));
+        when(roomService.getAllRooms(anyLong(), anyBoolean())).thenReturn(List.of(roomDto));
 
         mockMvc.perform(get("/rooms")
                         .header(requesterHeader, requesterId)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .param("isVisible", "true"))
+
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(roomDto.getId()), Long.class))
                 .andExpect(jsonPath("$.[0].area", is(roomDto.getArea()), Double.class))
@@ -149,23 +158,73 @@ public class RoomControllerIntegrationTest {
 
     @Test
     @SneakyThrows
-    void deleteRoomById() {
+    void hideRoomById() {
+        when(roomService.hideRoomById(anyLong(), eq(roomId))).thenReturn(hiddenRoomDto);
+
+        mockMvc.perform(patch("/rooms/{id}/hide", roomId)
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.ALL_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(hiddenRoomDto.getId()), Long.class))
+                .andExpect(jsonPath("$.area", is(hiddenRoomDto.getArea()), Double.class))
+                .andExpect(jsonPath("$.number", is(hiddenRoomDto.getNumber())))
+                .andExpect(jsonPath("$.type", is(hiddenRoomDto.getType().toString())))
+                .andExpect(jsonPath("$.isVisible", is(hiddenRoomDto.getIsVisible())));
+
+        verify(roomService).hideRoomById(requesterId, roomId);
+
+        when(roomService.hideRoomById(anyLong(), anyLong())).thenThrow(NotFoundException.class);
+        mockMvc.perform(patch("/rooms/{id}/hide", roomId)
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+        verify(roomService, times(2)).hideRoomById(requesterId, roomId);
+    }
+
+    @Test
+    @SneakyThrows
+    void unhideRoomById() {
+        when(roomService.unhideRoomById(anyLong(), eq(roomId))).thenReturn(roomDto);
+
+        mockMvc.perform(patch("/rooms/{id}/unhide", roomId)
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.ALL_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(roomDto.getId()), Long.class))
+                .andExpect(jsonPath("$.area", is(roomDto.getArea()), Double.class))
+                .andExpect(jsonPath("$.number", is(roomDto.getNumber())))
+                .andExpect(jsonPath("$.type", is(roomDto.getType().toString())))
+                .andExpect(jsonPath("$.isVisible", is(roomDto.getIsVisible())));
+
+        verify(roomService).unhideRoomById(requesterId, roomId);
+
+        when(roomService.unhideRoomById(anyLong(), anyLong())).thenThrow(NotFoundException.class);
+        mockMvc.perform(patch("/rooms/{id}/unhide", roomId)
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+        verify(roomService, times(2)).unhideRoomById(requesterId, roomId);
+    }
+
+    @Test
+    @SneakyThrows
+    void permanentlyDeleteRoomById() {
         mockMvc.perform(delete("/rooms/{Id}", roomId)
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.ALL_VALUE))
                 .andExpect(status().isNoContent());
 
-        verify(roomService).deleteRoomById(requesterId, roomId);
+        verify(roomService).permanentlyDeleteRoomById(requesterId, roomId);
 
         doThrow(NotFoundException.class)
                 .when(roomService)
-                .deleteRoomById(requesterId, roomId);
+                .permanentlyDeleteRoomById(requesterId, roomId);
 
         mockMvc.perform(delete("/rooms/{Id}", roomId)
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.ALL_VALUE))
                 .andExpect(status().isNotFound());
 
-        verify(roomService, times(2)).deleteRoomById(requesterId, roomId);
+        verify(roomService, times(2)).permanentlyDeleteRoomById(requesterId, roomId);
     }
 }

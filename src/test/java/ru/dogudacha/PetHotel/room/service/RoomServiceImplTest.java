@@ -74,6 +74,22 @@ public class RoomServiceImplTest {
             .isVisible(true)
             .build();
 
+    private final Room hiddenRoom = Room.builder()
+            .id(1L)
+            .area(5.0)
+            .number("standard room")
+            .type(RoomTypes.SMALL)
+            .isVisible(false)
+            .build();
+
+    private final RoomDto hiddenRoomDto = RoomDto.builder()
+            .id(1L)
+            .area(5.0)
+            .number("standard room")
+            .type(RoomTypes.SMALL)
+            .isVisible(false)
+            .build();
+
     @InjectMocks
     private RoomServiceImpl roomService;
     @Mock
@@ -420,12 +436,12 @@ public class RoomServiceImplTest {
     }
 
     @Test
-    void getAllRooms_whenGetAllRoomsByBoss_thenReturnAllRooms() {
+    void getAllRooms_whenGetAllRoomsByBossAndTrue_thenReturnAllRooms() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
-        when(roomRepository.getAllRooms()).thenReturn(Optional.of(List.of(room)));
+        when(roomRepository.getAllRooms(anyBoolean())).thenReturn(Optional.of(List.of(room)));
         when(roomMapper.toListRoomDto(anyList())).thenReturn(List.of(roomDto));
 
-        Collection<RoomDto> resultCollection = roomService.getAllRooms(boss.getId());
+        Collection<RoomDto> resultCollection = roomService.getAllRooms(boss.getId(), room.getIsVisible());
         List<RoomDto> result = resultCollection.stream().toList();
 
         Assertions.assertNotNull(result);
@@ -436,17 +452,17 @@ public class RoomServiceImplTest {
         Assertions.assertTrue(result.get(0).getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.get(0).getNumber());
 
-        verify(roomRepository, times(1)).getAllRooms();
+        verify(roomRepository, times(1)).getAllRooms(anyBoolean());
         verifyNoMoreInteractions(roomRepository);
     }
 
     @Test
     void getAllRooms_whenGetAllRoomsByAdmin_thenReturnAllRooms() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
-        when(roomRepository.getAllRooms()).thenReturn(Optional.of(List.of(room)));
+        when(roomRepository.getAllRooms(anyBoolean())).thenReturn(Optional.of(List.of(room)));
         when(roomMapper.toListRoomDto(anyList())).thenReturn(List.of(roomDto));
 
-        Collection<RoomDto> resultCollection = roomService.getAllRooms(admin.getId());
+        Collection<RoomDto> resultCollection = roomService.getAllRooms(admin.getId(), room.getIsVisible());
         List<RoomDto> result = resultCollection.stream().toList();
 
         Assertions.assertNotNull(result);
@@ -457,17 +473,17 @@ public class RoomServiceImplTest {
         Assertions.assertTrue(result.get(0).getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.get(0).getNumber());
 
-        verify(roomRepository, times(1)).getAllRooms();
+        verify(roomRepository, times(1)).getAllRooms(anyBoolean());
         verifyNoMoreInteractions(roomRepository);
     }
 
     @Test
     void getAllRooms_whenGetAllRoomsByFinancial_thenReturnAllRooms() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
-        when(roomRepository.getAllRooms()).thenReturn(Optional.of(List.of(room)));
+        when(roomRepository.getAllRooms(anyBoolean())).thenReturn(Optional.of(List.of(room)));
         when(roomMapper.toListRoomDto(anyList())).thenReturn(List.of(roomDto));
 
-        Collection<RoomDto> resultCollection = roomService.getAllRooms(financial.getId());
+        Collection<RoomDto> resultCollection = roomService.getAllRooms(financial.getId(), room.getIsVisible());
         List<RoomDto> result = resultCollection.stream().toList();
 
         Assertions.assertNotNull(result);
@@ -478,7 +494,7 @@ public class RoomServiceImplTest {
         Assertions.assertTrue(result.get(0).getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.get(0).getNumber());
 
-        verify(roomRepository, times(1)).getAllRooms();
+        verify(roomRepository, times(1)).getAllRooms(anyBoolean());
         verifyNoMoreInteractions(roomRepository);
     }
 
@@ -487,45 +503,187 @@ public class RoomServiceImplTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
         assertThrows(AccessDeniedException.class,
-                () -> roomService.getAllRooms(user.getId()));
+                () -> roomService.getAllRooms(user.getId(), room.getIsVisible()));
     }
 
     @Test
-    void deleteRoomById_whenRequesterBossAndRoomFound_thenRoomWillDelete() {
+    void hideRoomById_whenHideRoomByIdByBoss_thenRoomHidden() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
-        when(roomRepository.deleteRoomById(anyLong())).thenReturn(1);
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
+        when(roomRepository.save(any(Room.class))).thenReturn(hiddenRoom);
+        when(roomMapper.toRoomDto(any(Room.class))).thenReturn(hiddenRoomDto);
 
-        roomService.deleteRoomById(boss.getId(), room.getId());
+        RoomDto result = roomService.hideRoomById(boss.getId(), hiddenRoom.getId());
 
-        verify(roomRepository, times(1)).deleteRoomById(anyLong());
-        verifyNoMoreInteractions(roomRepository);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1L, result.getId());
+        Assertions.assertEquals(hiddenRoomDto.getType(), result.getType());
+        Assertions.assertEquals(hiddenRoomDto.getArea(), result.getArea());
+        Assertions.assertFalse(result.getIsVisible());
+        Assertions.assertEquals(hiddenRoomDto.getNumber(), result.getNumber());
+
+        verify(roomRepository, times(1)).save(any(Room.class));
     }
 
     @Test
-    void deleteRoomById_whenRequesterAdminAndRoomFound_thenRoomWillDelete() {
+    void hideRoomById_whenHideRoomByIdByAdmin_thenRoomHidden() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
-        when(roomRepository.deleteRoomById(anyLong())).thenReturn(1);
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
+        when(roomRepository.save(any(Room.class))).thenReturn(hiddenRoom);
+        when(roomMapper.toRoomDto(any(Room.class))).thenReturn(hiddenRoomDto);
 
-        roomService.deleteRoomById(admin.getId(), room.getId());
+        RoomDto result = roomService.hideRoomById(admin.getId(), hiddenRoom.getId());
 
-        verify(roomRepository, times(1)).deleteRoomById(anyLong());
-        verifyNoMoreInteractions(roomRepository);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1L, result.getId());
+        Assertions.assertEquals(hiddenRoomDto.getType(), result.getType());
+        Assertions.assertEquals(hiddenRoomDto.getArea(), result.getArea());
+        Assertions.assertFalse(result.getIsVisible());
+        Assertions.assertEquals(hiddenRoomDto.getNumber(), result.getNumber());
+
+        verify(roomRepository, times(1)).save(any(Room.class));
     }
 
     @Test
-    void deleteRoomById_whenRequesterNotFound_thenNotFoundException() {
+    void hideRoomById_whenHideRoomByIdByUser_thenAccessDeniedException() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+
+        assertThrows(AccessDeniedException.class,
+                () -> roomService.hideRoomById(user.getId(), room.getId()));
+    }
+
+    @Test
+    void hideRoomById_whenHideRoomByIdByFinancial_thenAccessDeniedException() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
+
+        assertThrows(AccessDeniedException.class,
+                () -> roomService.hideRoomById(financial.getId(), room.getId()));
+    }
+
+    @Test
+    void hideRoomById_whenRequesterIsNotFound_thenNotFoundException() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class,
-                () -> roomService.deleteRoomById(boss.getId(), room.getId()));
+                () -> roomService.hideRoomById(boss.getId(), room.getId()));
     }
 
     @Test
-    void deleteRoomById_whenRoomNotFound_thenNotFoundException() {
+    void hideRoomById_whenRequesterFoundAndRoomIsNotFound_thenNotFoundException() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class,
+                () -> roomService.hideRoomById(boss.getId(), room.getId()));
+    }
+
+    @Test
+    void unhideRoomById_whenUnhideRoomByIdByBoss_thenRoomUnhidden() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.of(hiddenRoom));
+        when(roomRepository.save(any(Room.class))).thenReturn(room);
+        when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
+
+        RoomDto result = roomService.unhideRoomById(boss.getId(), room.getId());
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1L, result.getId());
+        Assertions.assertEquals(roomDto.getType(), result.getType());
+        Assertions.assertEquals(roomDto.getArea(), result.getArea());
+        Assertions.assertTrue(result.getIsVisible());
+        Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
+
+        verify(roomRepository, times(1)).save(any(Room.class));
+    }
+
+    @Test
+    void unhideRoomById_whenUnhideRoomByIdByAdmin_thenRoomUnhidden() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
+        when(roomRepository.save(any(Room.class))).thenReturn(room);
+        when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
+
+        RoomDto result = roomService.hideRoomById(admin.getId(), room.getId());
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1L, result.getId());
+        Assertions.assertEquals(roomDto.getType(), result.getType());
+        Assertions.assertEquals(roomDto.getArea(), result.getArea());
+        Assertions.assertTrue(result.getIsVisible());
+        Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
+
+        verify(roomRepository, times(1)).save(any(Room.class));
+    }
+
+    @Test
+    void unhideRoomById_whenUnhideRoomByIdByUser_thenAccessDeniedException() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+
+        assertThrows(AccessDeniedException.class,
+                () -> roomService.unhideRoomById(user.getId(), room.getId()));
+    }
+
+    @Test
+    void unhideRoomById_whenUnhideRoomByIdByFinancial_thenAccessDeniedException() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
+
+        assertThrows(AccessDeniedException.class,
+                () -> roomService.unhideRoomById(financial.getId(), room.getId()));
+    }
+
+    @Test
+    void unhideRoomById_whenRequesterIsNotFound_thenNotFoundException() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class,
+                () -> roomService.unhideRoomById(boss.getId(), room.getId()));
+    }
+
+    @Test
+    void unhideRoomById_whenRequesterFoundAndRoomIsNotFound_thenNotFoundException() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class,
+                () -> roomService.unhideRoomById(boss.getId(), room.getId()));
+    }
+
+    @Test
+    void permanentlyDeleteRoomById_whenRequesterBossAndRoomFound_thenRoomWillDelete() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
+        when(roomRepository.deleteRoomById(anyLong())).thenReturn(1);
+
+        roomService.permanentlyDeleteRoomById(boss.getId(), room.getId());
+
+        verify(roomRepository, times(1)).deleteRoomById(anyLong());
+        verifyNoMoreInteractions(roomRepository);
+    }
+
+    @Test
+    void permanentlyDeleteRoomById_whenRequesterAdminAndRoomFound_thenRoomWillDelete() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
+        when(roomRepository.deleteRoomById(anyLong())).thenReturn(1);
+
+        roomService.permanentlyDeleteRoomById(admin.getId(), room.getId());
+
+        verify(roomRepository, times(1)).deleteRoomById(anyLong());
+        verifyNoMoreInteractions(roomRepository);
+    }
+
+    @Test
+    void permanentlyDeleteRoomById_whenRequesterNotFound_thenNotFoundException() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class,
+                () -> roomService.permanentlyDeleteRoomById(boss.getId(), room.getId()));
+    }
+
+    @Test
+    void permanentlyDeleteRoomById_whenRoomNotFound_thenNotFoundException() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
         when(roomRepository.deleteRoomById(anyLong())).thenReturn(0);
 
         assertThrows(NotFoundException.class,
-                () -> roomService.deleteRoomById(boss.getId(), room.getId()));
+                () -> roomService.permanentlyDeleteRoomById(boss.getId(), room.getId()));
     }
 }

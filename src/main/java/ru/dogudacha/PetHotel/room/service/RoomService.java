@@ -12,7 +12,11 @@ public interface RoomService {
 
     RoomDto updateRoom(Long userId, Long roomId, UpdateRoomDto roomDto);
 
-    Collection<RoomDto> getAllRooms(Long userId);
+    Collection<RoomDto> getAllRooms(Long userId, Boolean isVisible);
 
-    void deleteRoomById(Long userId, Long roomId);
+    RoomDto hideRoomById(Long userId, Long roomId);
+
+    RoomDto unhideRoomById(Long userId, Long roomId);
+
+    void permanentlyDeleteRoomById(Long userId, Long roomId);
 }
