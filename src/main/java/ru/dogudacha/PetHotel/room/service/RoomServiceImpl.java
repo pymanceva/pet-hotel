@@ -42,7 +42,7 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(readOnly = true)
     @Override
     public RoomDto getRoomById(Long userId, Long roomId) {
-        checkWatchAccess(userId);
+        checkViewAccess(userId);
 
         Room room = findRoomById(roomId);
         log.info("RoomService: getRoomById, userId={}, roomId={}", userId, roomId);
@@ -83,7 +83,7 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(readOnly = true)
     @Override
     public Collection<RoomDto> getAllRooms(Long userId, Boolean isVisible) {
-        checkWatchAccess(userId);
+        checkViewAccess(userId);
 
         List<Room> allRooms = roomRepository.getAllRooms(isVisible).orElse(Collections.emptyList());
         log.info("RoomService: getAllRooms, userId={}, list size={}", userId, allRooms.size());
@@ -153,7 +153,7 @@ public class RoomServiceImpl implements RoomService {
         }
     }
 
-    private void checkWatchAccess(Long userId) {
+    private void checkViewAccess(Long userId) {
         User user = findUserById(userId);
 
         if (user.getRole().ordinal() == 2) {
