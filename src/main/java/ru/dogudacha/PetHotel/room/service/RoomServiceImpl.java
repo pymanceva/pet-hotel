@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dogudacha.PetHotel.exception.AccessDeniedException;
+import ru.dogudacha.PetHotel.exception.ConflictException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
 import ru.dogudacha.PetHotel.room.dto.RoomDto;
-import ru.dogudacha.PetHotel.room.dto.RoomWithoutPriceDto;
 import ru.dogudacha.PetHotel.room.dto.UpdateRoomDto;
 import ru.dogudacha.PetHotel.room.dto.mapper.RoomMapper;
 import ru.dogudacha.PetHotel.room.model.Room;
@@ -42,22 +42,12 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(readOnly = true)
     @Override
     public RoomDto getRoomById(Long userId, Long roomId) {
-        checkPriceAccess(userId);
+        checkViewAccess(userId);
 
         Room room = findRoomById(roomId);
         log.info("RoomService: getRoomById, userId={}, roomId={}", userId, roomId);
 
         return roomMapper.toRoomDto(room);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public RoomWithoutPriceDto getRoomWithoutPriceById(Long userId, Long roomId) {
-        checkLoginAccess(userId);
-        Room room = findRoomById(roomId);
-        log.info("RoomService: getRoomWithoutPriceById, userId={}, roomId={}", userId, roomId);
-
-        return roomMapper.toRoomDtoWithoutPrice(room);
     }
 
     @Transactional
@@ -72,20 +62,16 @@ public class RoomServiceImpl implements RoomService {
             newRoom.setType(oldRoom.getType());
         }
 
-        if (Objects.isNull(newRoom.getSize())) {
-            newRoom.setSize(oldRoom.getSize());
-        }
-
-        if (Objects.isNull(newRoom.getPrice())) {
-            newRoom.setPrice(oldRoom.getPrice());
+        if (Objects.isNull(newRoom.getArea())) {
+            newRoom.setArea(oldRoom.getArea());
         }
 
         if (Objects.isNull(newRoom.getNumber())) {
             newRoom.setNumber(oldRoom.getNumber());
         }
 
-        if (Objects.isNull(newRoom.getIsAvailable())) {
-            newRoom.setIsAvailable(oldRoom.getIsAvailable());
+        if (Objects.isNull(newRoom.getIsVisible())) {
+            newRoom.setIsVisible(oldRoom.getIsVisible());
         }
 
         Room updatedRoom = roomRepository.save(newRoom);
@@ -96,28 +82,47 @@ public class RoomServiceImpl implements RoomService {
 
     @Transactional(readOnly = true)
     @Override
-    public Collection<RoomDto> getAllRooms(Long userId) {
-        checkPriceAccess(userId);
+    public Collection<RoomDto> getAllRooms(Long userId, Boolean isVisible) {
+        checkViewAccess(userId);
 
-        List<Room> allRooms = roomRepository.getAllRooms().orElse(Collections.emptyList());
+        List<Room> allRooms = roomRepository.getAllRooms(isVisible).orElse(Collections.emptyList());
         log.info("RoomService: getAllRooms, userId={}, list size={}", userId, allRooms.size());
 
         return roomMapper.toListRoomDto(allRooms);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     @Override
-    public Collection<RoomWithoutPriceDto> getAllRoomsWithoutPrice(Long userId) {
-        checkLoginAccess(userId);
-        List<Room> allRooms = roomRepository.getAllRooms().orElse(Collections.emptyList());
-        log.info("RoomService: getAllRoomsWithoutPrice, userId={}, list size={}", userId, allRooms.size());
+    public RoomDto hideRoomById(Long userId, Long roomId) {
+        checkAdminAccess(userId);
+        Room room = findRoomById(roomId);
 
-        return roomMapper.toListRoomWithoutPriceDto(allRooms);
+        //пока уловие всегда true, в дальнейшем здесь буду проверять наличие активных бронирований у номера
+        if (true) {
+            room.setIsVisible(false);
+            roomRepository.save(room);
+            log.info("RoomService: hideRoomById, userId={}, roomId={}", userId, roomId);
+            return roomMapper.toRoomDto(room);
+        } else {
+            throw new ConflictException(String.format("room with id=%d has opened bookings", roomId));
+        }
     }
 
     @Transactional
     @Override
-    public void deleteRoomById(Long userId, Long roomId) {
+    public RoomDto unhideRoomById(Long userId, Long roomId) {
+        checkAdminAccess(userId);
+        Room room = findRoomById(roomId);
+
+        room.setIsVisible(true);
+        roomRepository.save(room);
+        log.info("RoomService: unhideRoomById, userId={}, roomId={}", userId, roomId);
+        return roomMapper.toRoomDto(room);
+    }
+
+    @Transactional
+    @Override
+    public void permanentlyDeleteRoomById(Long userId, Long roomId) {
         checkAdminAccess(userId);
 
         int result = roomRepository.deleteRoomById(roomId);
@@ -126,7 +131,7 @@ public class RoomServiceImpl implements RoomService {
             throw new NotFoundException(String.format("room with id=%d not found", roomId));
         }
 
-        log.info("RoomService: deleteRoomById, userId={}, roomId={}", userId, roomId);
+        log.info("RoomService: permanentlyDeleteRoomById, userId={}, roomId={}", userId, roomId);
     }
 
     private Room findRoomById(Long id) {
@@ -148,16 +153,12 @@ public class RoomServiceImpl implements RoomService {
         }
     }
 
-    private void checkPriceAccess(Long userId) {
+    private void checkViewAccess(Long userId) {
         User user = findUserById(userId);
 
         if (user.getRole().ordinal() == 2) {
             throw new AccessDeniedException(String.format("User with role=%s, can't access for this information",
                     user.getRole()));
         }
-    }
-
-    private void checkLoginAccess(Long userId) {
-        User user = findUserById(userId);
     }
 }
