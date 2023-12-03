@@ -66,7 +66,6 @@ public class RoomServiceIntegrationTest {
             .area(10.0)
             .type(RoomTypes.BIG)
             .description("update room description")
-            .isVisible(true)
             .build();
 
     @Test
