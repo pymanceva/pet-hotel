@@ -15,7 +15,8 @@ paths:
       tags:
         - room-controller
       operationId: getAllRooms
-      description: Получение списка номеров. Доступно только для пользователей с ролью BOSS или ADMIN. Вывод номеров происходит отдельно действующих, и отдкльно скрытых, в зависимости от параметра isVisible.
+      description: Получение списка номеров. Доступно только для пользователей с ролью BOSS или ADMIN. Вывод номеров происходит отдельно действующих, и отдельно скрытых, в зависимости от параметра isVisible.
+      summary: Запрос списка номеров
       parameters:
         - name: X-PetHotel-User-Id
           in: header
@@ -73,6 +74,7 @@ paths:
         - room-controller
       operationId: addRoom
       description: Добавление нового номера. Функция доступна только пользователям уровня BOSS и ADMIN.
+      summary: Добавление нового номера
       parameters:
         - name: X-PetHotel-User-Id
           in: header
@@ -129,6 +131,7 @@ paths:
         - room-controller
       operationId: getRoomById
       description: Получение карточки номера. Доступно только пользователям уровня BOSS и ADMIN.
+      summary: Получение информации о номере
       parameters:
         - name: X-PetHotel-User-Id
           in: header
@@ -185,6 +188,7 @@ paths:
         - room-controller
       operationId: deleteRoomById
       description: Безвозвратное удаление карточки номера. Доступно только пользователям уровня BOSS и ADMIN.
+      summary: Удаление существующего номера (безвозвратно)
       parameters:
         - name: X-PetHotel-User-Id
           in: header
@@ -237,6 +241,7 @@ paths:
         - room-controller
       operationId: updateRoom
       description: Изменение карточки номера. Доступно только пользователям уровня BOSS и ADMIN. Поле isVisible не изменяется.
+      summary: Изменение информации о номере (кроме параметра видимости isVisible)
       parameters:
         - name: X-PetHotel-User-Id
           in: header
@@ -300,6 +305,7 @@ paths:
         - room-controller
       operationId: unhideRoomById
       description: В UI называется "Восстановление номера" (из удаленных). Изменение параметра видимости на TRUE, после чего номер отражается в сетке бронирований. Доступно только пользователям уровня BOSS и ADMIN. Кроме поля isVisible ничего не меняется.
+      summary: Возвращает номер в статус "действующий"
       parameters:
         - name: X-PetHotel-User-Id
           in: header
@@ -357,6 +363,7 @@ paths:
         - room-controller
       operationId: hideRoomById
       description: В UI называется "Удаление номера". Изменение параметра видимости на FALSE, после чего номер не отражается в сетке бронирований. Доступно только пользователям уровня BOSS и ADMIN. Кроме поля isVisible ничего не меняется. Из БД запись не удаляется.
+      summary: Удаляет номер из списка действующих
       parameters:
         - name: X-PetHotel-User-Id
           in: header
