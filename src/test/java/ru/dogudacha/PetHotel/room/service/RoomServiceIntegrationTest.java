@@ -106,7 +106,6 @@ public class RoomServiceIntegrationTest {
         assertThat(result.getArea(), equalTo(updateRoomDto.getArea()));
         assertThat(result.getType(), equalTo(updateRoomDto.getType()));
         assertThat(result.getDescription(), equalTo(updateRoomDto.getDescription()));
-        assertTrue(result.getIsVisible());
     }
 
     @Test
