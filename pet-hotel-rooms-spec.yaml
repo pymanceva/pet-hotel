@@ -1,7 +1,6 @@
 openapi: 3.0.1
 info:
   title: 'PetHotel: Rooms Specification'
-  description: Документация раздела по работе с номерами
   version: v1
 servers:
   - url: http://localhost:8080
@@ -15,8 +14,6 @@ paths:
       tags:
         - room-controller
       operationId: getAllRooms
-      description: Получение списка номеров. Доступно только для пользователей с ролью BOSS или ADMIN. Вывод номеров происходит отдельно действующих, и отдельно скрытых, в зависимости от параметра isVisible.
-      summary: Запрос списка номеров
       parameters:
         - name: X-PetHotel-User-Id
           in: header
@@ -26,7 +23,9 @@ paths:
             format: int64
         - name: isVisible
           in: query
-          description: True - для действующих номеров, False - для скрытых номеров (для юзера называются удаленные)
+          description: >-
+            True - для действующих номеров, False - для скрытых номеров (для
+            юзера называются удаленные)
           required: true
           schema:
             type: boolean
@@ -57,12 +56,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
           description: Internal Server Error
           content:
@@ -73,8 +66,6 @@ paths:
       tags:
         - room-controller
       operationId: addRoom
-      description: Добавление нового номера. Функция доступна только пользователям уровня BOSS и ADMIN.
-      summary: Добавление нового номера
       parameters:
         - name: X-PetHotel-User-Id
           in: header
@@ -130,8 +121,6 @@ paths:
       tags:
         - room-controller
       operationId: getRoomById
-      description: Получение карточки номера. Доступно только пользователям уровня BOSS и ADMIN.
-      summary: Получение информации о номере
       parameters:
         - name: X-PetHotel-User-Id
           in: header
@@ -171,12 +160,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
           description: Internal Server Error
           content:
@@ -187,8 +170,6 @@ paths:
       tags:
         - room-controller
       operationId: deleteRoomById
-      description: Безвозвратное удаление карточки номера. Доступно только пользователям уровня BOSS и ADMIN.
-      summary: Удаление существующего номера (безвозвратно)
       parameters:
         - name: X-PetHotel-User-Id
           in: header
@@ -224,12 +205,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
           description: Internal Server Error
           content:
@@ -240,8 +215,6 @@ paths:
       tags:
         - room-controller
       operationId: updateRoom
-      description: Изменение карточки номера. Доступно только пользователям уровня BOSS и ADMIN. Поле isVisible не изменяется.
-      summary: Изменение информации о номере (кроме параметра видимости isVisible)
       parameters:
         - name: X-PetHotel-User-Id
           in: header
@@ -304,8 +277,6 @@ paths:
       tags:
         - room-controller
       operationId: unhideRoomById
-      description: В UI называется "Восстановление номера" (из удаленных). Изменение параметра видимости на TRUE, после чего номер отражается в сетке бронирований. Доступно только пользователям уровня BOSS и ADMIN. Кроме поля isVisible ничего не меняется.
-      summary: Возвращает номер в статус "действующий"
       parameters:
         - name: X-PetHotel-User-Id
           in: header
@@ -362,8 +333,6 @@ paths:
       tags:
         - room-controller
       operationId: hideRoomById
-      description: В UI называется "Удаление номера". Изменение параметра видимости на FALSE, после чего номер не отражается в сетке бронирований. Доступно только пользователям уровня BOSS и ADMIN. Кроме поля isVisible ничего не меняется. Из БД запись не удаляется.
-      summary: Удаляет номер из списка действующих
       parameters:
         - name: X-PetHotel-User-Id
           in: header
@@ -421,18 +390,14 @@ components:
       type: object
       properties:
         errors:
-          description: Список ошибок из StackTrace
           type: array
           items:
             type: string
         message:
-          description: Текст ошибки
           type: string
         reason:
-          description: Кастомное описание причины
           type: string
         httpStatus:
-          description: Код ответа
           type: string
           enum:
             - 100 CONTINUE
@@ -516,33 +481,23 @@ components:
         id:
           type: integer
           format: int64
-          example: 1
         number:
-          description: Буквенно-цифровое обозначение номера
-          example: 1D
           maxLength: 100
           minLength: 1
           type: string
         area:
-          description: Площадь номера в квадратных метрах
-          example: 6.0
           minimum: 0
           type: number
           format: double
         type:
-          description: Тип номера
           type: string
           enum:
             - SMALL
             - BIG
             - EXOT
         description:
-          description: Описание номера
-          example: Номер для собак стандартный
           type: string
         isVisible:
-          description: Текущий статус номера - действующий либо удаленный.
-          example: true
           type: boolean
     UpdateRoomDto:
       type: object
@@ -550,28 +505,21 @@ components:
         id:
           type: integer
           format: int64
-          example: 1
         number:
-          description: Буквенно-цифровое обозначение номера
-          example: 1D
           maxLength: 100
           minLength: 1
           type: string
         area:
-          description: Площадь номера в квадратных метрах
-          example: 6.0
           minimum: 0
           type: number
           format: double
         type:
-          description: Тип номера
           type: string
           enum:
             - SMALL
             - BIG
             - EXOT
         description:
-          description: Описание номера
-          example: Номер для собак стандартный
           type: string
-
+        isVisible:
+          type: boolean
