@@ -1,0 +1,644 @@
+openapi: '3.0.1'
+info:
+  title: 'PetHotel: Owners Specification'
+  description: Pet hotel owners
+  version: 'v1'
+
+servers:
+  - url: http://localhost:8080
+    description: Local server fo develop
+
+paths:
+  /owners:
+    post:
+      tags:
+        - owner-controller
+      summary: Добавление нового клиента (собственника зверушки)
+      operationId: addOwner
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewOwnerDto'
+      responses:
+        201:
+          description: Created - клиент создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnerDto'
+        400:
+          description: Запрос составлен неверно.
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Error: Field mainPhone must not be blank."
+                timestamp: 2023-12-03 09:10:50
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        403:
+          description: Недостаточно прав для совершения действия.
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for edit this information"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        404:
+          description: Объект не найден.
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=5 not found"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        409:
+          description: Ошибка уникальности полей базы данных.
+          content:
+            application/json:
+              example:
+                status: CONFLICT
+                reason: integrity constraint has been violated.
+                message: "Attempt to insert duplicate key row in object owner with unique index owner_main_phone."
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        500:
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+
+    get:
+      tags:
+        - owner-controller
+      summary: Получение списка всех пользователей
+      operationId: getAllOwners
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+      responses:
+        200:
+          description: OK,
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OwnerDto"
+        400:
+          description: Запрос составлен неверно.
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: ""
+                timestamp: 2023-12-03 09:10:50
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        403:
+          description: Недостаточно прав для совершения действия.
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        404:
+          description: Объект не найден.
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "owner with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        500:
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+
+  /owners/{id}:
+    get:
+      tags:
+        - owner-controller
+      summary: Получение пользователя по id
+      operationId: getOwnerById
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: OK,
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnerDto"
+        400:
+          description: Запрос составлен неверно.
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: ""
+                timestamp: 2023-12-03 09:10:50
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        403:
+          description: Недостаточно прав для совершения действия.
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        404:
+          description: Объект не найден.
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "owner with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        500:
+          description: Объект не найден.
+          content:
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+    delete:
+      tags:
+        - owner-controller
+      summary: Удаление пользователя по id
+      operationId: deleteOwnerById
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        204:
+          description: NO_CONTENT
+          
+        400:
+          description: Запрос составлен неверно.
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: ""
+                timestamp: 2023-12-03 09:10:50
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        403:
+          description: Недостаточно прав для совершения действия.
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        404:
+          description: Объект не найден.
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "owner with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        500:
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+    patch:
+      tags:
+        - owner-controller
+      summary: Изменить данные пользователя
+      operationId: updateOwner
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOwnerDto'
+      responses:
+        200:
+          description: OK,
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnerDto"
+        400:
+          description: Запрос составлен неверно.
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: ""
+                timestamp: 2023-12-03 09:10:50
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        403:
+          description: Недостаточно прав для совершения действия.
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        404:
+          description: Объект не найден.
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "owner with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        500:
+          description: Объект не найден.
+          content:
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+
+components:
+  parameters:
+    requesterHeader:
+      name: X-PetHotel-User-Id
+      description: Id пользователя осуществляющего запрос
+      in: header
+      required: true
+      schema:
+        type: string
+
+
+  schemas:
+    NewOwnerDto:
+      title: NewOwnerDto
+      type: object
+      required: [ name, mainPhone ]
+      properties:
+        surname:
+          description: Фамилия клиента
+          type: string
+          maxLength: 20
+          minLength: 2
+          example: Сумкин
+        name:
+          description: Имя клиента
+          type: string
+          maxLength: 15
+          minLength: 2
+          example: Фёдор
+        middleName:
+          description: Отчество клиента
+          type: string
+          maxLength: 15
+          minLength: 2
+          example: Святославович
+        mainPhone:
+          description: Основной номер телефона клиента
+          type: string
+          pattern: ^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$
+          uniqueItems: true
+          example: "+79123456789"
+        optionalPhone:
+          description: Дополнительный номер телефона клиента
+          type: string
+          pattern: ^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$
+          example: "+71234567890"
+        otherContacts:
+          description: Прочие контакты клиента
+          type: string
+          maxLength: 500
+          example: 'VK: FSumkin, TG: @Fumkin'
+        actualAddress:
+          description: Фактический адрес клиента
+          type: string
+          maxLength: 150
+          example: г.Омск, ул.Омуля д.15, кв.32
+        trustedMan:
+          description: Доверенное лицо клиента
+          type: string
+          maxLength: 150
+          example: Гендальф, +79217775533
+        source:
+          description: Откуда узнали о гостинице
+          type: string
+          maxLength: 100
+          example: Рассказали друзья
+        rating:
+          description: Рейтинг клиента
+          type: integer
+          format: int32
+          default: 0
+          example: 3
+
+    OwnerDto:
+      title: OwnerDto
+      type: object
+      properties:
+        id:
+          description: Id клиента
+          type: integer
+          format: int64
+          example: 103
+        surname:
+          description: Фамилия клиента
+          type: string
+          example: Сумкин
+        name:
+          description: Имя клиента
+          type: string
+          example: Фёдор
+        middleName:
+          description: Отчество клиента
+          type: string
+          example: Святославович
+        mainPhone:
+          description: Основной номер телефона клиента
+          type: string
+          example: "+79123456789"
+        optionalPhone:
+          description: Дополнительный номер телефона клиента
+          type: string
+          example: "+71234567890"
+        otherContacts:
+          description: Прочие контакты клиента
+          type: string
+          example: VK - FSumkin, TG - @Fumkin
+        actualAddress:
+          description: Фактический адрес клиента
+          type: string
+          example: г. Омск, ул. Омуля д.15, кв.32
+        trustedMan:
+          description: Доверенное лицо клиента
+          type: string
+          example: Гендальф, +79217775533
+        source:
+          description: Откуда узнали о гостинице
+          type: string
+          example: Рассказали друзья
+        rating:
+          description: Рейтинг клиента
+          type: integer
+          format: int32
+          example: 3
+
+    UpdateOwnerDto:
+      title: UpdateOwnerDto
+      description: DTO для обновления данных пользователя
+      type: object
+      required: [ id ]
+      properties:
+        id:
+          description: Id клиента
+          type: integer
+          format: int64
+          example: 228
+        surname:
+          description: Фамилия клиента
+          type: string
+          maxLength: 20
+          minLength: 2
+          example: Пинкман
+        name:
+          description: Имя клиента
+          type: string
+          maxLength: 15
+          minLength: 2
+          example: Джесси
+        middleName:
+          description: Отчество клиента
+          type: string
+          maxLength: 15
+          minLength: 2
+          example: Альбукеркиевич
+        mainPhone:
+          description: Основной номер телефона клиента
+          type: string
+          pattern: ^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$
+          uniqueItems: true
+          example: "+7(505)1483369"
+        optionalPhone:
+          description: Дополнительный номер телефона клиента
+          type: string
+          pattern: ^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$
+          example: "+71234567890"
+        otherContacts:
+          description: Прочие контакты клиента
+          type: string
+          maxLength: 500
+          example: 'VK: FSumkin, TG: @Fumkin'
+        actualAddress:
+          description: Фактический адрес клиента
+          type: string
+          maxLength: 150
+          example: г.Омск, ул.Омуля д.15, кв.32
+        trustedMan:
+          description: Доверенное лицо клиента
+          type: string
+          maxLength: 150
+          example: Гендальф, +79217775533
+        source:
+          description: Откуда узнали о гостинице
+          type: string
+          maxLength: 100
+          example: Рассказали друзья
+        rating:
+          description: Рейтинг клиента
+          type: integer
+          format: int32
+          default: 0
+          example: 3
+
+    ErrorDto:
+      title: ErrorDto
+      description: Сведения об ошибке
+      type: object
+      properties:
+        httpStatus:
+          type: string
+          description: Код статуса HTTP-ответа
+          example: CONFLICT
+          enum:
+            - 100 CONTINUE
+            - 101 SWITCHING_PROTOCOLS
+            - 102 PROCESSING
+            - 103 CHECKPOINT
+            - 200 OK
+            - 201 CREATED
+            - 202 ACCEPTED
+            - 203 NON_AUTHORITATIVE_INFORMATION
+            - 204 NO_CONTENT
+            - 205 RESET_CONTENT
+            - 206 PARTIAL_CONTENT
+            - 207 MULTI_STATUS
+            - 208 ALREADY_REPORTED
+            - 226 IM_USED
+            - 300 MULTIPLE_CHOICES
+            - 301 MOVED_PERMANENTLY
+            - 302 FOUND
+            - 302 MOVED_TEMPORARILY
+            - 303 SEE_OTHER
+            - 304 NOT_MODIFIED
+            - 305 USE_PROXY
+            - 307 TEMPORARY_REDIRECT
+            - 308 PERMANENT_REDIRECT
+            - 400 BAD_REQUEST
+            - 401 UNAUTHORIZED
+            - 402 PAYMENT_REQUIRED
+            - 403 FORBIDDEN
+            - 404 NOT_FOUND
+            - 405 METHOD_NOT_ALLOWED
+            - 406 NOT_ACCEPTABLE
+            - 407 PROXY_AUTHENTICATION_REQUIRED
+            - 408 REQUEST_TIMEOUT
+            - 409 CONFLICT
+            - 410 GONE
+            - 411 LENGTH_REQUIRED
+            - 412 PRECONDITION_FAILED
+            - 413 PAYLOAD_TOO_LARGE
+            - 413 REQUEST_ENTITY_TOO_LARGE
+            - 414 URI_TOO_LONG
+            - 414 REQUEST_URI_TOO_LONG
+            - 415 UNSUPPORTED_MEDIA_TYPE
+            - 416 REQUESTED_RANGE_NOT_SATISFIABLE
+            - 417 EXPECTATION_FAILED
+            - 418 I_AM_A_TEAPOT
+            - 419 INSUFFICIENT_SPACE_ON_RESOURCE
+            - 420 METHOD_FAILURE
+            - 421 DESTINATION_LOCKED
+            - 422 UNPROCESSABLE_ENTITY
+            - 423 LOCKED
+            - 424 FAILED_DEPENDENCY
+            - 425 TOO_EARLY
+            - 426 UPGRADE_REQUIRED
+            - 428 PRECONDITION_REQUIRED
+            - 429 TOO_MANY_REQUESTS
+            - 431 REQUEST_HEADER_FIELDS_TOO_LARGE
+            - 451 UNAVAILABLE_FOR_LEGAL_REASONS
+            - 500 INTERNAL_SERVER_ERROR
+            - 501 NOT_IMPLEMENTED
+            - 502 BAD_GATEWAY
+            - 503 SERVICE_UNAVAILABLE
+            - 504 GATEWAY_TIMEOUT
+            - 505 HTTP_VERSION_NOT_SUPPORTED
+            - 506 VARIANT_ALSO_NEGOTIATES
+            - 507 INSUFFICIENT_STORAGE
+            - 508 LOOP_DETECTED
+            - 509 BANDWIDTH_LIMIT_EXCEEDED
+            - 510 NOT_EXTENDED
+            - 511 NETWORK_AUTHENTICATION_REQUIRED
+
+        message:
+          type: string
+          description: Сообщение об ошибке
+          example: "validation email size error"
+
+        reason:
+          type: string
+          description: Общее описание причины ошибки
+          example: Request parameters validation error
+
+        timestamp:
+          type: string
+          description: Дата и время когда произошла ошибка (в формате \"yyyy-MM-dd HH:mm:ss\")
+          example: 2022-06-09 06:27:23
+
+        errors:
+          type: array
+          description: Список стектрейсов или описания ошибок
+          example: "[]"
+          items:
+            type: string
+            description: Cтектрейс или описание ошибок
+            example: "[]"
+
+
+
+
+
