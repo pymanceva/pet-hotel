@@ -66,7 +66,6 @@ public class RoomServiceIntegrationTest {
             .area(10.0)
             .type(RoomTypes.BIG)
             .description("update room description")
-            .isVisible(true)
             .build();
 
     @Test
@@ -107,7 +106,6 @@ public class RoomServiceIntegrationTest {
         assertThat(result.getArea(), equalTo(updateRoomDto.getArea()));
         assertThat(result.getType(), equalTo(updateRoomDto.getType()));
         assertThat(result.getDescription(), equalTo(updateRoomDto.getDescription()));
-        assertTrue(result.getIsVisible());
     }
 
     @Test

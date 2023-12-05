@@ -20,5 +20,4 @@ public class UpdateRoomDto {
     private Double area;
     private RoomTypes type;
     private String description;
-    private Boolean isVisible;
 }
