@@ -22,17 +22,12 @@
         "tags": [
           "pet-controller"
         ],
+        "summary": "Добавление нового питомца",
         "description": "Обратите внимание: добавить нового питомца может пользователь с ролью admin или boss",
         "operationId": "Добавление нового питомца",
         "parameters": [
           {
-            "name": "X-PetHotel-User-Id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
+            "$ref": "#/components/parameters/requesterHeader"
           }
         ],
         "requestBody": {
@@ -50,7 +45,7 @@
           "201": {
             "description": "Питомец добавлен",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PetDto"
                 }
@@ -58,26 +53,33 @@
             }
           },
           "400": {
-            "description": "Запрос составлен некорректно",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[]",
+                  "status": "BAD_REQUEST",
+                  "reason": "Incorrectly made request.",
+                  "message": "Required request header X-PetHotel-User-Id for method parameter type Long is not present",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/Error"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ApiError"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/Error"
                 }
               }
-            }
+            },
+            "description": "Запрос составлен некорректно"
           },
           "403": {
             "description": "Доступ запрещён",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[]",
+                  "status": "FORBIDDEN",
+                  "reason": "Operation is denied for this user.",
+                  "message": "User with role = %s, can nott access for this action",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
@@ -85,111 +87,35 @@
             }
           },
           "404": {
-            "description": "Питомец или пользователь не найден",
+            "description": "Пользователь не найден",
             "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Нарушение целостности данных",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "pet-controller"
-        ],
-        "description": "Обратите внимание: получить список всех питомцев может пользователь с ролью admin или boss",
-        "operationId": "Получение списка всех питомцев",
-        "parameters": [
-          {
-            "name": "X-PetHotel-User-Id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PetDto"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Запрос составлен некорректно",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/Error"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ApiError"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Доступ запрещён",
-            "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[]",
+                  "status": "NOT_FOUND",
+                  "reason": "The required object was not found.",
+                  "message": "User with id=2 was not found",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
               }
             }
           },
-          "404": {
-            "description": "Питомец илм пользователь не найден",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          },
           "409": {
-            "description": "Conflict",
+            "description": "У этого клиента уже есть питомец с такой кличкой",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[]",
+                  "status": "CONFLICT",
+                  "reason": "For the requested operation the conditions are not met.",
+                  "message": "The client with id = 1 already has a pet with name = Бобик.",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -197,9 +123,16 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[ \"org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:256)\", \"org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:229)\", \"org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)\", \"org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)\", \"org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:242)\" ....]",
+                  "status": "I_AM_A_TEAPOT",
+                  "reason": "Internal Server Error.",
+                  "message": "could not execute statement [ERROR: relation \\\"pets\\\" does not exist\\n  Позиция: 13] [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]; SQL [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -212,17 +145,11 @@
         "tags": [
           "pet-controller"
         ],
-        "description": "Обратите внимание: получение питомца по его идентификатору для зооняни",
+        "summary": "Получение питомца по его идентификатору",
         "operationId": "Получение питомца по его идентификатору",
         "parameters": [
           {
-            "name": "X-PetHotel-User-Id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
+            "$ref": "#/components/parameters/requesterHeader"
           },
           {
             "description": "id питомца",
@@ -239,7 +166,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PetDto"
                 }
@@ -247,26 +174,33 @@
             }
           },
           "400": {
-            "description": "Запрос составлен некорректно",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[]",
+                  "status": "BAD_REQUEST",
+                  "reason": "Incorrectly made request.",
+                  "message": "Required request header X-PetHotel-User-Id for method parameter type Long is not present",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/Error"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ApiError"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/Error"
                 }
               }
-            }
+            },
+            "description": "Запрос составлен некорректно"
           },
           "403": {
             "description": "Доступ запрещён",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[]",
+                  "status": "FORBIDDEN",
+                  "reason": "Operation is denied for this user.",
+                  "message": "User with role = %s, can nott access for this action",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
@@ -276,19 +210,16 @@
           "404": {
             "description": "Питомец или пользователь не найден",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[]",
+                  "status": "NOT_FOUND",
+                  "reason": "The required object was not found.",
+                  "message": "User with id=2 was not found",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -296,9 +227,16 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[ \"org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:256)\", \"org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:229)\", \"org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)\", \"org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)\", \"org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:242)\" ....]",
+                  "status": "I_AM_A_TEAPOT",
+                  "reason": "Internal Server Error.",
+                  "message": "could not execute statement [ERROR: relation \\\"pets\\\" does not exist\\n  Позиция: 13] [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]; SQL [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -309,17 +247,12 @@
         "tags": [
           "pet-controller"
         ],
-        "description": "Обратите внимание: удалить питомца может пользователь с ролью admin или boss",
+        "summary": "Удаление питомца по его идентификатору",
+        "description": "Обратите внимание: удаление питомца не должно быть доступно пользователю",
         "operationId": "Удаление питомца",
         "parameters": [
           {
-            "name": "X-PetHotel-User-Id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
+            "$ref": "#/components/parameters/requesterHeader"
           },
           {
             "description": "id питомца",
@@ -337,26 +270,33 @@
             "description": "Питомец удалён"
           },
           "400": {
-            "description": "Запрос составлен некорректно",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[]",
+                  "status": "BAD_REQUEST",
+                  "reason": "Incorrectly made request.",
+                  "message": "Required request header X-PetHotel-User-Id for method parameter type Long is not present",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/Error"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ApiError"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/Error"
                 }
               }
-            }
+            },
+            "description": "Запрос составлен некорректно"
           },
           "403": {
             "description": "Доступ запрещён",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[]",
+                  "status": "FORBIDDEN",
+                  "reason": "Operation is denied for this user.",
+                  "message": "User with role = %s, can nott access for this action",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
@@ -366,9 +306,16 @@
           "404": {
             "description": "Питомец или пользователь не найден",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[]",
+                  "status": "NOT_FOUND",
+                  "reason": "The required object was not found.",
+                  "message": "User with id=2 was not found",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -376,9 +323,16 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[ \"org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:256)\", \"org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:229)\", \"org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)\", \"org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)\", \"org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:242)\" ....]",
+                  "status": "I_AM_A_TEAPOT",
+                  "reason": "Internal Server Error.",
+                  "message": "could not execute statement [ERROR: relation \\\"pets\\\" does not exist\\n  Позиция: 13] [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]; SQL [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -389,17 +343,12 @@
         "tags": [
           "pet-controller"
         ],
+        "summary": "Изменение данных о питомце по его идентификатору",
         "description": "Обратите внимание: изменить данные о питомце может пользователь с ролью admin или boss",
         "operationId": "Изменение данных о питомце",
         "parameters": [
           {
-            "name": "X-PetHotel-User-Id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
+            "$ref": "#/components/parameters/requesterHeader"
           },
           {
             "description": "id питомца",
@@ -427,7 +376,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PetDto"
                 }
@@ -435,26 +384,33 @@
             }
           },
           "400": {
-            "description": "Запрос составлен некорректно",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[]",
+                  "status": "BAD_REQUEST",
+                  "reason": "Incorrectly made request.",
+                  "message": "Required request header X-PetHotel-User-Id for method parameter type Long is not present",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/Error"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ApiError"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/Error"
                 }
               }
-            }
+            },
+            "description": "Запрос составлен некорректно"
           },
           "403": {
             "description": "Доступ запрещён",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[]",
+                  "status": "FORBIDDEN",
+                  "reason": "Operation is denied for this user.",
+                  "message": "User with role = %s, can nott access for this action",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
@@ -462,120 +418,52 @@
             }
           },
           "404": {
-            "description": "Питомец илм пользователь не найден",
+            "description": "Питомец или пользователь не найден",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[]",
+                  "status": "NOT_FOUND",
+                  "reason": "The required object was not found.",
+                  "message": "User with id=2 was not found",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
           },
           "409": {
-            "description": "Нарушение целостности данных",
+            "description": "У этого клиента уже есть питомец с такой кличкой",
             "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/pets/{id}/admin": {
-      "get": {
-        "tags": [
-          "pet-controller"
-        ],
-        "description": "Обратите внимание: получение данных о питомце для пользователей с ролью admin или boss",
-        "operationId": "Получение данных о питомце по его идентификатору для админов",
-        "parameters": [
-          {
-            "name": "X-PetHotel-User-Id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "description": "id питомца",
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PetForAdminDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Запрос составлен некорректно",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/Error"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ApiError"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Доступ запрещён",
-            "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[]",
+                  "status": "CONFLICT",
+                  "reason": "For the requested operation the conditions are not met.",
+                  "message": "The client with id = 1 already has a pet with name = Бобик.",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
               }
             }
           },
-          "404": {
-            "description": "Питомец илм пользователь не найден",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "*/*": {
+              "application/json": {
+                "example": {
+                  "error": "[ \"org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:256)\", \"org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:229)\", \"org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)\", \"org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)\", \"org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:242)\" ....]",
+                  "status": "I_AM_A_TEAPOT",
+                  "reason": "Internal Server Error.",
+                  "message": "could not execute statement [ERROR: relation \\\"pets\\\" does not exist\\n  Позиция: 13] [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]; SQL [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]",
+                  "timestamp": "2022-09-07 09:10:50"
+                },
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -585,8 +473,20 @@
     }
   },
   "components": {
+    "parameters": {
+      "requesterHeader": {
+        "name": "X-PetHotel-User-Id",
+        "description": "Id пользователя осуществляющего запрос",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
     "schemas": {
-      "ApiError": {
+      "Error": {
         "type": "object",
         "properties": {
           "errors": {
@@ -609,7 +509,7 @@
             "description": "Общее описание причины ошибки",
             "example": "For the requested operation the conditions are not met."
           },
-          "status": {
+          "httpStatus": {
             "type": "string",
             "description": "Код статуса HTTP-ответа",
             "example": "FORBIDDEN",
@@ -691,122 +591,52 @@
           }
         }
       },
-      "Error": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string"
-          },
-          "reason": {
-            "type": "string"
-          },
-          "httpStatus": {
-            "type": "string",
-            "enum": [
-              "100 CONTINUE",
-              "101 SWITCHING_PROTOCOLS",
-              "102 PROCESSING",
-              "103 EARLY_HINTS",
-              "103 CHECKPOINT",
-              "200 OK",
-              "201 CREATED",
-              "202 ACCEPTED",
-              "203 NON_AUTHORITATIVE_INFORMATION",
-              "204 NO_CONTENT",
-              "205 RESET_CONTENT",
-              "206 PARTIAL_CONTENT",
-              "207 MULTI_STATUS",
-              "208 ALREADY_REPORTED",
-              "226 IM_USED",
-              "300 MULTIPLE_CHOICES",
-              "301 MOVED_PERMANENTLY",
-              "302 FOUND",
-              "302 MOVED_TEMPORARILY",
-              "303 SEE_OTHER",
-              "304 NOT_MODIFIED",
-              "305 USE_PROXY",
-              "307 TEMPORARY_REDIRECT",
-              "308 PERMANENT_REDIRECT",
-              "400 BAD_REQUEST",
-              "401 UNAUTHORIZED",
-              "402 PAYMENT_REQUIRED",
-              "403 FORBIDDEN",
-              "404 NOT_FOUND",
-              "405 METHOD_NOT_ALLOWED",
-              "406 NOT_ACCEPTABLE",
-              "407 PROXY_AUTHENTICATION_REQUIRED",
-              "408 REQUEST_TIMEOUT",
-              "409 CONFLICT",
-              "410 GONE",
-              "411 LENGTH_REQUIRED",
-              "412 PRECONDITION_FAILED",
-              "413 PAYLOAD_TOO_LARGE",
-              "413 REQUEST_ENTITY_TOO_LARGE",
-              "414 URI_TOO_LONG",
-              "414 REQUEST_URI_TOO_LONG",
-              "415 UNSUPPORTED_MEDIA_TYPE",
-              "416 REQUESTED_RANGE_NOT_SATISFIABLE",
-              "417 EXPECTATION_FAILED",
-              "418 I_AM_A_TEAPOT",
-              "419 INSUFFICIENT_SPACE_ON_RESOURCE",
-              "420 METHOD_FAILURE",
-              "421 DESTINATION_LOCKED",
-              "422 UNPROCESSABLE_ENTITY",
-              "423 LOCKED",
-              "424 FAILED_DEPENDENCY",
-              "425 TOO_EARLY",
-              "426 UPGRADE_REQUIRED",
-              "428 PRECONDITION_REQUIRED",
-              "429 TOO_MANY_REQUESTS",
-              "431 REQUEST_HEADER_FIELDS_TOO_LARGE",
-              "451 UNAVAILABLE_FOR_LEGAL_REASONS",
-              "500 INTERNAL_SERVER_ERROR",
-              "501 NOT_IMPLEMENTED",
-              "502 BAD_GATEWAY",
-              "503 SERVICE_UNAVAILABLE",
-              "504 GATEWAY_TIMEOUT",
-              "505 HTTP_VERSION_NOT_SUPPORTED",
-              "506 VARIANT_ALSO_NEGOTIATES",
-              "507 INSUFFICIENT_STORAGE",
-              "508 LOOP_DETECTED",
-              "509 BANDWIDTH_LIMIT_EXCEEDED",
-              "510 NOT_EXTENDED",
-              "511 NETWORK_AUTHENTICATION_REQUIRED"
-            ]
-          },
-          "timeStamp": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
       "NewPetDto": {
+        "description": "Дто для создания нового питомца",
         "required": [
-          "age",
+          "owner",
+          "type",
+          "name",
           "breed",
-          "diet",
-          "isContact",
-          "isPhotographed",
-          "isTakesMedications",
-          "sex",
-          "typeOfPet",
-          "weight"
+          "birthDate",
+          "sex"
         ],
         "type": "object",
         "properties": {
-          "typeOfPet": {
-            "maxLength": 250,
+          "ownerId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "id клиента",
+            "example": 1
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "DOG",
+              "CAT",
+              "EXOTIC"
+            ],
+            "description": "Тип животного/не может быть пустым shortDto",
+            "example": "DOG"
+          },
+          "name": {
+            "maxLength": 30,
             "minLength": 1,
             "type": "string",
-            "description": "Вид питомца",
-            "example": "Собаки (малые и средне-крупные), кошки, экзоты (птицы, рептилии, грызуны, свиньи, пауки и т.д.)."
+            "description": "Кличка питомца shortDto",
+            "example": "Барбос"
           },
           "breed": {
-            "maxLength": 250,
+            "maxLength": 30,
             "minLength": 1,
             "type": "string",
-            "description": "Порода питомца",
-            "example": "Спаниель."
+            "description": "Порода питомца/не может быть пустым shortDto",
+            "example": "Спаниель"
+          },
+          "birthDate": {
+            "type": "string",
+            "description": "Дата рождения (в формате \"yyyy-MM-dd\"), должно быть в прошлом fullDto",
+            "example": "2022-06-09"
           },
           "sex": {
             "type": "string",
@@ -814,47 +644,301 @@
               "FEMALE",
               "MALE",
               "HERMAPHRODITE"
-            ]
+            ],
+            "description": "Пол питомца/не может быть пустым",
+            "example": "Женский"
           },
-          "age": {
-            "type": "integer",
-            "format": "int32",
-            "minLength": 1,
-            "description": "Возраст питомца",
-            "example": 3
-          },
-          "weight": {
-            "type": "integer",
-            "format": "int32",
-            "minLength": 1,
-            "description": "Вес питомца",
-            "example": 3
-          },
-          "diet": {
+          "color": {
+            "maxLength": 30,
             "type": "string",
-            "enum": [
-              "NATURAL_RAW_FOOD",
-              "NATURAL_COOKED_FOOD",
-              "READY_INDUSTRIAL_FOOD"
-            ]
+            "description": "Окрас питомца fullDto",
+            "example": "Черный"
           },
-          "isTakesMedications": {
-            "type": "boolean",
-            "description": "Нужно ли давать питомцу лекарства",
-            "example": true,
-            "default": false
+          "sign": {
+            "maxLength": 150,
+            "type": "string",
+            "description": "Чип, Клеймо, Особые приметы fullDto",
+            "example": "Клеймо"
           },
-          "isContact": {
+          "isExhibition": {
             "type": "boolean",
-            "description": "Можно ли питомцу контактировать с другими животными",
-            "example": true,
-            "default": false
+            "description": "Выставочная ли собака? shortDto",
+            "example": true
           },
-          "isPhotographed": {
+          "vetVisitDate": {
+            "type": "string",
+            "description": "Дата последнего посещения ветврача (в формате \"yyyy-MM-dd\"), должно быть в прошлом fullDto",
+            "example": "2023-06-09"
+          },
+          "vetVisitReason": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Причина последнего посещения врача fullDto",
+            "example": "Ушиб лапы"
+          },
+          "vaccine": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Даты последних прививок, названия вакцин shortDto",
+            "example": "1.11.2023 антиклещ"
+          },
+          "parasites": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Дата обработки от глистов/паразитов fullDto",
+            "example": "22.11.2023"
+          },
+          "fleaMite": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Даты обработки от блох/клещей с указанием препарата fullDto",
+            "example": "22.11.2023 антиклещ"
+          },
+          "surgery": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Перенесенные операции (кастрация) fullDto",
+            "example": "Кастрация"
+          },
+          "pastDisease": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Перенесенные заболевания fullDto",
+            "example": "пиелонефрит"
+          },
+          "healthСharacteristic": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Особенности состояния здоровья питомца (ФИП)",
+            "example": "без особенностей"
+          },
+          "urineAnalysis": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Дата последней сдачи мочи",
+            "example": "1.11.2023"
+          },
+          "allergy": {
             "type": "boolean",
-            "description": "Можно ли фотографировать питомца",
-            "example": true,
-            "default": false
+            "description": "Есть ли аллергия? fullDto",
+            "example": true
+          },
+          "allergyType": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Если предыдущее поле true, тогда в этом поле описание на что аллергия fullDto",
+            "example": "На молоко"
+          },
+          "chronicDisease": {
+            "type": "boolean",
+            "description": "Есть ли у питомца хронические заболевания? shortDto",
+            "example": true
+          },
+          "chronicDiseaseType": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Если предыдущее поле true, тогда в этом поле описание какие хронические заболевания есть shortDto",
+            "example": "пиелонефрит"
+          },
+          "heatDate": {
+            "type": "string",
+            "description": "Предполагаемая дата очередной течки (для сук)(в формате \"yyyy-MM-dd\"), должно быть в будущем fullDto",
+            "example": "2023-06-09"
+          },
+          "vetData": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Контакты ветврача, к которому следует обращаться в случае необходимости fullDto",
+            "example": "89000000000 Иван Иваныч Иванов"
+          },
+          "stayWithoutMaster": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Есть ли опыт разлуки с хозяином? fullDto",
+            "example": "Да, разлучается спокойно"
+          },
+          "stayAlone": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Умеет ли питомец спокойно оставаться один? shortDto",
+            "example": "нет, воет, когда остаётся один"
+          },
+          "specialCare": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Требуется ли спец уход, какой? shortDto",
+            "example": "да, нужно расчёсывать шерсть два раза в день"
+          },
+          "barkHowl": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Лает / воет в одиночестве? fullDto",
+            "example": "да"
+          },
+          "furnitureDamage": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Портит ли вещи, мебель? fullDto",
+            "example": "нет"
+          },
+          "foodFromTable": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Ворует ли еду со стола? fullDto",
+            "example": "нет"
+          },
+          "defecateAtHome": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Справляет ли  нужду дома? fullDto",
+            "example": "нет"
+          },
+          "markAtHome": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Метит дома? fullDto",
+            "example": "нет"
+          },
+          "newPeople": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Как относится к незнакомым людям? shortDto",
+            "example": "дружелюбно"
+          },
+          "isBitePeople": {
+            "type": "boolean",
+            "description": "Ваша собака когда-нибудь кого-нибудь кусала? fullDto",
+            "example": true
+          },
+          "reasonOfBite": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Если предыдущее поле true, тогда в этом поле причина укуса fullDto",
+            "example": "Дразнил"
+          },
+          "playWithDogs": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Играет / гуляет с другими собаками? fullDto",
+            "example": "да"
+          },
+          "isDogTraining": {
+            "type": "boolean",
+            "description": "Прошел ли питомец курс послушания? shortDto",
+            "example": true
+          },
+          "trainingName": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Если предыдущее поле true, тогда в этом поле название курс послушания shortDto",
+            "example": "Послушная собака"
+          },
+          "like": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Что любит fullDto",
+            "example": "Когда гладят по голове"
+          },
+          "notLike": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Что не любит fullDto",
+            "example": "Когда трогают хвост"
+          },
+          "toys": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Любимые игрушки, игры питомца fullDto",
+            "example": "Мячик"
+          },
+          "badHabit": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Вредные привычки fullDto",
+            "example": "Разбрасывает еду из миски"
+          },
+          "walking": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Сколько раз в день питомец привык гулять?/гуляет ли на улице fullDto",
+            "example": "три раза"
+          },
+          "morningWalking": {
+            "maxLength": 150,
+            "type": "string",
+            "description": "Привычное время прогулок Утро fullDto",
+            "example": "6 утра"
+          },
+          "dayWalking": {
+            "maxLength": 150,
+            "type": "string",
+            "description": "Привычное время прогулок День fullDto",
+            "example": "В 2 часа дня"
+          },
+          "eveningWalking": {
+            "maxLength": 150,
+            "type": "string",
+            "description": "Привычное время прогулок Вечер fullDto",
+            "example": "В 8 часов вечера"
+          },
+          "feedingQuantity": {
+            "type": "integer",
+            "description": "Количество кормлений в день (От 1 до 9) fullDto",
+            "format": "int32",
+            "example": 7
+          },
+          "feedType": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Вид корма (сухой / натуралка/консервы) shortDto",
+            "example": "сухой корм"
+          },
+          "feedName": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Название корма\\консерв fullDto",
+            "example": "Довольный пёс"
+          },
+          "feedComposition": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Состав корма/консерв fullDto",
+            "example": "говядина и овощи"
+          },
+          "feedingRate": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Норма на 1 кормление fullDto",
+            "example": "100 г"
+          },
+          "feedingPractice": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Особенности кормления fullDto",
+            "example": "без особенностей"
+          },
+          "treat": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Разрешенные лакомства и их количество fullDto",
+            "example": "сахар"
+          },
+          "isMedicine": {
+            "type": "boolean",
+            "description": "Необходимы ли лекарства, витамины? fullDto",
+            "example": true
+          },
+          "medicineRegimen": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Если предыдущее поле true, тогда в этом поле название, режим приема лекарств/витаминов и доза fullDto",
+            "example": "Здоровая собака"
+          },
+          "additionalData": {
+            "maxLength": 1000,
+            "type": "string",
+            "description": "Дополнительные комментарии, особенности поведения fullDto",
+            "example": "Любит, чтоб чесали животик"
           }
         }
       },
@@ -863,17 +947,46 @@
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "description": "id питомца",
+            "example": 1
           },
-          "typeOfPet": {
+          "owner": {
+            "$ref": "#/components/schemas/OwnerShortDto"
+          },
+          "type": {
             "type": "string",
-            "description": "Вид питомца",
-            "example": "Собаки (малые и средне-крупные), кошки, экзоты (птицы, рептилии, грызуны, свиньи, пауки и т.д.)."
+            "enum": [
+              "DOG",
+              "CAT",
+              "EXOTIC"
+            ],
+            "description": "Тип животного/не может быть пустым shortDto",
+            "example": "DOG"
+          },
+          "name": {
+            "maxLength": 30,
+            "minLength": 1,
+            "type": "string",
+            "description": "Кличка питомца shortDto",
+            "example": "Барбос"
           },
           "breed": {
+            "maxLength": 30,
+            "minLength": 1,
             "type": "string",
-            "description": "Порода питомца",
-            "example": "Спаниель."
+            "description": "Порода питомца/не может быть пустым shortDto",
+            "example": "Спаниель"
+          },
+          "birthDate": {
+            "type": "string",
+            "description": "Дата рождения (в формате \"yyyy-MM-dd\"), должно быть в прошлом fullDto",
+            "example": "2022-06-09"
+          },
+          "age": {
+            "type": "string",
+            "description": "Возраст питомца shortDto высчитывается автоматически на основании даты рождения",
+            "example": "3 года"
           },
           "sex": {
             "type": "string",
@@ -881,86 +994,336 @@
               "FEMALE",
               "MALE",
               "HERMAPHRODITE"
-            ]
+            ],
+            "description": "Пол питомца/не может быть пустым",
+            "example": "Женский"
           },
-          "age": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Возраст питомца",
-            "example": 3
-          },
-          "weight": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Вес питомца",
-            "example": 3
-          },
-          "diet": {
+          "color": {
+            "maxLength": 30,
             "type": "string",
-            "enum": [
-              "NATURAL_RAW_FOOD",
-              "NATURAL_COOKED_FOOD",
-              "READY_INDUSTRIAL_FOOD"
-            ]
+            "description": "Окрас питомца fullDto",
+            "example": "Черный"
           },
-          "isTakesMedications": {
+          "sign": {
+            "maxLength": 150,
+            "type": "string",
+            "description": "Чип, Клеймо, Особые приметы fullDto",
+            "example": "Клеймо"
+          },
+          "isExhibition": {
             "type": "boolean",
-            "description": "Нужно ли давать питомцу лекарства",
+            "description": "Выставочная ли собака? shortDto",
             "example": true
           },
-          "isContact": {
+          "vetVisitDate": {
+            "type": "string",
+            "description": "Дата последнего посещения ветврача (в формате \"yyyy-MM-dd\"), должно быть в прошлом fullDto",
+            "example": "2023-06-09"
+          },
+          "vetVisitReason": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Причина последнего посещения врача fullDto",
+            "example": "Ушиб лапы"
+          },
+          "vaccine": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Даты последних прививок, названия вакцин shortDto",
+            "example": "1.11.2023 антиклещ"
+          },
+          "parasites": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Дата обработки от глистов/паразитов fullDto",
+            "example": "22.11.2023"
+          },
+          "fleaMite": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Даты обработки от блох/клещей с указанием препарата fullDto",
+            "example": "22.11.2023 антиклещ"
+          },
+          "surgery": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Перенесенные операции (кастрация) fullDto",
+            "example": "Кастрация"
+          },
+          "pastDisease": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Перенесенные заболевания fullDto",
+            "example": "пиелонефрит"
+          },
+          "healthСharacteristic": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Особенности состояния здоровья питомца (ФИП)",
+            "example": "без особенностей"
+          },
+          "urineAnalysis": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Дата последней сдачи мочи",
+            "example": "1.11.2023"
+          },
+          "allergy": {
             "type": "boolean",
-            "description": "Можно ли питомцу контактировать с другими животными",
+            "description": "Есть ли аллергия? fullDto",
             "example": true
           },
-          "isPhotographed": {
+          "allergyType": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Если предыдущее поле true, тогда в этом поле описание на что аллергия fullDto",
+            "example": "На молоко"
+          },
+          "chronicDisease": {
             "type": "boolean",
-            "description": "Можно ли фотографировать питомца",
+            "description": "Есть ли у питомца хронические заболевания? shortDto",
             "example": true
           },
-          "comments": {
-            "type": "array",
-            "description": "Список комментариев",
-            "example": [],
-            "items": {
-              "type": "CommentDto",
-              "description": "Комментарий",
-              "example": "[]"
-            }
+          "chronicDiseaseType": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Если предыдущее поле true, тогда в этом поле описание какие хронические заболевания есть shortDto",
+            "example": "пиелонефрит"
+          },
+          "heatDate": {
+            "type": "string",
+            "description": "Предполагаемая дата очередной течки (для сук)(в формате \"yyyy-MM-dd\"), должно быть в будущем fullDto",
+            "example": "2023-06-09"
+          },
+          "vetData": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Контакты ветврача, к которому следует обращаться в случае необходимости fullDto",
+            "example": "89000000000 Иван Иваныч Иванов"
+          },
+          "stayWithoutMaster": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Есть ли опыт разлуки с хозяином? fullDto",
+            "example": "Да, разлучается спокойно"
+          },
+          "stayAlone": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Умеет ли питомец спокойно оставаться один? shortDto",
+            "example": "нет, воет, когда остаётся один"
+          },
+          "specialCare": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Требуется ли спец уход, какой? shortDto",
+            "example": "да, нужно расчёсывать шерсть два раза в день"
+          },
+          "barkHowl": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Лает / воет в одиночестве? fullDto",
+            "example": "да"
+          },
+          "furnitureDamage": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Портит ли вещи, мебель? fullDto",
+            "example": "нет"
+          },
+          "foodFromTable": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Ворует ли еду со стола? fullDto",
+            "example": "нет"
+          },
+          "defecateAtHome": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Справляет ли  нужду дома? fullDto",
+            "example": "нет"
+          },
+          "markAtHome": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Метит дома? fullDto",
+            "example": "нет"
+          },
+          "newPeople": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Как относится к незнакомым людям? shortDto",
+            "example": "дружелюбно"
+          },
+          "isBitePeople": {
+            "type": "boolean",
+            "description": "Ваша собака когда-нибудь кого-нибудь кусала? fullDto",
+            "example": true
+          },
+          "reasonOfBite": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Если предыдущее поле true, тогда в этом поле причина укуса fullDto",
+            "example": "Дразнил"
+          },
+          "playWithDogs": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Играет / гуляет с другими собаками? fullDto",
+            "example": "да"
+          },
+          "isDogTraining": {
+            "type": "boolean",
+            "description": "Прошел ли питомец курс послушания? shortDto",
+            "example": true
+          },
+          "trainingName": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Если предыдущее поле true, тогда в этом поле название курс послушания shortDto",
+            "example": "Послушная собака"
+          },
+          "like": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Что любит fullDto",
+            "example": "Когда гладят по голове"
+          },
+          "notLike": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Что не любит fullDto",
+            "example": "Когда трогают хвост"
+          },
+          "toys": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Любимые игрушки, игры питомца fullDto",
+            "example": "Мячик"
+          },
+          "badHabit": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Вредные привычки fullDto",
+            "example": "Разбрасывает еду из миски"
+          },
+          "walking": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Сколько раз в день питомец привык гулять?/гуляет ли на улице fullDto",
+            "example": "три раза"
+          },
+          "morningWalking": {
+            "maxLength": 150,
+            "type": "string",
+            "description": "Привычное время прогулок Утро fullDto",
+            "example": "6 утра"
+          },
+          "dayWalking": {
+            "maxLength": 150,
+            "type": "string",
+            "description": "Привычное время прогулок День fullDto",
+            "example": "В 2 часа дня"
+          },
+          "eveningWalking": {
+            "maxLength": 150,
+            "type": "string",
+            "description": "Привычное время прогулок Вечер fullDto",
+            "example": "В 8 часов вечера"
+          },
+          "feedingQuantity": {
+            "type": "integer",
+            "description": "Количество кормлений в день (От 1 до 9) fullDto",
+            "format": "int32",
+            "example": 7
+          },
+          "feedType": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Вид корма (сухой / натуралка/консервы) shortDto",
+            "example": "сухой корм"
+          },
+          "feedName": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Название корма\\консерв fullDto",
+            "example": "Довольный пёс"
+          },
+          "feedComposition": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Состав корма/консерв fullDto",
+            "example": "говядина и овощи"
+          },
+          "feedingRate": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Норма на 1 кормление fullDto",
+            "example": "100 г"
+          },
+          "feedingPractice": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Особенности кормления fullDto",
+            "example": "без особенностей"
+          },
+          "treat": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Разрешенные лакомства и их количество fullDto",
+            "example": "сахар"
+          },
+          "isMedicine": {
+            "type": "boolean",
+            "description": "Необходимы ли лекарства, витамины? fullDto",
+            "example": true
+          },
+          "medicineRegimen": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Если предыдущее поле true, тогда в этом поле название, режим приема лекарств/витаминов и доза fullDto",
+            "example": "Здоровая собака"
+          },
+          "additionalData": {
+            "maxLength": 1000,
+            "type": "string",
+            "description": "Дополнительные комментарии, особенности поведения fullDto",
+            "example": "Любит, чтоб чесали животик"
           }
         }
       },
       "UpdatePetDto": {
-        "required": [
-          "age",
-          "breed",
-          "diet",
-          "isContact",
-          "isPhotographed",
-          "isTakesMedications",
-          "sex",
-          "typeOfPet",
-          "weight"
-        ],
+        "description": "Дто для изменения данных питомца",
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
+          "type": {
+            "type": "string",
+            "enum": [
+              "DOG",
+              "CAT",
+              "EXOTIC"
+            ],
+            "description": "Тип животного/не может быть пустым shortDto",
+            "example": "DOG"
           },
-          "typeOfPet": {
-            "maxLength": 250,
+          "name": {
+            "maxLength": 30,
             "minLength": 1,
             "type": "string",
-            "description": "Вид питомца",
-            "example": "Собаки (малые и средне-крупные), кошки, экзоты (птицы, рептилии, грызуны, свиньи, пауки и т.д.)."
+            "description": "Кличка питомца shortDto",
+            "example": "Барбос"
           },
           "breed": {
-            "maxLength": 250,
+            "maxLength": 30,
             "minLength": 1,
             "type": "string",
-            "description": "Порода питомца",
-            "example": "Спаниель."
+            "description": "Порода питомца/не может быть пустым shortDto",
+            "example": "Спаниель"
+          },
+          "birthDate": {
+            "type": "string",
+            "description": "Дата рождения (в формате \"yyyy-MM-dd\"), должно быть в прошлом fullDto",
+            "example": "2022-06-09"
           },
           "sex": {
             "type": "string",
@@ -968,133 +1331,320 @@
               "FEMALE",
               "MALE",
               "HERMAPHRODITE"
-            ]
+            ],
+            "description": "Пол питомца/не может быть пустым",
+            "example": "Женский"
           },
-          "age": {
-            "type": "integer",
-            "format": "int32",
-            "minLength": 1,
-            "description": "Возраст питомца",
-            "example": 3
-          },
-          "weight": {
-            "type": "integer",
-            "format": "int32",
-            "minLength": 1,
-            "description": "Вес питомца",
-            "example": 3
-          },
-          "diet": {
+          "color": {
+            "maxLength": 30,
             "type": "string",
-            "enum": [
-              "NATURAL_RAW_FOOD",
-              "NATURAL_COOKED_FOOD",
-              "READY_INDUSTRIAL_FOOD"
-            ]
+            "description": "Окрас питомца fullDto",
+            "example": "Черный"
           },
-          "isTakesMedications": {
-            "type": "boolean",
-            "description": "Нужно ли давать питомцу лекарства",
-            "example": true,
-            "default": false
+          "sign": {
+            "maxLength": 150,
+            "type": "string",
+            "description": "Чип, Клеймо, Особые приметы fullDto",
+            "example": "Клеймо"
           },
-          "isContact": {
+          "isExhibition": {
             "type": "boolean",
-            "description": "Можно ли питомцу контактировать с другими животными",
-            "example": true,
-            "default": false
+            "description": "Выставочная ли собака? shortDto",
+            "example": true
           },
-          "isPhotographed": {
+          "vetVisitDate": {
+            "type": "string",
+            "description": "Дата последнего посещения ветврача (в формате \"yyyy-MM-dd\"), должно быть в прошлом fullDto",
+            "example": "2023-06-09"
+          },
+          "vetVisitReason": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Причина последнего посещения врача fullDto",
+            "example": "Ушиб лапы"
+          },
+          "vaccine": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Даты последних прививок, названия вакцин shortDto",
+            "example": "1.11.2023 антиклещ"
+          },
+          "parasites": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Дата обработки от глистов/паразитов fullDto",
+            "example": "22.11.2023"
+          },
+          "fleaMite": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Даты обработки от блох/клещей с указанием препарата fullDto",
+            "example": "22.11.2023 антиклещ"
+          },
+          "surgery": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Перенесенные операции (кастрация) fullDto",
+            "example": "Кастрация"
+          },
+          "pastDisease": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Перенесенные заболевания fullDto",
+            "example": "пиелонефрит"
+          },
+          "healthСharacteristic": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Особенности состояния здоровья питомца (ФИП)",
+            "example": "без особенностей"
+          },
+          "urineAnalysis": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Дата последней сдачи мочи",
+            "example": "1.11.2023"
+          },
+          "allergy": {
             "type": "boolean",
-            "description": "Можно ли фотографировать питомца",
-            "example": true,
-            "default": false
+            "description": "Есть ли аллергия? fullDto",
+            "example": true
+          },
+          "allergyType": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Если предыдущее поле true, тогда в этом поле описание на что аллергия fullDto",
+            "example": "На молоко"
+          },
+          "chronicDisease": {
+            "type": "boolean",
+            "description": "Есть ли у питомца хронические заболевания? shortDto",
+            "example": true
+          },
+          "chronicDiseaseType": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Если предыдущее поле true, тогда в этом поле описание какие хронические заболевания есть shortDto",
+            "example": "пиелонефрит"
+          },
+          "heatDate": {
+            "type": "string",
+            "description": "Предполагаемая дата очередной течки (для сук)(в формате \"yyyy-MM-dd\"), должно быть в будущем fullDto",
+            "example": "2023-06-09"
+          },
+          "vetData": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Контакты ветврача, к которому следует обращаться в случае необходимости fullDto",
+            "example": "89000000000 Иван Иваныч Иванов"
+          },
+          "stayWithoutMaster": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Есть ли опыт разлуки с хозяином? fullDto",
+            "example": "Да, разлучается спокойно"
+          },
+          "stayAlone": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Умеет ли питомец спокойно оставаться один? shortDto",
+            "example": "нет, воет, когда остаётся один"
+          },
+          "specialCare": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Требуется ли спец уход, какой? shortDto",
+            "example": "да, нужно расчёсывать шерсть два раза в день"
+          },
+          "barkHowl": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Лает / воет в одиночестве? fullDto",
+            "example": "да"
+          },
+          "furnitureDamage": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Портит ли вещи, мебель? fullDto",
+            "example": "нет"
+          },
+          "foodFromTable": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Ворует ли еду со стола? fullDto",
+            "example": "нет"
+          },
+          "defecateAtHome": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Справляет ли  нужду дома? fullDto",
+            "example": "нет"
+          },
+          "markAtHome": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Метит дома? fullDto",
+            "example": "нет"
+          },
+          "newPeople": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Как относится к незнакомым людям? shortDto",
+            "example": "дружелюбно"
+          },
+          "isBitePeople": {
+            "type": "boolean",
+            "description": "Ваша собака когда-нибудь кого-нибудь кусала? fullDto",
+            "example": true
+          },
+          "reasonOfBite": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Если предыдущее поле true, тогда в этом поле причина укуса fullDto",
+            "example": "Дразнил"
+          },
+          "playWithDogs": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Играет / гуляет с другими собаками? fullDto",
+            "example": "да"
+          },
+          "isDogTraining": {
+            "type": "boolean",
+            "description": "Прошел ли питомец курс послушания? shortDto",
+            "example": true
+          },
+          "trainingName": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Если предыдущее поле true, тогда в этом поле название курс послушания shortDto",
+            "example": "Послушная собака"
+          },
+          "like": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Что любит fullDto",
+            "example": "Когда гладят по голове"
+          },
+          "notLike": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Что не любит fullDto",
+            "example": "Когда трогают хвост"
+          },
+          "toys": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Любимые игрушки, игры питомца fullDto",
+            "example": "Мячик"
+          },
+          "badHabit": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Вредные привычки fullDto",
+            "example": "Разбрасывает еду из миски"
+          },
+          "walking": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Сколько раз в день питомец привык гулять?/гуляет ли на улице fullDto",
+            "example": "три раза"
+          },
+          "morningWalking": {
+            "maxLength": 150,
+            "type": "string",
+            "description": "Привычное время прогулок Утро fullDto",
+            "example": "6 утра"
+          },
+          "dayWalking": {
+            "maxLength": 150,
+            "type": "string",
+            "description": "Привычное время прогулок День fullDto",
+            "example": "В 2 часа дня"
+          },
+          "eveningWalking": {
+            "maxLength": 150,
+            "type": "string",
+            "description": "Привычное время прогулок Вечер fullDto",
+            "example": "В 8 часов вечера"
+          },
+          "feedingQuantity": {
+            "type": "integer",
+            "description": "Количество кормлений в день (От 1 до 9) fullDto",
+            "format": "int32",
+            "example": 7
+          },
+          "feedType": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Вид корма (сухой / натуралка/консервы) shortDto",
+            "example": "сухой корм"
+          },
+          "feedName": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Название корма\\консерв fullDto",
+            "example": "Довольный пёс"
+          },
+          "feedComposition": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Состав корма/консерв fullDto",
+            "example": "говядина и овощи"
+          },
+          "feedingRate": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Норма на 1 кормление fullDto",
+            "example": "100 г"
+          },
+          "feedingPractice": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Особенности кормления fullDto",
+            "example": "без особенностей"
+          },
+          "treat": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Разрешенные лакомства и их количество fullDto",
+            "example": "сахар"
+          },
+          "isMedicine": {
+            "type": "boolean",
+            "description": "Необходимы ли лекарства, витамины? fullDto",
+            "example": true
+          },
+          "medicineRegimen": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Если предыдущее поле true, тогда в этом поле название, режим приема лекарств/витаминов и доза fullDto",
+            "example": "Здоровая собака"
+          },
+          "additionalData": {
+            "maxLength": 1000,
+            "type": "string",
+            "description": "Дополнительные комментарии, особенности поведения fullDto",
+            "example": "Любит, чтоб чесали животик"
           }
         }
       },
-      "PetForAdminDto": {
+      "OwnerShortDto": {
+        "description": "Краткое Дто клиента",
         "type": "object",
         "properties": {
-          "id": {
+          "name": {
+            "maxLength": 30,
+            "minLength": 1,
+            "type": "string",
+            "description": "ФИО хозяина питомца shortDto",
+            "example": "Иванов И.И."
+          },
+          "rating": {
             "type": "integer",
-            "format": "int64"
-          },
-          "typeOfPet": {
-            "type": "string",
-            "description": "Вид питомца",
-            "example": "Собаки (малые и средне-крупные), кошки, экзоты (птицы, рептилии, грызуны, свиньи, пауки и т.д.)."
-          },
-          "breed": {
-            "type": "string",
-            "description": "Порода питомца",
-            "example": "Спаниель."
-          },
-          "sex": {
-            "type": "string",
-            "enum": [
-              "FEMALE",
-              "MALE",
-              "HERMAPHRODITE"
-            ]
-          },
-          "age": {
-            "type": "integer",
+            "description": "Рейтинг клиента (От 1 до 10)",
             "format": "int32",
-            "description": "Возраст питомца",
-            "example": 3
-          },
-          "weight": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Вес питомца",
-            "example": 3
-          },
-          "diet": {
-            "type": "string",
-            "enum": [
-              "NATURAL_RAW_FOOD",
-              "NATURAL_COOKED_FOOD",
-              "READY_INDUSTRIAL_FOOD"
-            ]
-          },
-          "isTakesMedications": {
-            "type": "boolean",
-            "description": "Нужно ли давать питомцу лекарства",
-            "example": true
-          },
-          "isContact": {
-            "type": "boolean",
-            "description": "Можно ли питомцу контактировать с другими животными",
-            "example": true
-          },
-          "isPhotographed": {
-            "type": "boolean",
-            "description": "Можно ли фотографировать питомца",
-            "example": true
-          },
-          "comments": {
-            "type": "array",
-            "description": "Список комментариев",
-            "example": [],
-            "items": {
-              "type": "CommentDto",
-              "description": "Комментарий",
-              "example": "[]"
-            }
-          },
-          "historyOfBookings": {
-            "type": "array",
-            "description": "История бронирования",
-            "example": [],
-            "items": {
-              "type": "BookingDto",
-              "description": "Бронирование",
-              "example": "[]"
-            }
-          },
-          "additionalServices": {
-            "type": "string",
-            "description": "Дополнительные услуги"
+            "example": 7
           }
         }
       }

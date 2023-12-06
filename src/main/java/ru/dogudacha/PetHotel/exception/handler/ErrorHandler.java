@@ -13,12 +13,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.dogudacha.PetHotel.exception.AccessDeniedException;
+import ru.dogudacha.PetHotel.exception.ConflictException;
 import ru.dogudacha.PetHotel.exception.InvalidDateRangeException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
-import ru.dogudacha.PetHotel.exception.dto.ApiError;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -28,16 +30,13 @@ import static java.time.LocalDateTime.now;
 @RestControllerAdvice
 public class ErrorHandler {
 
-    record Error(String message, String reason, HttpStatus httpStatus, LocalDateTime timeStamp) {
-    }
-
-
     @ExceptionHandler(MissingRequestHeaderException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Error handleMissingRequestHeaderException(final MissingRequestHeaderException ex) {
         log.error("EH: MissingRequestHeaderException: {}", ex.getMessage(), ex);
 
         return new Error(
+                new ArrayList<>(),
                 ex.getMessage(),
                 "Required request header is not present.",
                 HttpStatus.BAD_REQUEST,
@@ -51,6 +50,7 @@ public class ErrorHandler {
         log.error("EH: AccessDeniedException: {}", ex.getMessage(), ex);
 
         return new Error(
+                new ArrayList<>(),
                 ex.getMessage(),
                 "Operation is denied for this user.",
                 HttpStatus.FORBIDDEN,
@@ -60,113 +60,127 @@ public class ErrorHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError errorMethodArgumentNotValidException(final MethodArgumentNotValidException ex) {
+    public Error errorMethodArgumentNotValidException(final MethodArgumentNotValidException ex) {
         log.error("EH: MethodArgumentNotValidException: {}", ex.getMessage(), ex);
-        return ApiError.builder()
-                .message(Objects.requireNonNull(ex.getFieldError()).getDefaultMessage())
-                .reason("Incorrectly made request")
-                .httpStatus(HttpStatus.BAD_REQUEST)
-                .timeStamp(now())
-                .build();
+        return new Error(
+                new ArrayList<>(),
+                ex.getMessage(),
+                "Incorrectly made request",
+                HttpStatus.BAD_REQUEST,
+                now());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError errorMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException ex) {
+    public Error errorMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException ex) {
         log.error("EH: MethodArgumentTypeMismatchException: {}", ex.getMessage(), ex);
-        return ApiError.builder()
-                .message(ex.getMessage() + ". Param:" + ex.getName() + " Value=" + ex.getValue())
-                .reason("Incorrectly made request")
-                .httpStatus(HttpStatus.BAD_REQUEST)
-                .timeStamp(now())
-                .build();
+        return new Error(
+                new ArrayList<>(),
+                String.format(ex.getMessage() + ". Param:" + ex.getName() + " Value=" + ex.getValue()),
+                "Incorrectly made request",
+                HttpStatus.BAD_REQUEST,
+                now());
     }
-
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError errorMissingServletRequestParameterException(final MissingServletRequestParameterException ex) {
+    public Error errorMissingServletRequestParameterException(final MissingServletRequestParameterException ex) {
         log.error("EH: MissingServletRequestParameterException: {}", ex.getMessage(), ex);
-        return ApiError.builder()
-                .message(ex.getMessage())
-                .reason("Incorrectly made request")
-                .httpStatus(HttpStatus.BAD_REQUEST)
-                .timeStamp(now())
-                .build();
+        return new Error(
+                new ArrayList<>(),
+                ex.getMessage(),
+                "Incorrectly made request",
+                HttpStatus.BAD_REQUEST,
+                now());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError errorDataIntegrityViolationException(final DataIntegrityViolationException ex) {
+    public Error errorDataIntegrityViolationException(final DataIntegrityViolationException ex) {
         log.error("EH: DataIntegrityViolationException: {}", ex.getMessage(), ex);
-        return ApiError.builder()
-                .message(Objects.requireNonNull(ex.getRootCause()).getMessage())
-                .reason("Integrity constraint has been violated.")
-                .httpStatus(HttpStatus.CONFLICT)
-                .timeStamp(now())
-                .build();
+        return new Error(
+                new ArrayList<>(),
+                Objects.requireNonNull(ex.getRootCause()).getMessage(),
+                "Integrity constraint has been violated.",
+                HttpStatus.CONFLICT,
+                now());
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError errorConstraintViolationException(final ConstraintViolationException ex) {
+    public Error errorConstraintViolationException(final ConstraintViolationException ex) {
         log.error("EH: ConstraintViolationException: {}", ex.getMessage(), ex);
-        return ApiError.builder()
-                .message(ex.getCause().getMessage())
-                .reason("Integrity constraint has been violated.")
-                .httpStatus(HttpStatus.CONFLICT)
-                .timeStamp(now())
-                .build();
+        return new Error(
+                new ArrayList<>(),
+                ex.getMessage(),
+                "Integrity constraint has been violated.",
+                HttpStatus.CONFLICT,
+                now());
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError handleNotFoundException(final NotFoundException ex) {
+    public Error handleNotFoundException(final NotFoundException ex) {
         log.error("EH: NotFoundException: {}", ex.getMessage(), ex);
-        return ApiError.builder()
-                .message(ex.getMessage())
-                .reason("The required object was not found.")
-                .httpStatus(HttpStatus.NOT_FOUND)
-                .timeStamp(now())
-                .build();
+        return new Error(
+                new ArrayList<>(),
+                ex.getMessage(),
+                "The required object was not found.",
+                HttpStatus.NOT_FOUND,
+                now());
     }
 
     @ExceptionHandler(InvalidDateRangeException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleInvalidDateRangeException(final InvalidDateRangeException ex) {
+    public Error handleInvalidDateRangeException(final InvalidDateRangeException ex) {
         log.error("EH: InvalidDateRangeException: {}", ex.getMessage());
-        return ApiError.builder()
-                .message(ex.getMessage())
-                .reason("For the requested operation the conditions are not met.")
-                .httpStatus(HttpStatus.BAD_REQUEST)
-                .timeStamp(now())
-                .build();
+        return new Error(
+                new ArrayList<>(),
+                ex.getMessage(),
+                "For the requested operation the conditions are not met.",
+                HttpStatus.BAD_REQUEST,
+                now());
     }
 
     @ExceptionHandler(HttpMessageConversionException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handleHttpMessageConversionException(final HttpMessageConversionException ex) {
+    public Error handleHttpMessageConversionException(final HttpMessageConversionException ex) {
         log.error("EH: HttpMessageConversionException: {}", ex.getMessage());
-        return ApiError.builder()
-                .message(ex.getMessage())
-                .reason("Request parameters validation error.")
-                .httpStatus(HttpStatus.CONFLICT)
-                .timeStamp(now())
-                .build();
+        return new Error(
+                new ArrayList<>(),
+                ex.getMessage(),
+                "Request parameters validation error.",
+                HttpStatus.CONFLICT,
+                now());
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Error handleConflictException(final ConflictException ex) {
+        log.error("EH: ConflictException: {}", ex.getMessage());
+        return new Error(
+                new ArrayList<>(),
+                ex.getMessage(),
+                "For the requested operation the conditions are not met.",
+                HttpStatus.CONFLICT,
+                now());
     }
 
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ApiError errorThrowableException(final Throwable ex) {
+    public Error errorThrowableException(final Throwable ex) {
         log.error("EH: Internal Server Error. {}", ex.getMessage(), ex);
-        return ApiError.builder()
-                .errors(Arrays.stream(ex.getStackTrace())
+        return new Error(
+                Arrays.stream(ex.getStackTrace())
                         .map(StackTraceElement::toString)
-                        .collect(Collectors.toList()))
-                .message(ex.getMessage())
-                .reason("Internal Server Error.")
-                .httpStatus(HttpStatus.I_AM_A_TEAPOT)
-                .timeStamp(now())
-                .build();
+                        .collect(Collectors.toList()),
+                ex.getMessage(),
+                "Internal Server Error.",
+                HttpStatus.I_AM_A_TEAPOT,
+                now());
+    }
+
+    record Error(List<String> errors, String message, String reason, HttpStatus httpStatus, LocalDateTime timeStamp) {
     }
 }
+
