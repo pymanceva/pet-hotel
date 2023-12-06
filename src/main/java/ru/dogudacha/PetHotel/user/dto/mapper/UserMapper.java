@@ -19,4 +19,6 @@ public interface UserMapper {
     User toUser(UpdateUserDto updateUserDto);
 
     List<UserDto> map(List<User> users);
+
+    User map(Long id);
 }

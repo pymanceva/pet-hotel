@@ -13,15 +13,12 @@ import ru.dogudacha.PetHotel.exception.NotFoundException;
 import ru.dogudacha.PetHotel.pet.controller.PetController;
 import ru.dogudacha.PetHotel.pet.dto.NewPetDto;
 import ru.dogudacha.PetHotel.pet.dto.PetDto;
-import ru.dogudacha.PetHotel.pet.dto.PetForAdminDto;
 import ru.dogudacha.PetHotel.pet.dto.UpdatePetDto;
 import ru.dogudacha.PetHotel.pet.model.Sex;
-import ru.dogudacha.PetHotel.pet.model.TypeOfDiet;
+import ru.dogudacha.PetHotel.pet.model.TypeOfPet;
 import ru.dogudacha.PetHotel.pet.service.PetService;
 import ru.dogudacha.PetHotel.user.model.Roles;
 import ru.dogudacha.PetHotel.user.model.User;
-
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -36,7 +33,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 @WebMvcTest(controllers = PetController.class)
 public class PetControllerTest {
@@ -73,60 +69,23 @@ public class PetControllerTest {
 
     final PetDto petDto = PetDto.builder()
             .id(1L)
-            .typeOfPet("Dog")
+            .typeOfPet(TypeOfPet.DOG)
             .breed("Spaniel")
             .sex(Sex.FEMALE)
-            .age(2)
-            .weight(7)
-            .diet(TypeOfDiet.READY_INDUSTRIAL_FOOD)
-            .isTakesMedications(false)
-            .isContact(true)
-            .isPhotographed(true)
-            .comments("Like play with ball.")
-            .build();
-
-    final PetForAdminDto petForAdminDto = PetForAdminDto.builder()
-            .id(1L)
-            .typeOfPet("Dog")
-            .breed("Spaniel")
-            .sex(Sex.FEMALE)
-            .age(2)
-            .weight(7)
-            .diet(TypeOfDiet.READY_INDUSTRIAL_FOOD)
-            .isTakesMedications(false)
-            .isContact(true)
-            .isPhotographed(true)
-            .comments("Like play with ball.")
-            .historyOfBookings(null)
-            .additionalServices(null)
+            .age("2 года")
             .build();
 
 
     final UpdatePetDto updatePet = UpdatePetDto.builder()
-            .typeOfPet("Dog small")
             .breed("Spaniel span")
             .sex(Sex.MALE)
-            .age(12)
-            .weight(8)
-            .diet(TypeOfDiet.NATURAL_RAW_FOOD)
-            .isTakesMedications(true)
-            .isContact(false)
-            .isPhotographed(false)
-            .comments("Like play with small ball.")
             .build();
 
     final PetDto updatedPet = PetDto.builder()
             .id(1L)
-            .typeOfPet("Dog small")
+            .typeOfPet(TypeOfPet.DOG)
             .breed("Spaniel span")
             .sex(Sex.MALE)
-            .age(12)
-            .weight(8)
-            .diet(TypeOfDiet.NATURAL_RAW_FOOD)
-            .isTakesMedications(true)
-            .isContact(false)
-            .isPhotographed(false)
-            .comments("Like play with small ball.")
             .build();
 
 
@@ -143,16 +102,10 @@ public class PetControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", notNullValue()))
-                .andExpect(jsonPath("$.typeOfPet", is(petForAdminDto.getTypeOfPet())))
-                .andExpect(jsonPath("$.breed", is(petForAdminDto.getBreed())))
-                .andExpect(jsonPath("$.sex", is(petForAdminDto.getSex().toString())))
-                .andExpect(jsonPath("$.age", is(petForAdminDto.getAge())))
-                .andExpect(jsonPath("$.weight", is(petForAdminDto.getWeight())))
-                .andExpect(jsonPath("$.diet", is(petForAdminDto.getDiet().toString())))
-                .andExpect(jsonPath("$.isTakesMedications", is(petForAdminDto.getIsTakesMedications())))
-                .andExpect(jsonPath("$.isContact", is(petForAdminDto.getIsContact())))
-                .andExpect(jsonPath("$.isPhotographed", is(petForAdminDto.getIsPhotographed())))
-                .andExpect(jsonPath("$.comments", is(petForAdminDto.getComments())));
+                .andExpect(jsonPath("$.typeOfPet", is(petDto.getTypeOfPet())))
+                .andExpect(jsonPath("$.breed", is(petDto.getBreed())))
+                .andExpect(jsonPath("$.sex", is(petDto.getSex().toString())))
+                .andExpect(jsonPath("$.age", is(petDto.getAge())));
 
         mockMvc.perform(post("/pets")
                         .header(requesterHeader, requesterAdmin.getId())
@@ -162,16 +115,10 @@ public class PetControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", notNullValue()))
-                .andExpect(jsonPath("$.typeOfPet", is(petForAdminDto.getTypeOfPet())))
-                .andExpect(jsonPath("$.breed", is(petForAdminDto.getBreed())))
-                .andExpect(jsonPath("$.sex", is(petForAdminDto.getSex().toString())))
-                .andExpect(jsonPath("$.age", is(petForAdminDto.getAge())))
-                .andExpect(jsonPath("$.weight", is(petForAdminDto.getWeight())))
-                .andExpect(jsonPath("$.diet", is(petForAdminDto.getDiet().toString())))
-                .andExpect(jsonPath("$.isTakesMedications", is(petForAdminDto.getIsTakesMedications())))
-                .andExpect(jsonPath("$.isContact", is(petForAdminDto.getIsContact())))
-                .andExpect(jsonPath("$.isPhotographed", is(petForAdminDto.getIsPhotographed())))
-                .andExpect(jsonPath("$.comments", is(petForAdminDto.getComments())));
+                .andExpect(jsonPath("$.typeOfPet", is(petDto.getTypeOfPet())))
+                .andExpect(jsonPath("$.breed", is(petDto.getBreed())))
+                .andExpect(jsonPath("$.sex", is(petDto.getSex().toString())))
+                .andExpect(jsonPath("$.age", is(petDto.getAge())));
 
 
         String errorAccessDenied = String.format("User with role = %s, can't access for this action",
@@ -205,47 +152,7 @@ public class PetControllerTest {
     @Test
     @SneakyThrows
     void getPetById() {
-        when(petService.getPetByIdForAdmin(anyLong(), anyLong())).thenReturn(petForAdminDto);
-
-        mockMvc.perform(get("/pets/{id}/admin", petDto.getId())
-                        .header(requesterHeader, requesterAdmin.getId())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", notNullValue()))
-                .andExpect(jsonPath("$.typeOfPet", is(petForAdminDto.getTypeOfPet())))
-                .andExpect(jsonPath("$.breed", is(petForAdminDto.getBreed())))
-                .andExpect(jsonPath("$.sex", is(petForAdminDto.getSex().toString())))
-                .andExpect(jsonPath("$.age", is(petForAdminDto.getAge())))
-                .andExpect(jsonPath("$.weight", is(petForAdminDto.getWeight())))
-                .andExpect(jsonPath("$.diet", is(petForAdminDto.getDiet().toString())))
-                .andExpect(jsonPath("$.isTakesMedications", is(petForAdminDto.getIsTakesMedications())))
-                .andExpect(jsonPath("$.isContact", is(petForAdminDto.getIsContact())))
-                .andExpect(jsonPath("$.isPhotographed", is(petForAdminDto.getIsPhotographed())))
-                .andExpect(jsonPath("$.comments", is(petForAdminDto.getComments())))
-                .andExpect(jsonPath("$.historyOfBookings", is(petForAdminDto.getHistoryOfBookings())))
-                .andExpect(jsonPath("$.additionalServices", is(petForAdminDto.getAdditionalServices())));
-
-        mockMvc.perform(get("/pets/{id}/admin", petDto.getId())
-                        .header(requesterHeader, requesterBoss.getId())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", notNullValue()))
-                .andExpect(jsonPath("$.typeOfPet", is(petForAdminDto.getTypeOfPet())))
-                .andExpect(jsonPath("$.breed", is(petForAdminDto.getBreed())))
-                .andExpect(jsonPath("$.sex", is(petForAdminDto.getSex().toString())))
-                .andExpect(jsonPath("$.age", is(petForAdminDto.getAge())))
-                .andExpect(jsonPath("$.weight", is(petForAdminDto.getWeight())))
-                .andExpect(jsonPath("$.diet", is(petForAdminDto.getDiet().toString())))
-                .andExpect(jsonPath("$.isTakesMedications", is(petForAdminDto.getIsTakesMedications())))
-                .andExpect(jsonPath("$.isContact", is(petForAdminDto.getIsContact())))
-                .andExpect(jsonPath("$.isPhotographed", is(petForAdminDto.getIsPhotographed())))
-                .andExpect(jsonPath("$.comments", is(petForAdminDto.getComments())))
-                .andExpect(jsonPath("$.historyOfBookings", is(petForAdminDto.getHistoryOfBookings())))
-                .andExpect(jsonPath("$.additionalServices", is(petForAdminDto.getAdditionalServices())));
-
-        when(petService.getPetByIdForUser(anyLong(), anyLong())).thenReturn(petDto);
+        when(petService.getPetById(anyLong(), anyLong())).thenReturn(petDto);
 
         mockMvc.perform(get("/pets/{id}", petDto.getId())
                         .header(requesterHeader, requesterUser.getId())
@@ -256,13 +163,7 @@ public class PetControllerTest {
                 .andExpect(jsonPath("$.typeOfPet", is(petDto.getTypeOfPet())))
                 .andExpect(jsonPath("$.breed", is(petDto.getBreed())))
                 .andExpect(jsonPath("$.sex", is(petDto.getSex().toString())))
-                .andExpect(jsonPath("$.age", is(petDto.getAge())))
-                .andExpect(jsonPath("$.weight", is(petDto.getWeight())))
-                .andExpect(jsonPath("$.diet", is(petDto.getDiet().toString())))
-                .andExpect(jsonPath("$.isTakesMedications", is(petDto.getIsTakesMedications())))
-                .andExpect(jsonPath("$.isContact", is(petDto.getIsContact())))
-                .andExpect(jsonPath("$.isPhotographed", is(petDto.getIsPhotographed())))
-                .andExpect(jsonPath("$.comments", is(petDto.getComments())));
+                .andExpect(jsonPath("$.age", is(petDto.getAge())));
 
         mockMvc.perform(get("/pets/{id}", petDto.getId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -270,7 +171,7 @@ public class PetControllerTest {
                 .andExpect(status().isBadRequest());
 
         String errorNotFoundPet = String.format("Pet with id = %d not found", petDto.getId());
-        when(petService.getPetByIdForAdmin(anyLong(), eq(0L))).thenThrow(new NotFoundException(errorNotFoundPet));
+        when(petService.getPetById(anyLong(), eq(0L))).thenThrow(new NotFoundException(errorNotFoundPet));
 
         mockMvc.perform(get("/pets/{id}/admin", 0L)
                         .header(requesterHeader, requesterBoss.getId())
@@ -278,7 +179,7 @@ public class PetControllerTest {
                 .andDo(print())
                 .andExpect(status().isNotFound());
 
-        verify(petService, times(3)).getPetByIdForAdmin(anyLong(), anyLong());
+        verify(petService, times(2)).getPetById(anyLong(), anyLong());
     }
 
 
@@ -298,13 +199,7 @@ public class PetControllerTest {
                 .andExpect(jsonPath("$.typeOfPet", is(updatePet.getTypeOfPet())))
                 .andExpect(jsonPath("$.breed", is(updatePet.getBreed())))
                 .andExpect(jsonPath("$.sex", is(updatePet.getSex().toString())))
-                .andExpect(jsonPath("$.age", is(updatePet.getAge())))
-                .andExpect(jsonPath("$.weight", is(updatePet.getWeight())))
-                .andExpect(jsonPath("$.diet", is(updatePet.getDiet().toString())))
-                .andExpect(jsonPath("$.isTakesMedications", is(updatePet.getIsTakesMedications())))
-                .andExpect(jsonPath("$.isContact", is(updatePet.getIsContact())))
-                .andExpect(jsonPath("$.isPhotographed", is(updatePet.getIsPhotographed())))
-                .andExpect(jsonPath("$.comments", is(updatePet.getComments())));
+                .andExpect(jsonPath("$.age", is(updatePet.getAge())));
 
         mockMvc.perform(patch("/pets/{id}", petDto.getId())
                         .header(requesterHeader, requesterBoss.getId())
@@ -317,13 +212,7 @@ public class PetControllerTest {
                 .andExpect(jsonPath("$.typeOfPet", is(updatePet.getTypeOfPet())))
                 .andExpect(jsonPath("$.breed", is(updatePet.getBreed())))
                 .andExpect(jsonPath("$.sex", is(updatePet.getSex().toString())))
-                .andExpect(jsonPath("$.age", is(updatePet.getAge())))
-                .andExpect(jsonPath("$.weight", is(updatePet.getWeight())))
-                .andExpect(jsonPath("$.diet", is(updatePet.getDiet().toString())))
-                .andExpect(jsonPath("$.isTakesMedications", is(updatePet.getIsTakesMedications())))
-                .andExpect(jsonPath("$.isContact", is(updatePet.getIsContact())))
-                .andExpect(jsonPath("$.isPhotographed", is(updatePet.getIsPhotographed())))
-                .andExpect(jsonPath("$.comments", is(updatePet.getComments())));
+                .andExpect(jsonPath("$.age", is(updatePet.getAge())));
 
 
         String errorAccessDenied = String.format("User with role = %s, can't access for this action",
@@ -367,71 +256,6 @@ public class PetControllerTest {
         verify(petService, times(4)).updatePet(anyLong(), anyLong(), any(UpdatePetDto.class));
     }
 
-
-    @Test
-    @SneakyThrows
-    void getAllPets() {
-        when(petService.getAllPetsForAdmin(anyLong())).thenReturn(List.of(petForAdminDto));
-
-        mockMvc.perform(get("/pets")
-                        .header(requesterHeader, requesterAdmin.getId())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id", notNullValue()))
-                .andExpect(jsonPath("$[0].typeOfPet", is(petForAdminDto.getTypeOfPet())))
-                .andExpect(jsonPath("$[0].breed", is(petForAdminDto.getBreed())))
-                .andExpect(jsonPath("$[0].sex", is(petForAdminDto.getSex().toString())))
-                .andExpect(jsonPath("$[0].age", is(petForAdminDto.getAge())))
-                .andExpect(jsonPath("$[0].weight", is(petForAdminDto.getWeight())))
-                .andExpect(jsonPath("$[0].diet", is(petForAdminDto.getDiet().toString())))
-                .andExpect(jsonPath("$[0].isTakesMedications", is(petForAdminDto.getIsTakesMedications())))
-                .andExpect(jsonPath("$[0].isContact", is(petForAdminDto.getIsContact())))
-                .andExpect(jsonPath("$[0].isPhotographed", is(petForAdminDto.getIsPhotographed())))
-                .andExpect(jsonPath("$[0].comments", is(petForAdminDto.getComments())))
-                .andExpect(jsonPath("$[0].historyOfBookings", is(petForAdminDto.getHistoryOfBookings())))
-                .andExpect(jsonPath("$[0].additionalServices", is(petForAdminDto.getAdditionalServices())));
-
-        mockMvc.perform(get("/pets")
-                        .header(requesterHeader, requesterBoss.getId())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id", notNullValue()))
-                .andExpect(jsonPath("$[0].typeOfPet", is(petForAdminDto.getTypeOfPet())))
-                .andExpect(jsonPath("$[0].breed", is(petForAdminDto.getBreed())))
-                .andExpect(jsonPath("$[0].sex", is(petForAdminDto.getSex().toString())))
-                .andExpect(jsonPath("$[0].age", is(petForAdminDto.getAge())))
-                .andExpect(jsonPath("$[0].weight", is(petForAdminDto.getWeight())))
-                .andExpect(jsonPath("$[0].diet", is(petForAdminDto.getDiet().toString())))
-                .andExpect(jsonPath("$[0].isTakesMedications", is(petForAdminDto.getIsTakesMedications())))
-                .andExpect(jsonPath("$[0].isContact", is(petForAdminDto.getIsContact())))
-                .andExpect(jsonPath("$[0].isPhotographed", is(petForAdminDto.getIsPhotographed())))
-                .andExpect(jsonPath("$[0].comments", is(petForAdminDto.getComments())))
-                .andExpect(jsonPath("$[0].historyOfBookings", is(petForAdminDto.getHistoryOfBookings())))
-                .andExpect(jsonPath("$[0].additionalServices", is(petForAdminDto.getAdditionalServices())));
-
-        String error = String.format("User with role = %s, can't access for this action",
-                requesterUser.getRole());
-        when(petService.getAllPetsForAdmin(anyLong())).thenThrow(new AccessDeniedException(error));
-
-        mockMvc.perform(get("/pets")
-                        .header(requesterHeader, requesterUser.getId())
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(updatePet)))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-
-        mockMvc.perform(get("/pets")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-
-        verify(petService, times(3)).getAllPetsForAdmin(anyLong());
-    }
 
     @Test
     @SneakyThrows

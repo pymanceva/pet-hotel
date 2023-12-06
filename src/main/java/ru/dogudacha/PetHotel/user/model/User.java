@@ -2,6 +2,10 @@ package ru.dogudacha.PetHotel.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.dogudacha.PetHotel.pet.model.Pet;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Getter
@@ -22,4 +26,8 @@ public class User {
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     Roles role;
+//
+//    @OneToMany(mappedBy = "pet",
+//            orphanRemoval = true)
+//    private List<Pet> pets = new ArrayList<>();
 }
