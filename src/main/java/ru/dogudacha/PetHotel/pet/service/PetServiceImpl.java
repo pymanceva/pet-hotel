@@ -5,10 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dogudacha.PetHotel.exception.AccessDeniedException;
+import ru.dogudacha.PetHotel.exception.ConflictException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
 import ru.dogudacha.PetHotel.pet.dto.NewPetDto;
 import ru.dogudacha.PetHotel.pet.dto.PetDto;
-import ru.dogudacha.PetHotel.pet.dto.PetForAdminDto;
 import ru.dogudacha.PetHotel.pet.dto.UpdatePetDto;
 import ru.dogudacha.PetHotel.pet.mapper.PetMapper;
 import ru.dogudacha.PetHotel.pet.model.Pet;
@@ -16,9 +16,7 @@ import ru.dogudacha.PetHotel.pet.repository.PetRepository;
 import ru.dogudacha.PetHotel.user.model.User;
 import ru.dogudacha.PetHotel.user.repository.UserRepository;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +30,11 @@ public class PetServiceImpl implements PetService {
     @Transactional
     public PetDto addPet(Long requesterId, NewPetDto newPetDto) {
         User requester = findUserById(requesterId);
+        //метод проверки наличия хозяина питомца, будет дописан после добавления сущности оунеров
+        //findOwnerById(newPetDto.getOwnerId());
         checkAccess(requester);
+        //метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
+//        checkPet(newPetDto);
         Pet newPet = petMapper.toPet(newPetDto);
         Pet savedPet = petRepository.save(newPet);
         log.info("PetService: addPet, requesterId={}, petId={}", requesterId, savedPet.getId());
@@ -41,7 +43,7 @@ public class PetServiceImpl implements PetService {
 
     @Override
     @Transactional(readOnly = true)
-    public PetDto getPetByIdForUser(Long requesterId, Long petId) {
+    public PetDto getPetById(Long requesterId, Long petId) {
         findUserById(requesterId);
         Pet pet = getPetIfExists(petId);
         log.info("PetService: getPetById, requesterId={}, petId={}", requesterId, petId);
@@ -49,67 +51,187 @@ public class PetServiceImpl implements PetService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public PetForAdminDto getPetByIdForAdmin(Long requesterId, Long petId) {
-        User requester = findUserById(requesterId);
-        checkAccess(requester);
-        Pet pet = getPetIfExists(petId);
-        log.info("PetService: getPetById, requesterId={}, petId={}", requesterId, petId);
-        return petMapper.toPetForAdminDto(pet);
-    }
-
-    @Override
     @Transactional
     public PetDto updatePet(Long requesterId, Long petId, UpdatePetDto updatePetDto) {
         User requester = findUserById(requesterId);
         checkAccess(requester);
-        Pet pet = getPetIfExists(petId);
-        if (Objects.nonNull(updatePetDto.getTypeOfPet()) && !updatePetDto.getTypeOfPet().isBlank()) {
-            pet.setTypeOfPet(updatePetDto.getTypeOfPet());
+        Pet oldPet = getPetIfExists(petId);
+        Pet newPet = petMapper.toPet(updatePetDto);
+        newPet.setId(oldPet.getId());
+        //метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
+//        checkPet(pet, updatePetDto);
+        if (Objects.isNull(updatePetDto.getType())) {
+            newPet.setType(oldPet.getType());
         }
-        if (Objects.nonNull(updatePetDto.getBreed()) && !updatePetDto.getBreed().isBlank()) {
-            pet.setBreed(updatePetDto.getBreed());
+        if (Objects.isNull(updatePetDto.getName()) || updatePetDto.getName().isBlank()) {
+            newPet.setName(oldPet.getName());
         }
-        if (Objects.nonNull(updatePetDto.getSex())) {
-            pet.setSex(updatePetDto.getSex());
+        if (Objects.isNull(updatePetDto.getBreed()) || updatePetDto.getBreed().isBlank()) {
+            newPet.setBreed(oldPet.getBreed());
         }
-        if (Objects.nonNull(updatePetDto.getAge())) {
-            pet.setAge(updatePetDto.getAge());
+        if (Objects.isNull(updatePetDto.getBirthDate())) {
+            newPet.setBirthDate(oldPet.getBirthDate());
         }
-        if (Objects.nonNull(updatePetDto.getWeight())) {
-            pet.setWeight(updatePetDto.getWeight());
+        if (Objects.isNull(updatePetDto.getSex())) {
+            newPet.setSex(oldPet.getSex());
         }
-        if (Objects.nonNull(updatePetDto.getDiet())) {
-            pet.setDiet(updatePetDto.getDiet());
+        if (Objects.isNull(updatePetDto.getColor()) || updatePetDto.getColor().isBlank()) {
+            newPet.setColor(oldPet.getColor());
         }
-        if (Objects.nonNull(updatePetDto.getIsTakesMedications())) {
-            pet.setIsTakesMedications(updatePetDto.getIsTakesMedications());
+        if (Objects.isNull(updatePetDto.getSign()) || updatePetDto.getSign().isBlank()) {
+            newPet.setSign(oldPet.getSign());
         }
-        if (Objects.nonNull(updatePetDto.getIsContact())) {
-            pet.setIsContact(updatePetDto.getIsContact());
+        if (Objects.isNull(updatePetDto.getIsExhibition())) {
+            newPet.setIsExhibition(oldPet.getIsExhibition());
         }
-        if (Objects.nonNull(updatePetDto.getIsPhotographed())) {
-            pet.setIsPhotographed(updatePetDto.getIsPhotographed());
+        if (Objects.isNull(updatePetDto.getVetVisitDate())) {
+            newPet.setVetVisitDate(oldPet.getVetVisitDate());
         }
-        if (Objects.nonNull(updatePetDto.getComments())) {
-            pet.setComments(updatePetDto.getComments());
+        if (Objects.isNull(updatePetDto.getVetVisitReason()) || updatePetDto.getVetVisitReason().isBlank()) {
+            newPet.setVetVisitReason(oldPet.getVetVisitReason());
         }
-        Pet savedPet = petRepository.save(pet);
+        if (Objects.isNull(updatePetDto.getVaccine()) || updatePetDto.getVaccine().isBlank()) {
+            newPet.setVaccine(oldPet.getVaccine());
+        }
+        if (Objects.isNull(updatePetDto.getParasites()) || updatePetDto.getParasites().isBlank()) {
+            newPet.setParasites(oldPet.getParasites());
+        }
+        if (Objects.isNull(updatePetDto.getFleaMite()) || updatePetDto.getFleaMite().isBlank()) {
+            newPet.setFleaMite(oldPet.getFleaMite());
+        }
+        if (Objects.isNull(updatePetDto.getSurgery()) || updatePetDto.getSurgery().isBlank()) {
+            newPet.setSurgery(oldPet.getSurgery());
+        }
+        if (Objects.isNull(updatePetDto.getPastDisease()) || updatePetDto.getPastDisease().isBlank()) {
+            newPet.setPastDisease(oldPet.getPastDisease());
+        }
+        if (Objects.isNull(updatePetDto.getHealthCharacteristic()) || updatePetDto.getHealthCharacteristic().isBlank()) {
+            newPet.setHealthCharacteristic(oldPet.getHealthCharacteristic());
+        }
+        if (Objects.isNull(updatePetDto.getUrineAnalysis()) || updatePetDto.getUrineAnalysis().isBlank()) {
+            newPet.setUrineAnalysis(oldPet.getUrineAnalysis());
+        }
+        if (Objects.isNull(updatePetDto.getIsAllergy())) {
+            newPet.setIsAllergy(oldPet.getIsAllergy());
+        }
+        if (Objects.isNull(updatePetDto.getAllergyType()) || updatePetDto.getAllergyType().isBlank()) {
+            newPet.setAllergyType(oldPet.getAllergyType());
+        }
+        if (Objects.isNull(updatePetDto.getIsChronicDisease())) {
+            newPet.setIsChronicDisease(oldPet.getIsChronicDisease());
+        }
+        if (Objects.isNull(updatePetDto.getChronicDiseaseType()) || updatePetDto.getChronicDiseaseType().isBlank()) {
+            newPet.setChronicDiseaseType(oldPet.getChronicDiseaseType());
+        }
+        if (Objects.isNull(updatePetDto.getHeatDate())) {
+            newPet.setHeatDate(oldPet.getHeatDate());
+        }
+        if (Objects.isNull(updatePetDto.getVetData()) || updatePetDto.getVetData().isBlank()) {
+            newPet.setVetData(oldPet.getVetData());
+        }
+        if (Objects.isNull(updatePetDto.getStayWithoutMaster()) || updatePetDto.getStayWithoutMaster().isBlank()) {
+            newPet.setStayWithoutMaster(oldPet.getStayWithoutMaster());
+        }
+        if (Objects.isNull(updatePetDto.getStayAlone()) || updatePetDto.getStayAlone().isBlank()) {
+            newPet.setStayAlone(oldPet.getStayAlone());
+        }
+        if (Objects.isNull(updatePetDto.getSpecialCare()) || updatePetDto.getSpecialCare().isBlank()) {
+            newPet.setSpecialCare(oldPet.getSpecialCare());
+        }
+        if (Objects.isNull(updatePetDto.getBarkHowl()) || updatePetDto.getBarkHowl().isBlank()) {
+            newPet.setBarkHowl(oldPet.getBarkHowl());
+        }
+        if (Objects.isNull(updatePetDto.getFurnitureDamage()) || updatePetDto.getFurnitureDamage().isBlank()) {
+            newPet.setFurnitureDamage(oldPet.getFurnitureDamage());
+        }
+        if (Objects.isNull(updatePetDto.getFoodFromTable()) || updatePetDto.getFoodFromTable().isBlank()) {
+            newPet.setFoodFromTable(oldPet.getFoodFromTable());
+        }
+        if (Objects.isNull(updatePetDto.getDefecateAtHome()) || updatePetDto.getDefecateAtHome().isBlank()) {
+            newPet.setDefecateAtHome(oldPet.getDefecateAtHome());
+        }
+        if (Objects.isNull(updatePetDto.getAllergyType()) || updatePetDto.getAllergyType().isBlank()) {
+            newPet.setAllergyType(oldPet.getAllergyType());
+        }
+        if (Objects.isNull(updatePetDto.getMarkAtHome()) || updatePetDto.getMarkAtHome().isBlank()) {
+            newPet.setMarkAtHome(oldPet.getMarkAtHome());
+        }
+        if (Objects.isNull(updatePetDto.getNewPeople()) || updatePetDto.getNewPeople().isBlank()) {
+            newPet.setNewPeople(oldPet.getNewPeople());
+        }
+        if (Objects.isNull(updatePetDto.getIsBitePeople())) {
+            newPet.setIsBitePeople(oldPet.getIsBitePeople());
+        }
+        if (Objects.isNull(updatePetDto.getReasonOfBite()) || updatePetDto.getReasonOfBite().isBlank()) {
+            newPet.setReasonOfBite(oldPet.getReasonOfBite());
+        }
+        if (Objects.isNull(updatePetDto.getPlayWithDogs()) || updatePetDto.getPlayWithDogs().isBlank()) {
+            newPet.setPlayWithDogs(oldPet.getPlayWithDogs());
+        }
+        if (Objects.isNull(updatePetDto.getIsDogTraining())) {
+            newPet.setIsDogTraining(oldPet.getIsDogTraining());
+        }
+        if (Objects.isNull(updatePetDto.getTrainingName()) || updatePetDto.getTrainingName().isBlank()) {
+            newPet.setTrainingName(oldPet.getTrainingName());
+        }
+        if (Objects.isNull(updatePetDto.getLike()) || updatePetDto.getLike().isBlank()) {
+            newPet.setLike(oldPet.getLike());
+        }
+        if (Objects.isNull(updatePetDto.getNotLike()) || updatePetDto.getNotLike().isBlank()) {
+            newPet.setNotLike(oldPet.getNotLike());
+        }
+        if (Objects.isNull(updatePetDto.getToys()) || updatePetDto.getToys().isBlank()) {
+            newPet.setToys(oldPet.getToys());
+        }
+        if (Objects.isNull(updatePetDto.getBadHabit()) || updatePetDto.getBadHabit().isBlank()) {
+            newPet.setBadHabit(oldPet.getBadHabit());
+        }
+        if (Objects.isNull(updatePetDto.getWalking()) || updatePetDto.getWalking().isBlank()) {
+            newPet.setWalking(oldPet.getWalking());
+        }
+        if (Objects.isNull(updatePetDto.getMorningWalking()) || updatePetDto.getMorningWalking().isBlank()) {
+            newPet.setMorningWalking(oldPet.getMorningWalking());
+        }
+        if (Objects.isNull(updatePetDto.getDayWalking()) || updatePetDto.getDayWalking().isBlank()) {
+            newPet.setDayWalking(oldPet.getDayWalking());
+        }
+        if (Objects.isNull(updatePetDto.getEveningWalking()) || updatePetDto.getEveningWalking().isBlank()) {
+            newPet.setEveningWalking(oldPet.getEveningWalking());
+        }
+        if (Objects.isNull(updatePetDto.getFeedingQuantity())) {
+            newPet.setFeedingQuantity(oldPet.getFeedingQuantity());
+        }
+        if (Objects.isNull(updatePetDto.getFeedType()) || updatePetDto.getFeedType().isBlank()) {
+            newPet.setFeedType(oldPet.getFeedType());
+        }
+        if (Objects.isNull(updatePetDto.getFeedName()) || updatePetDto.getFeedName().isBlank()) {
+            newPet.setFeedName(oldPet.getFeedName());
+        }
+        if (Objects.isNull(updatePetDto.getFeedComposition()) || updatePetDto.getFeedComposition().isBlank()) {
+            newPet.setFeedComposition(oldPet.getFeedComposition());
+        }
+        if (Objects.isNull(updatePetDto.getFeedingRate()) || updatePetDto.getFeedingRate().isBlank()) {
+            newPet.setFeedingRate(oldPet.getFeedingRate());
+        }
+        if (Objects.isNull(updatePetDto.getFeedingPractice()) || updatePetDto.getFeedingPractice().isBlank()) {
+            newPet.setFeedingPractice(oldPet.getFeedingPractice());
+        }
+        if (Objects.isNull(updatePetDto.getTreat()) || updatePetDto.getTreat().isBlank()) {
+            newPet.setTreat(oldPet.getTreat());
+        }
+        if (Objects.isNull(updatePetDto.getIsMedicine())) {
+            newPet.setIsMedicine(oldPet.getIsMedicine());
+        }
+        if (Objects.isNull(updatePetDto.getMedicineRegimen()) || updatePetDto.getMedicineRegimen().isBlank()) {
+            newPet.setMedicineRegimen(oldPet.getMedicineRegimen());
+        }
+        if (Objects.isNull(updatePetDto.getAdditionalData()) || updatePetDto.getAdditionalData().isBlank()) {
+            newPet.setAdditionalData(oldPet.getAdditionalData());
+        }
+        Pet savedPet = petRepository.save(newPet);
         log.info("PetService: updatePet, requesterId={}, petId={}, updatePetDto={}", requesterId, petId, updatePetDto);
         return petMapper.toPetDto(savedPet);
 
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<PetDto> getAllPetsForAdmin(Long requesterId) {
-        User requester = findUserById(requesterId);
-        checkAccess(requester);
-        List<Pet> pets = petRepository.findAll();
-        log.info("PetService: getAllPetsForAdmin, requesterId={}", requesterId);
-        return pets.stream()
-                .map(petMapper::toPetForAdminDto)
-                .collect(Collectors.toList());
     }
 
     @Override
@@ -126,6 +248,11 @@ public class PetServiceImpl implements PetService {
         return userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("User with id = %d not found", userId)));
     }
+    //метод проверки наличия хозяина питомца, будет дописан после добавления сущности оунеров
+//    private User findOwnerById(long userId) {
+//        return ownerRepository.findById(userId).orElseThrow(() ->
+//                new NotFoundException(String.format("Owner with id = %d not found", userId)));
+//    }
 
     private void checkAccess(User requester) {
         if (requester.getRole().ordinal() >= 2) {
@@ -138,4 +265,30 @@ public class PetServiceImpl implements PetService {
         return petRepository.findById(petId).orElseThrow(() ->
                 new NotFoundException(String.format("Pet with id = %d not found", petId)));
     }
+    //метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
+//    private void checkPet(NewPetDto newPetDto) {
+//        try {
+//            Pet pet = petRepository.findByOwnerAndName(newPetDto.getOwnerId(), newPetDto.getName());
+//            if (pet != null) {
+//                throw new ConflictException(String.format("The client with id = %d already has a pet with name = %s.", newPetDto.getOwnerId(), newPetDto.getName()));
+//            }
+//
+//        } catch (NullPointerException exception) {
+//            return;
+//        }
+//
+//    }
+    //метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
+//    private void checkPet(Pet oldPet, UpdatePetDto updatePetDto) {
+//        try {
+//            Pet pet = petRepository.findByOwnerAndName(oldPet.getOwner(), updatePetDto.getName());
+//            if (pet != null) {
+//                throw new ConflictException(String.format("The client with id = %d already has a pet with name = %s.", oldPet.getOwner(), updatePetDto.getName()));
+//            }
+//
+//        } catch (NullPointerException exception) {
+//            return;
+//        }
+//
+//    }
 }

@@ -14,16 +14,17 @@ import lombok.*;
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_room")
     private Long id;
-    @Column(name = "number", nullable = false)
+    @Column(name = "number_room", nullable = false)
     private String number;
-    @Column(name = "size")
-    private Double size;
-    @Column(name = "type", nullable = false)
+    @Column(name = "area_room")
+    private Double area;
+    @Column(name = "type_room", nullable = false)
     @Enumerated(EnumType.STRING)
     private RoomTypes type;
-    @Column(name = "price")
-    private Double price;
-    @Column(name = "available")
-    private Boolean isAvailable;
+    @Column(name = "description_room")
+    private String description;
+    @Column(name = "visible_room")
+    private Boolean isVisible;
 }

@@ -1,7 +1,6 @@
 package ru.dogudacha.PetHotel.room.service;
 
 import ru.dogudacha.PetHotel.room.dto.RoomDto;
-import ru.dogudacha.PetHotel.room.dto.RoomWithoutPriceDto;
 import ru.dogudacha.PetHotel.room.dto.UpdateRoomDto;
 
 import java.util.Collection;
@@ -11,13 +10,13 @@ public interface RoomService {
 
     RoomDto getRoomById(Long userId, Long roomId);
 
-    RoomWithoutPriceDto getRoomWithoutPriceById(Long userId, Long roomId);
-
     RoomDto updateRoom(Long userId, Long roomId, UpdateRoomDto roomDto);
 
-    Collection<RoomDto> getAllRooms(Long userId);
+    Collection<RoomDto> getAllRooms(Long userId, Boolean isVisible);
 
-    Collection<RoomWithoutPriceDto> getAllRoomsWithoutPrice(Long userId);
+    RoomDto hideRoomById(Long userId, Long roomId);
 
-    void deleteRoomById(Long userId, Long roomId);
+    RoomDto unhideRoomById(Long userId, Long roomId);
+
+    void permanentlyDeleteRoomById(Long userId, Long roomId);
 }
