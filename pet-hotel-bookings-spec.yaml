@@ -1,0 +1,757 @@
+openapi: 3.0.1
+info:
+  title: 'PetHotel: Bookings Specification'
+  description: Документация раздела по работе с бронированиями
+  version: v1
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+tags:
+  - description: API для работы с бронированиями.
+    name: booking-controller
+paths:
+  /bookings:
+    post:
+      tags:
+        - booking-controller
+      operationId: addBooking
+      description: Добавление нового бронирования. Доступно только пользователям с ролью ROLE_BOSS и ROLE_ADMIN.
+      summary: Добавить новое бронирование
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewBookingDto'
+        description: Данные о добавляемом бронировании
+        required: true
+      responses:
+        '201':
+          description: Бронирование добавлено
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BookingDto'
+        '400':
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: 'Required request header X-PetHotel-User-Id for method parameter type Long is not present'
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Запрос составлен некорректно.Например, переданы невалидные данные.
+        '403':
+          description: У пользователя с данной ролью нет прав на совершение данного действия.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Объект не найден - в БД отсутствует пользователь с id, переданном в header.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=1 is not found"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Конфликт данных - у данного номера уже имеется бронирование, накладывающееся на выбранные даты.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: CONFLICT
+                reason: For the requested operation the conditions are not met.
+                message: 'Room with id=1 already has booking for these dates'
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error. Все прочие неотлавливаемые исключения.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /bookings/{id}:
+    get:
+      tags:
+        - booking-controller
+      operationId: getBookingById
+      description: Получение бронирования по ID. Доступно только для пользователей с ролью ROLE_BOSS или ROLE_ADMIN.
+      summary: Получить информацию о бронировании
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - name: id
+          in: path
+          description: ID бронирования
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BookingDto'
+        '400':
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: 'Required request header X-PetHotel-User-Id for method parameter type Long is not present'
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Запрос составлен некорректно.Например, переданы невалидные данные.
+        '403':
+          description: У пользователя с данной ролью нет прав на совершение данного действия.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Объект не найден - в БД отсутствует пользователь с id, переданном в header либо бронирование с указанным ID.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=1 is not found"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error. Все прочие неотлавливаемые исключения.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - booking-controller
+      operationId: deleteBookingById
+      description: Удаление существующего бронирования. Доступно только пользователям ROLE_BOSS и ROLE_ADMIN.
+      summary: Удалить информацию о бронировании (безвозвратно)
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - name: id
+          in: path
+          description: ID бронирования
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: No Content
+        '400':
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: 'Required request header X-PetHotel-User-Id for method parameter type Long is not present'
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Запрос составлен некорректно.Например, переданы невалидные данные.
+        '403':
+          description: У пользователя с данной ролью нет прав на совершение данного действия.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Объект не найден - в БД отсутствует пользователь с id, переданном в header либо бронирование с указанным ID.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=1 is not found"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error. Все прочие неотлавливаемые исключения.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - booking-controller
+      operationId: updateBooking
+      description: Редактирование существующего бронирования. Доступно пользователям ROLE_BOSS и ROLE_ADMIN.
+      summary: Изменить информацию об имеющемся бронировании
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - name: id
+          in: path
+          description: ID бронирования
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBookingDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BookingDto'
+        '400':
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: 'Required request header X-PetHotel-User-Id for method parameter type Long is not present'
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Запрос составлен некорректно.Например, переданы невалидные данные.
+        '403':
+          description: У пользователя с данной ролью нет прав на совершение данного действия.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Объект не найден - в БД отсутствует пользователь с id, переданном в header либо бронирование с указанным ID.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=1 is not found"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Конфликт данных - у данного номера уже имеется бронирование, накладывающееся на выбранные даты.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: CONFLICT
+                reason: For the requested operation the conditions are not met.
+                message: 'Room with id=1 already has booking for these dates'
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error. Все прочие неотлавливаемые исключения.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  parameters:
+    requesterHeader:
+      name: X-PetHotel-User-Id
+      description: Id пользователя, осуществляющего запрос
+      in: header
+      required: true
+      schema:
+        type: integer
+        format: int64
+  schemas:
+    Error:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: Список стектрейсов или описания ошибок
+          example: []
+          items:
+            type: string
+            description: Cтектрейс или описание ошибки
+            example: '[]'
+        message:
+          type: string
+          description: Сообщение об ошибке
+          example: "validation email size error"
+        reason:
+          type: string
+          description: Общее описание причины ошибки
+          example: Request parameters validation error
+        httpStatus:
+          type: string
+          description: Код статуса HTTP-ответа
+          example: FORBIDDEN
+          enum:
+            - 100 CONTINUE
+            - 101 SWITCHING_PROTOCOLS
+            - 102 PROCESSING
+            - 103 CHECKPOINT
+            - 200 OK
+            - 201 CREATED
+            - 202 ACCEPTED
+            - 203 NON_AUTHORITATIVE_INFORMATION
+            - 204 NO_CONTENT
+            - 205 RESET_CONTENT
+            - 206 PARTIAL_CONTENT
+            - 207 MULTI_STATUS
+            - 208 ALREADY_REPORTED
+            - 226 IM_USED
+            - 300 MULTIPLE_CHOICES
+            - 301 MOVED_PERMANENTLY
+            - 302 FOUND
+            - 302 MOVED_TEMPORARILY
+            - 303 SEE_OTHER
+            - 304 NOT_MODIFIED
+            - 305 USE_PROXY
+            - 307 TEMPORARY_REDIRECT
+            - 308 PERMANENT_REDIRECT
+            - 400 BAD_REQUEST
+            - 401 UNAUTHORIZED
+            - 402 PAYMENT_REQUIRED
+            - 403 FORBIDDEN
+            - 404 NOT_FOUND
+            - 405 METHOD_NOT_ALLOWED
+            - 406 NOT_ACCEPTABLE
+            - 407 PROXY_AUTHENTICATION_REQUIRED
+            - 408 REQUEST_TIMEOUT
+            - 409 CONFLICT
+            - 410 GONE
+            - 411 LENGTH_REQUIRED
+            - 412 PRECONDITION_FAILED
+            - 413 PAYLOAD_TOO_LARGE
+            - 413 REQUEST_ENTITY_TOO_LARGE
+            - 414 URI_TOO_LONG
+            - 414 REQUEST_URI_TOO_LONG
+            - 415 UNSUPPORTED_MEDIA_TYPE
+            - 416 REQUESTED_RANGE_NOT_SATISFIABLE
+            - 417 EXPECTATION_FAILED
+            - 418 I_AM_A_TEAPOT
+            - 419 INSUFFICIENT_SPACE_ON_RESOURCE
+            - 420 METHOD_FAILURE
+            - 421 DESTINATION_LOCKED
+            - 422 UNPROCESSABLE_ENTITY
+            - 423 LOCKED
+            - 424 FAILED_DEPENDENCY
+            - 425 TOO_EARLY
+            - 426 UPGRADE_REQUIRED
+            - 428 PRECONDITION_REQUIRED
+            - 429 TOO_MANY_REQUESTS
+            - 431 REQUEST_HEADER_FIELDS_TOO_LARGE
+            - 451 UNAVAILABLE_FOR_LEGAL_REASONS
+            - 500 INTERNAL_SERVER_ERROR
+            - 501 NOT_IMPLEMENTED
+            - 502 BAD_GATEWAY
+            - 503 SERVICE_UNAVAILABLE
+            - 504 GATEWAY_TIMEOUT
+            - 505 HTTP_VERSION_NOT_SUPPORTED
+            - 506 VARIANT_ALSO_NEGOTIATES
+            - 507 INSUFFICIENT_STORAGE
+            - 508 LOOP_DETECTED
+            - 509 BANDWIDTH_LIMIT_EXCEEDED
+            - 510 NOT_EXTENDED
+            - 511 NETWORK_AUTHENTICATION_REQUIRED
+        timestamp:
+          type: string
+          description: >-
+            Дата и время когда произошла ошибка (в формате "yyyy-MM-dd
+            HH:mm:ss")
+          example: '2023-01-01 00:00:00'
+    BookingDto:
+      required:
+        - id
+        - type
+        - checkInDate
+        - checkOutDate
+        - status
+        - price
+        - amount
+        - prepaymentAmount
+        - isPrepaid
+        - Room
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        type:
+          description: Тип бронирования (обычное или временное закрытие номера, например, для ремонта)
+          type: string
+          example: TYPE_BOOKING
+          enum:
+            - TYPE_BOOKING
+            - TYPE_CLOSING
+        checkInDate:
+          description: Дата заезда в формате "dd.MM.yyyy"
+          example: 01.01.2024
+          type: string
+        checkOutDate:
+          description: Дата выезда в формате "dd.MM.yyyy"
+          example: 31.01.2024
+          type: string
+        checkInTime:
+          description: Время заезда в формате "HH:mm"
+          example: 10:00
+          type: string
+        checkOutTime:
+          description: Время выезда в формате "HH:mm"
+          example: 15:00
+          type: string
+        status:
+          description: Статус бронирования (Первичное, Подтвержденное, Заселен, Выселен, Отменено). По умолчанию для бронирования типа TYPE_BOOKING устанавливается статус STATUS_INITIAL. Если поле isPrepaid=true - статус STATUS_CONFIRMED. Для бронирования типа TYPE_CLOSING устанавливается статус STATUS_CONFIRMED. Остальные статусы присваиваются пользователем вручную.
+          example: STATUS_CONFIRMED
+          type: string
+          enum:
+            - STATUS_INITIAL
+            - STATUS_CONFIRMED
+            - STATUS_CHECKED_IN
+            - STATUS_CHECKED_OUT
+            - STATUS_CANCELLED
+        reasonOfStop:
+          description: Причина закрытия номера. Обязательно для бронирования типа TYPE_CLOSING
+          example: REASON_CLEANING
+          type: string
+          enum:
+            - REASON_UNAVAILABLE
+            - REASON_RENOVATION
+            - REASON_CLEANING
+        reasonOfCancel:
+          description: Отмены бронирования.
+          example: По желанию клиента.
+          maxLength: 150
+          type: string
+        price:
+          description: Цена за сутки.
+          example: 1000
+          type: number
+          format: double
+          min: 0
+          max: 999999.99
+          default: 0
+        amount:
+          description: Стоимость за весь период бронирования.
+          example: 1000
+          type: number
+          format: double
+          min: 0
+          max: 9999999.99
+          default: 0
+        prepaymentAmount:
+          description: Сумма предоплаты.
+          example: 1000
+          type: number
+          format: double
+          min: 0
+          max: 999999.99
+          default: 0
+        isPrepaid:
+          type: boolean
+          description: Внесена ли предоплата
+          example: true
+          default: false
+        comment:
+          type: string
+          description: Комментарий к бронированию
+          example: Текст комментария
+          maxLength: 150
+        fileUrl:
+          type: string
+          example: https://picture.com
+          description: Ссылка на файл-вложение
+        Room:
+          $ref: '#/components/schemas/RoomDto'
+    NewBookingDto:
+      required:
+        - type
+        - checkInDate
+        - checkOutDate
+        - roomId
+      type: object
+      properties:
+        type:
+          description: Тип бронирования (обычное или временное закрытие номера, например, для ремонта)
+          type: string
+          example: TYPE_BOOKING
+          enum:
+            - TYPE_BOOKING
+            - TYPE_CLOSING
+        checkInDate:
+          description: Дата заезда в формате "dd.MM.yyyy"
+          example: 01.01.2024
+          type: string
+        checkOutDate:
+          description: Дата выезда в формате "dd.MM.yyyy"
+          example: 31.01.2024
+          type: string
+        checkInTime:
+          description: Время заезда в формате "HH:mm"
+          example: 10:00
+          type: string
+        checkOutTime:
+          description: Время выезда в формате "HH:mm"
+          example: 15:00
+          type: string
+        status:
+          description: Статус бронирования (Первичное, Подтвержденное, Заселен, Выселен, Отменено). По умолчанию для бронирования типа TYPE_BOOKING устанавливается статус STATUS_INITIAL. Если поле isPrepaid=true - статус STATUS_CONFIRMED. Для бронирования типа TYPE_CLOSING устанавливается статус STATUS_CONFIRMED. Остальные статусы присваиваются пользователем вручную.
+          example: STATUS_CONFIRMED
+          type: string
+          enum:
+            - STATUS_INITIAL
+            - STATUS_CONFIRMED
+            - STATUS_CHECKED_IN
+            - STATUS_CHECKED_OUT
+            - STATUS_CANCELLED
+        reasonOfStop:
+          description: Причина закрытия номера. Обязательно для бронирования типа TYPE_CLOSING
+          example: REASON_CLEANING
+          type: string
+          enum:
+            - REASON_UNAVAILABLE
+            - REASON_RENOVATION
+            - REASON_CLEANING
+        reasonOfCancel:
+          description: Отмены бронирования.
+          example: По желанию клиента.
+          maxLength: 150
+          type: string
+        price:
+          description: Цена за сутки.
+          example: 1000
+          type: number
+          format: double
+          min: 0
+          max: 999999.99
+          default: 0
+        amount:
+          description: Стоимость за весь период бронирования.
+          example: 1000
+          type: number
+          format: double
+          min: 0
+          max: 9999999.99
+          default: 0
+        prepaymentAmount:
+          description: Сумма предоплаты.
+          example: 1000
+          type: number
+          format: double
+          min: 0
+          max: 999999.99
+          default: 0
+        isPrepaid:
+          type: boolean
+          description: Внесена ли предоплата
+          example: true
+          default: false
+        comment:
+          type: string
+          description: Комментарий к бронированию
+          example: Текст комментария
+          maxLength: 150
+        fileUrl:
+          type: string
+          example: https://picture.com
+          description: Ссылка на файл-вложение
+        roomId:
+          type: integer
+          format: int64
+          description: Id бронируемого номера
+          example: 1
+    UpdateBookingDto:
+      type: object
+      properties:
+        type:
+          description: Тип бронирования (обычное или временное закрытие номера, например, для ремонта)
+          type: string
+          example: TYPE_BOOKING
+          enum:
+            - TYPE_BOOKING
+            - TYPE_CLOSING
+        checkInDate:
+          description: Дата заезда в формате "dd.MM.yyyy"
+          example: 01.01.2024
+          type: string
+        checkOutDate:
+          description: Дата выезда в формате "dd.MM.yyyy"
+          example: 31.01.2024
+          type: string
+        checkInTime:
+          description: Время заезда в формате "HH:mm"
+          example: 10:00
+          type: string
+        checkOutTime:
+          description: Время выезда в формате "HH:mm"
+          example: 15:00
+          type: string
+        status:
+          description: Статус бронирования (Первичное, Подтвержденное, Заселен, Выселен, Отменено). По умолчанию для бронирования типа TYPE_BOOKING устанавливается статус STATUS_INITIAL. Если поле isPrepaid=true - статус STATUS_CONFIRMED. Для бронирования типа TYPE_CLOSING устанавливается статус STATUS_CONFIRMED. Остальные статусы присваиваются пользователем вручную.
+          example: STATUS_CONFIRMED
+          type: string
+          enum:
+            - STATUS_INITIAL
+            - STATUS_CONFIRMED
+            - STATUS_CHECKED_IN
+            - STATUS_CHECKED_OUT
+            - STATUS_CANCELLED
+        reasonOfStop:
+          description: Причина закрытия номера. Обязательно для бронирования типа TYPE_CLOSING
+          example: REASON_CLEANING
+          type: string
+          enum:
+            - REASON_UNAVAILABLE
+            - REASON_RENOVATION
+            - REASON_CLEANING
+        reasonOfCancel:
+          description: Отмены бронирования.
+          example: По желанию клиента.
+          maxLength: 150
+          type: string
+        price:
+          description: Цена за сутки.
+          example: 1000
+          type: number
+          format: double
+          min: 0
+          max: 999999.99
+          default: 0
+        amount:
+          description: Стоимость за весь период бронирования.
+          example: 1000
+          type: number
+          format: double
+          min: 0
+          max: 9999999.99
+          default: 0
+        prepaymentAmount:
+          description: Сумма предоплаты.
+          example: 1000
+          type: number
+          format: double
+          min: 0
+          max: 999999.99
+          default: 0
+        isPrepaid:
+          type: boolean
+          description: Внесена ли предоплата
+          example: true
+          default: false
+        comment:
+          type: string
+          description: Комментарий к бронированию
+          example: Текст комментария
+          maxLength: 150
+        fileUrl:
+          type: string
+          example: https://picture.com
+          description: Ссылка на файл-вложение
+        roomId:
+          type: integer
+          format: int64
+          description: Id бронируемого номера
+          example: 1
+    RoomDto:
+      required:
+        - number
+        - type
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: ID номера
+          example: 1
+        number:
+          description: Буквенно-цифровое обозначение номера
+          maxLength: 100
+          minLength: 1
+          type: string
+          uniqueItems: true
+          example: 1F
+        area:
+          description: Площадь номера
+          minimum: 0
+          type: number
+          format: double
+          example: 6
+        Category:
+          $ref: '#/components/schemas/CategoryDto'
+        description:
+          description: Описание номера
+          example: Номер с отдельным входом
+          type: string
+          maxLength: 250
+        isVisible:
+          description: Отображение номера в сетке бронирований
+          type: boolean
+          default: true
+          example: true
+    CategoryDto:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: ID категории
+          example: 1
+        name:
+          maxLength: 20
+          minLength: 1
+          type: string
+          uniqueItems: true
+          description: Название категории
+          example: Номер для собак
+        text:
+          maxLength: 2500
+          description: Название категории
+          example: Номер для собак, антивандальная отделка, оснащен лежаками, мисками.
+
