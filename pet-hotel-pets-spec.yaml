@@ -41,7 +41,9 @@ paths:
                 error: '[]'
                 status: BAD_REQUEST
                 reason: Incorrectly made request.
-                message: 'Required request header X-PetHotel-User-Id for method parameter type Long is not present'
+                message: >-
+                  Required request header X-PetHotel-User-Id for method
+                  parameter type Long is not present
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -54,7 +56,7 @@ paths:
                 error: '[]'
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
-                message: 'User with role = %s, can nott access for this action'
+                message: User with role = %s, can not access for this action
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -66,7 +68,7 @@ paths:
                 error: '[]'
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: 'User with id=2 was not found'
+                message: User with id=2 was not found
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -78,7 +80,7 @@ paths:
                 error: '[]'
                 status: CONFLICT
                 reason: For the requested operation the conditions are not met.
-                message: 'The client with id = 1 already has a pet with name = Бобик.'
+                message: The client with id = 1 already has a pet with name = Бобик.
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -87,15 +89,23 @@ paths:
           content:
             application/json:
               example:
-                error: '[ "org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:256)",
-                "org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:229)",
-                "org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)",
-                "org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)",
-                "org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:242)"
-                ....]'
+                error: >-
+                  [
+                  "org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:256)",
+                  "org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:229)",
+                  "org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)",
+                  "org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)",
+                  "org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:242)"
+                  ....]
                 status: I_AM_A_TEAPOT
                 reason: Internal Server Error.
-                message: 'could not execute statement [ERROR: relation \"pets\" does not exist\n  Позиция: 13] [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]; SQL [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]'
+                message: >-
+                  could not execute statement [ERROR: relation \"pets\" does not
+                  exist\n  Позиция: 13] [insert into pets
+                  (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet)
+                  values (?,?,?,?,?,?,?,?,?,?)]; SQL [insert into pets
+                  (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet)
+                  values (?,?,?,?,?,?,?,?,?,?)]
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -128,7 +138,9 @@ paths:
                 error: '[]'
                 status: BAD_REQUEST
                 reason: Incorrectly made request.
-                message: 'Required request header X-PetHotel-User-Id for method parameter type Long is not present'
+                message: >-
+                  Required request header X-PetHotel-User-Id for method
+                  parameter type Long is not present
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -141,7 +153,7 @@ paths:
                 error: '[]'
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
-                message: 'User with role = %s, can nott access for this action'
+                message: User with role = %s, can not access for this action
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -153,7 +165,7 @@ paths:
                 error: '[]'
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: 'User with id=2 was not found'
+                message: User with id=2 was not found
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -162,15 +174,23 @@ paths:
           content:
             application/json:
               example:
-                error: '[ "org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:256)",
-                "org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:229)",
-                "org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)",
-                "org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)",
-                "org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:242)"
-                ....]'
+                error: >-
+                  [
+                  "org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:256)",
+                  "org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:229)",
+                  "org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)",
+                  "org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)",
+                  "org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:242)"
+                  ....]
                 status: I_AM_A_TEAPOT
                 reason: Internal Server Error.
-                message: 'could not execute statement [ERROR: relation \"pets\" does not exist\n  Позиция: 13] [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]; SQL [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]'
+                message: >-
+                  could not execute statement [ERROR: relation \"pets\" does not
+                  exist\n  Позиция: 13] [insert into pets
+                  (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet)
+                  values (?,?,?,?,?,?,?,?,?,?)]; SQL [insert into pets
+                  (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet)
+                  values (?,?,?,?,?,?,?,?,?,?)]
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -178,8 +198,7 @@ paths:
       tags:
         - pet-controller
       summary: Удаление питомца по его идентификатору
-      description: >-
-        Обратите внимание: удаление питомца не должно быть доступно пользователю
+      description: 'Обратите внимание: удаление питомца не должно быть доступно пользователю'
       operationId: Удаление питомца
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
@@ -200,7 +219,9 @@ paths:
                 error: '[]'
                 status: BAD_REQUEST
                 reason: Incorrectly made request.
-                message: 'Required request header X-PetHotel-User-Id for method parameter type Long is not present'
+                message: >-
+                  Required request header X-PetHotel-User-Id for method
+                  parameter type Long is not present
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -213,7 +234,7 @@ paths:
                 error: '[]'
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
-                message: 'User with role = %s, can nott access for this action'
+                message: User with role = %s, can not access for this action
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -225,7 +246,7 @@ paths:
                 error: '[]'
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: 'User with id=2 was not found'
+                message: User with id=2 was not found
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -234,15 +255,23 @@ paths:
           content:
             application/json:
               example:
-                error: '[ "org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:256)",
-                "org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:229)",
-                "org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)",
-                "org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)",
-                "org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:242)"
-                ....]'
+                error: >-
+                  [
+                  "org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:256)",
+                  "org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:229)",
+                  "org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)",
+                  "org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)",
+                  "org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:242)"
+                  ....]
                 status: I_AM_A_TEAPOT
                 reason: Internal Server Error.
-                message: 'could not execute statement [ERROR: relation \"pets\" does not exist\n  Позиция: 13] [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]; SQL [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]'
+                message: >-
+                  could not execute statement [ERROR: relation \"pets\" does not
+                  exist\n  Позиция: 13] [insert into pets
+                  (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet)
+                  values (?,?,?,?,?,?,?,?,?,?)]; SQL [insert into pets
+                  (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet)
+                  values (?,?,?,?,?,?,?,?,?,?)]
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -284,7 +313,9 @@ paths:
                 error: '[]'
                 status: BAD_REQUEST
                 reason: Incorrectly made request.
-                message: 'Required request header X-PetHotel-User-Id for method parameter type Long is not present'
+                message: >-
+                  Required request header X-PetHotel-User-Id for method
+                  parameter type Long is not present
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -297,7 +328,7 @@ paths:
                 error: '[]'
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
-                message: 'User with role = %s, can nott access for this action'
+                message: User with role = %s, can not access for this action
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -309,7 +340,7 @@ paths:
                 error: '[]'
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: 'User with id=2 was not found'
+                message: User with id=2 was not found
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -321,7 +352,7 @@ paths:
                 error: '[]'
                 status: CONFLICT
                 reason: For the requested operation the conditions are not met.
-                message: 'The client with id = 1 already has a pet with name = Бобик.'
+                message: The client with id = 1 already has a pet with name = Бобик.
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -330,15 +361,23 @@ paths:
           content:
             application/json:
               example:
-                error: '[ "org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:256)",
-                "org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:229)",
-                "org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)",
-                "org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)",
-                "org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:242)"
-                ....]'
+                error: >-
+                  [
+                  "org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:256)",
+                  "org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:229)",
+                  "org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)",
+                  "org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)",
+                  "org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:242)"
+                  ....]
                 status: I_AM_A_TEAPOT
                 reason: Internal Server Error.
-                message: 'could not execute statement [ERROR: relation \"pets\" does not exist\n  Позиция: 13] [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]; SQL [insert into pets (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet) values (?,?,?,?,?,?,?,?,?,?)]'
+                message: >-
+                  could not execute statement [ERROR: relation \"pets\" does not
+                  exist\n  Позиция: 13] [insert into pets
+                  (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet)
+                  values (?,?,?,?,?,?,?,?,?,?)]; SQL [insert into pets
+                  (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet)
+                  values (?,?,?,?,?,?,?,?,?,?)]
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -452,7 +491,7 @@ components:
             HH:mm:ss")
           example: '2022-06-09 06:27:23'
     NewPetDto:
-      description : Дто для создания нового питомца
+      description: Дто для создания нового питомца
       required:
         - owner
         - type
@@ -473,79 +512,81 @@ components:
             - DOG
             - CAT
             - EXOTIC
-          description: Тип животного/не может быть пустым shortDto
+          description: Тип животного
           example: DOG
-        name: 
+        name:
           maxLength: 30
           minLength: 1
           type: string
-          description: Кличка питомца shortDto
+          description: Кличка питомца
           example: Барбос
         breed:
           maxLength: 30
           minLength: 1
           type: string
-          description: Порода питомца/не может быть пустым shortDto
+          description: Порода питомца
           example: Спаниель
         birthDate:
           type: string
-          description: Дата рождения (в формате "yyyy-MM-dd"), должно быть в прошлом fullDto
-          example: '2022-06-09'
+          description: Дата рождения (в формате "dd.MM.yyyy"), должно быть в прошлом
+          example: 09.06.2023
         sex:
           type: string
           enum:
             - FEMALE
             - MALE
             - HERMAPHRODITE
-          description: Пол питомца/не может быть пустым
+          description: Пол питомца
           example: Женский
         color:
           maxLength: 30
           type: string
-          description: Окрас питомца fullDto
+          description: Окрас питомца
           example: Черный
         sign:
           maxLength: 150
           type: string
-          description: Чип, Клеймо, Особые приметы fullDto
+          description: Чип, Клеймо, Особые приметы
           example: Клеймо
         isExhibition:
           type: boolean
-          description: Выставочная ли собака? shortDto
+          description: Выставочная ли собака?
           example: true
         vetVisitDate:
           type: string
-          description: Дата последнего посещения ветврача (в формате "yyyy-MM-dd"), должно быть в прошлом fullDto
-          example: '2023-06-09'
+          description: >-
+            Дата последнего посещения ветврача (в формате "dd.MM.yyyy"), должно
+            быть в прошлом
+          example: 09.06.2023
         vetVisitReason:
           maxLength: 250
           type: string
-          description: Причина последнего посещения врача fullDto
+          description: Причина последнего посещения врача
           example: Ушиб лапы
         vaccine:
           maxLength: 250
           type: string
-          description: Даты последних прививок, названия вакцин shortDto
+          description: Даты последних прививок, названия вакцин
           example: 1.11.2023 антиклещ
         parasites:
           maxLength: 250
           type: string
-          description: Дата обработки от глистов/паразитов fullDto
+          description: Дата обработки от глистов/паразитов
           example: 22.11.2023
         fleaMite:
           maxLength: 250
           type: string
-          description: Даты обработки от блох/клещей с указанием препарата fullDto
+          description: Даты обработки от блох/клещей с указанием препарата
           example: 22.11.2023 антиклещ
         surgery:
           maxLength: 250
           type: string
-          description: Перенесенные операции (кастрация) fullDto
+          description: Перенесенные операции (кастрация)
           example: Кастрация
         pastDisease:
           maxLength: 500
           type: string
-          description: Перенесенные заболевания fullDto
+          description: Перенесенные заболевания
           example: пиелонефрит
         healthСharacteristic:
           maxLength: 500
@@ -559,187 +600,199 @@ components:
           example: 1.11.2023
         allergy:
           type: boolean
-          description: Есть ли аллергия? fullDto
+          description: Есть ли аллергия?
           example: true
         allergyType:
           maxLength: 250
           type: string
-          description: Если предыдущее поле true, тогда в этом поле описание на что аллергия fullDto
+          description: >-
+            Если предыдущее поле true, тогда в этом поле описание на что
+            аллергия
           example: На молоко
         chronicDisease:
           type: boolean
-          description: Есть ли у питомца хронические заболевания? shortDto
+          description: Есть ли у питомца хронические заболевания?
           example: true
         chronicDiseaseType:
           maxLength: 500
           type: string
-          description: Если предыдущее поле true, тогда в этом поле описание какие хронические заболевания есть shortDto
+          description: >-
+            Если предыдущее поле true, тогда в этом поле описание какие
+            хронические заболевания есть
           example: пиелонефрит
         heatDate:
           type: string
-          description: Предполагаемая дата очередной течки (для сук)(в формате "yyyy-MM-dd"), должно быть в будущем fullDto
-          example: '2023-06-09'
+          description: >-
+            Предполагаемая дата очередной течки (для сук)(в формате
+            "dd.MM.yyyy"), должно быть в будущем
+          example: 09.06.2023
         vetData:
           maxLength: 500
           type: string
-          description: Контакты ветврача, к которому следует обращаться в случае необходимости fullDto
+          description: >-
+            Контакты ветврача, к которому следует обращаться в случае
+            необходимости
           example: 89000000000 Иван Иваныч Иванов
         stayWithoutMaster:
           maxLength: 500
           type: string
-          description: Есть ли опыт разлуки с хозяином? fullDto
+          description: Есть ли опыт разлуки с хозяином?
           example: Да, разлучается спокойно
         stayAlone:
           maxLength: 250
           type: string
-          description: Умеет ли питомец спокойно оставаться один? shortDto
+          description: Умеет ли питомец спокойно оставаться один?
           example: нет, воет, когда остаётся один
         specialCare:
           maxLength: 500
           type: string
-          description: Требуется ли спец уход, какой? shortDto
+          description: Требуется ли спец уход, какой?
           example: да, нужно расчёсывать шерсть два раза в день
         barkHowl:
           maxLength: 250
           type: string
-          description: Лает / воет в одиночестве? fullDto
+          description: Лает / воет в одиночестве?
           example: да
         furnitureDamage:
           maxLength: 250
           type: string
-          description: Портит ли вещи, мебель? fullDto
+          description: Портит ли вещи, мебель?
           example: нет
         foodFromTable:
           maxLength: 250
           type: string
-          description: Ворует ли еду со стола? fullDto
+          description: Ворует ли еду со стола?
           example: нет
         defecateAtHome:
           maxLength: 250
           type: string
-          description: Справляет ли  нужду дома? fullDto
+          description: Справляет ли  нужду дома?
           example: нет
         markAtHome:
           maxLength: 250
           type: string
-          description: Метит дома? fullDto
+          description: Метит дома?
           example: нет
         newPeople:
           maxLength: 500
           type: string
-          description: Как относится к незнакомым людям? shortDto
+          description: Как относится к незнакомым людям?
           example: дружелюбно
         isBitePeople:
           type: boolean
-          description: Ваша собака когда-нибудь кого-нибудь кусала? fullDto
+          description: Ваша собака когда-нибудь кого-нибудь кусала?
           example: true
         reasonOfBite:
           maxLength: 250
           type: string
-          description: Если предыдущее поле true, тогда в этом поле причина укуса fullDto
+          description: Если предыдущее поле true, тогда в этом поле причина укуса
           example: Дразнил
         playWithDogs:
           maxLength: 500
           type: string
-          description: Играет / гуляет с другими собаками? fullDto
+          description: Играет / гуляет с другими собаками?
           example: да
         isDogTraining:
           type: boolean
-          description: Прошел ли питомец курс послушания? shortDto
+          description: Прошел ли питомец курс послушания?
           example: true
         trainingName:
           maxLength: 500
           type: string
-          description: Если предыдущее поле true, тогда в этом поле название курс послушания shortDto
+          description: >-
+            Если предыдущее поле true, тогда в этом поле название курс
+            послушания
           example: Послушная собака
         like:
           maxLength: 500
           type: string
-          description: Что любит fullDto
+          description: Что любит
           example: Когда гладят по голове
         notLike:
           maxLength: 500
           type: string
-          description: Что не любит fullDto
+          description: Что не люби
           example: Когда трогают хвост
         toys:
           maxLength: 500
           type: string
-          description: Любимые игрушки, игры питомца fullDto
+          description: Любимые игрушки, игры питомца
           example: Мячик
         badHabit:
           maxLength: 250
           type: string
-          description: Вредные привычки fullDto
+          description: Вредные привычки
           example: Разбрасывает еду из миски
         walking:
           maxLength: 250
           type: string
-          description: Сколько раз в день питомец привык гулять?/гуляет ли на улице fullDto
+          description: Сколько раз в день питомец привык гулять?/гуляет ли на улице
           example: три раза
         morningWalking:
           maxLength: 150
           type: string
-          description: Привычное время прогулок Утро fullDto
+          description: Привычное время прогулок Утро
           example: 6 утра
         dayWalking:
           maxLength: 150
           type: string
-          description: Привычное время прогулок День fullDto
+          description: Привычное время прогулок День
           example: В 2 часа дня
         eveningWalking:
           maxLength: 150
           type: string
-          description: Привычное время прогулок Вечер fullDto
+          description: Привычное время прогулок Вечер
           example: В 8 часов вечера
         feedingQuantity:
           type: integer
-          description: Количество кормлений в день (От 1 до 9) fullDto
+          description: Количество кормлений в день (От 1 до 9)
           format: int32
           example: 7
         feedType:
           maxLength: 250
           type: string
-          description: Вид корма (сухой / натуралка/консервы) shortDto
+          description: Вид корма (сухой / натуралка/консервы)
           example: сухой корм
         feedName:
           maxLength: 250
           type: string
-          description: Название корма\консерв fullDto
-          example: "Довольный пёс"
+          description: Название корма/консерв
+          example: Довольный пёс
         feedComposition:
           maxLength: 250
           type: string
-          description: Состав корма/консерв fullDto
+          description: Состав корма/консерв
           example: говядина и овощи
         feedingRate:
           maxLength: 250
           type: string
-          description: Норма на 1 кормление fullDto
+          description: Норма на 1 кормление
           example: 100 г
         feedingPractice:
           maxLength: 500
           type: string
-          description: Особенности кормления fullDto
+          description: Особенности кормления
           example: без особенностей
         treat:
           maxLength: 250
           type: string
-          description: Разрешенные лакомства и их количество fullDto
+          description: Разрешенные лакомства и их количество
           example: сахар
         isMedicine:
           type: boolean
-          description: Необходимы ли лекарства, витамины? fullDto
+          description: Необходимы ли лекарства, витамины?
           example: true
         medicineRegimen:
           maxLength: 500
           type: string
-          description: Если предыдущее поле true, тогда в этом поле название, режим приема лекарств/витаминов и доза fullDto
+          description: >-
+            Если предыдущее поле true, тогда в этом поле название, режим приема
+            лекарств/витаминов и доза
           example: Здоровая собака
         additionalData:
           maxLength: 1000
           type: string
-          description: Дополнительные комментарии, особенности поведения fullDto
+          description: Дополнительные комментарии, особенности поведения
           example: Любит, чтоб чесали животик
     PetDto:
       type: object
@@ -757,27 +810,29 @@ components:
             - DOG
             - CAT
             - EXOTIC
-          description: Тип животного/не может быть пустым shortDto
+          description: Тип животного
           example: DOG
-        name: 
+        name:
           maxLength: 30
           minLength: 1
           type: string
-          description: Кличка питомца shortDto
+          description: Кличка питомца
           example: Барбос
         breed:
           maxLength: 30
           minLength: 1
           type: string
-          description: Порода питомца/не может быть пустым shortDto
+          description: Порода питомца
           example: Спаниель
         birthDate:
           type: string
-          description: Дата рождения (в формате "yyyy-MM-dd"), должно быть в прошлом fullDto
-          example: '2022-06-09'
+          description: Дата рождения (в формате "dd.MM.yyyy"), должно быть в прошлом
+          example: 09.06.2023
         age:
           type: string
-          description: Возраст питомца shortDto высчитывается автоматически на основании даты рождения
+          description: >-
+            Возраст питомца, высчитывается автоматически на основании даты
+            рождения
           example: 3 года
         sex:
           type: string
@@ -785,55 +840,57 @@ components:
             - FEMALE
             - MALE
             - HERMAPHRODITE
-          description: Пол питомца/не может быть пустым
+          description: Пол питомца
           example: Женский
         color:
           maxLength: 30
           type: string
-          description: Окрас питомца fullDto
+          description: Окрас питомца
           example: Черный
         sign:
           maxLength: 150
           type: string
-          description: Чип, Клеймо, Особые приметы fullDto
+          description: Чип, Клеймо, Особые приметы
           example: Клеймо
         isExhibition:
           type: boolean
-          description: Выставочная ли собака? shortDto
+          description: Выставочная ли собака?
           example: true
         vetVisitDate:
           type: string
-          description: Дата последнего посещения ветврача (в формате "yyyy-MM-dd"), должно быть в прошлом fullDto
-          example: '2023-06-09'
+          description: >-
+            Дата последнего посещения ветврача (в формате "dd.MM.yyyy"), должно
+            быть в прошлом
+          example: 09.06.2023
         vetVisitReason:
           maxLength: 250
           type: string
-          description: Причина последнего посещения врача fullDto
+          description: Причина последнего посещения врача
           example: Ушиб лапы
         vaccine:
           maxLength: 250
           type: string
-          description: Даты последних прививок, названия вакцин shortDto
+          description: Даты последних прививок, названия вакцин
           example: 1.11.2023 антиклещ
         parasites:
           maxLength: 250
           type: string
-          description: Дата обработки от глистов/паразитов fullDto
+          description: Дата обработки от глистов/паразитов
           example: 22.11.2023
         fleaMite:
           maxLength: 250
           type: string
-          description: Даты обработки от блох/клещей с указанием препарата fullDto
+          description: Даты обработки от блох/клещей с указанием препарата
           example: 22.11.2023 антиклещ
         surgery:
           maxLength: 250
           type: string
-          description: Перенесенные операции (кастрация) fullDto
+          description: Перенесенные операции (кастрация)
           example: Кастрация
         pastDisease:
           maxLength: 500
           type: string
-          description: Перенесенные заболевания fullDto
+          description: Перенесенные заболевания
           example: пиелонефрит
         healthСharacteristic:
           maxLength: 500
@@ -847,190 +904,202 @@ components:
           example: 1.11.2023
         allergy:
           type: boolean
-          description: Есть ли аллергия? fullDto
+          description: Есть ли аллергия?
           example: true
         allergyType:
           maxLength: 250
           type: string
-          description: Если предыдущее поле true, тогда в этом поле описание на что аллергия fullDto
+          description: >-
+            Если предыдущее поле true, тогда в этом поле описание на что
+            аллергия
           example: На молоко
         chronicDisease:
           type: boolean
-          description: Есть ли у питомца хронические заболевания? shortDto
+          description: Есть ли у питомца хронические заболевания?
           example: true
         chronicDiseaseType:
           maxLength: 500
           type: string
-          description: Если предыдущее поле true, тогда в этом поле описание какие хронические заболевания есть shortDto
+          description: >-
+            Если предыдущее поле true, тогда в этом поле описание какие
+            хронические заболевания есть
           example: пиелонефрит
         heatDate:
           type: string
-          description: Предполагаемая дата очередной течки (для сук)(в формате "yyyy-MM-dd"), должно быть в будущем fullDto
-          example: '2023-06-09'
+          description: >-
+            Предполагаемая дата очередной течки (для сук)(в формате
+            "dd.MM.yyyy"), должно быть в будущем
+          example: 09.06.2023
         vetData:
           maxLength: 500
           type: string
-          description: Контакты ветврача, к которому следует обращаться в случае необходимости fullDto
+          description: >-
+            Контакты ветврача, к которому следует обращаться в случае
+            необходимости
           example: 89000000000 Иван Иваныч Иванов
         stayWithoutMaster:
           maxLength: 500
           type: string
-          description: Есть ли опыт разлуки с хозяином? fullDto
+          description: Есть ли опыт разлуки с хозяином?
           example: Да, разлучается спокойно
         stayAlone:
           maxLength: 250
           type: string
-          description: Умеет ли питомец спокойно оставаться один? shortDto
+          description: Умеет ли питомец спокойно оставаться один?
           example: нет, воет, когда остаётся один
         specialCare:
           maxLength: 500
           type: string
-          description: Требуется ли спец уход, какой? shortDto
+          description: Требуется ли спец уход, какой?
           example: да, нужно расчёсывать шерсть два раза в день
         barkHowl:
           maxLength: 250
           type: string
-          description: Лает / воет в одиночестве? fullDto
+          description: Лает / воет в одиночестве?
           example: да
         furnitureDamage:
           maxLength: 250
           type: string
-          description: Портит ли вещи, мебель? fullDto
+          description: Портит ли вещи, мебель?
           example: нет
         foodFromTable:
           maxLength: 250
           type: string
-          description: Ворует ли еду со стола? fullDto
+          description: Ворует ли еду со стола?
           example: нет
         defecateAtHome:
           maxLength: 250
           type: string
-          description: Справляет ли  нужду дома? fullDto
+          description: Справляет ли  нужду дома?
           example: нет
         markAtHome:
           maxLength: 250
           type: string
-          description: Метит дома? fullDto
+          description: Метит дома?
           example: нет
         newPeople:
           maxLength: 500
           type: string
-          description: Как относится к незнакомым людям? shortDto
+          description: Как относится к незнакомым людям?
           example: дружелюбно
         isBitePeople:
           type: boolean
-          description: Ваша собака когда-нибудь кого-нибудь кусала? fullDto
+          description: Ваша собака когда-нибудь кого-нибудь кусала?
           example: true
         reasonOfBite:
           maxLength: 250
           type: string
-          description: Если предыдущее поле true, тогда в этом поле причина укуса fullDto
+          description: Если предыдущее поле true, тогда в этом поле причина укуса
           example: Дразнил
         playWithDogs:
           maxLength: 500
           type: string
-          description: Играет / гуляет с другими собаками? fullDto
+          description: Играет / гуляет с другими собаками?
           example: да
         isDogTraining:
           type: boolean
-          description: Прошел ли питомец курс послушания? shortDto
+          description: Прошел ли питомец курс послушания?
           example: true
         trainingName:
           maxLength: 500
           type: string
-          description: Если предыдущее поле true, тогда в этом поле название курс послушания shortDto
+          description: >-
+            Если предыдущее поле true, тогда в этом поле название курс
+            послушания
           example: Послушная собака
         like:
           maxLength: 500
           type: string
-          description: Что любит fullDto
+          description: Что любит
           example: Когда гладят по голове
         notLike:
           maxLength: 500
           type: string
-          description: Что не любит fullDto
+          description: Что не любит
           example: Когда трогают хвост
         toys:
           maxLength: 500
           type: string
-          description: Любимые игрушки, игры питомца fullDto
+          description: Любимые игрушки, игры питомца
           example: Мячик
         badHabit:
           maxLength: 250
           type: string
-          description: Вредные привычки fullDto
+          description: Вредные привычки
           example: Разбрасывает еду из миски
         walking:
           maxLength: 250
           type: string
-          description: Сколько раз в день питомец привык гулять?/гуляет ли на улице fullDto
+          description: Сколько раз в день питомец привык гулять?/гуляет ли на улице
           example: три раза
         morningWalking:
           maxLength: 150
           type: string
-          description: Привычное время прогулок Утро fullDto
+          description: Привычное время прогулок Утро
           example: 6 утра
         dayWalking:
           maxLength: 150
           type: string
-          description: Привычное время прогулок День fullDto
+          description: Привычное время прогулок День
           example: В 2 часа дня
         eveningWalking:
           maxLength: 150
           type: string
-          description: Привычное время прогулок Вечер fullDto
+          description: Привычное время прогулок Вечер
           example: В 8 часов вечера
         feedingQuantity:
           type: integer
-          description: Количество кормлений в день (От 1 до 9) fullDto
+          description: Количество кормлений в день (От 1 до 9)
           format: int32
           example: 7
         feedType:
           maxLength: 250
           type: string
-          description: Вид корма (сухой / натуралка/консервы) shortDto
+          description: Вид корма (сухой / натуралка/консервы)
           example: сухой корм
         feedName:
           maxLength: 250
           type: string
-          description: Название корма\консерв fullDto
-          example: "Довольный пёс"
+          description: Название корма/консерв
+          example: Довольный пёс
         feedComposition:
           maxLength: 250
           type: string
-          description: Состав корма/консерв fullDto
+          description: Состав корма/консерв
           example: говядина и овощи
         feedingRate:
           maxLength: 250
           type: string
-          description: Норма на 1 кормление fullDto
+          description: Норма на 1 кормление
           example: 100 г
         feedingPractice:
           maxLength: 500
           type: string
-          description: Особенности кормления fullDto
+          description: Особенности кормления
           example: без особенностей
         treat:
           maxLength: 250
           type: string
-          description: Разрешенные лакомства и их количество fullDto
+          description: Разрешенные лакомства и их количество
           example: сахар
         isMedicine:
           type: boolean
-          description: Необходимы ли лекарства, витамины? fullDto
+          description: Необходимы ли лекарства, витамины?
           example: true
         medicineRegimen:
           maxLength: 500
           type: string
-          description: Если предыдущее поле true, тогда в этом поле название, режим приема лекарств/витаминов и доза fullDto
+          description: >-
+            Если предыдущее поле true, тогда в этом поле название, режим приема
+            лекарств/витаминов и доза
           example: Здоровая собака
         additionalData:
           maxLength: 1000
           type: string
-          description: Дополнительные комментарии, особенности поведения fullDto
+          description: Дополнительные комментарии, особенности поведения
           example: Любит, чтоб чесали животик
     UpdatePetDto:
-      description : Дто для изменения данных питомца
+      description: Дто для изменения данных питомца
       type: object
       properties:
         type:
@@ -1039,79 +1108,81 @@ components:
             - DOG
             - CAT
             - EXOTIC
-          description: Тип животного/не может быть пустым shortDto
+          description: Тип животного
           example: DOG
-        name: 
+        name:
           maxLength: 30
           minLength: 1
           type: string
-          description: Кличка питомца shortDto
+          description: Кличка питомца
           example: Барбос
         breed:
           maxLength: 30
           minLength: 1
           type: string
-          description: Порода питомца/не может быть пустым shortDto
+          description: Порода питомца
           example: Спаниель
         birthDate:
           type: string
-          description: Дата рождения (в формате "yyyy-MM-dd"), должно быть в прошлом fullDto
-          example: '2022-06-09'
+          description: Дата рождения (в формате "dd.MM.yyyy"), должно быть в прошлом
+          example: 09.06.2023
         sex:
           type: string
           enum:
             - FEMALE
             - MALE
             - HERMAPHRODITE
-          description: Пол питомца/не может быть пустым
+          description: Пол питомца
           example: Женский
         color:
           maxLength: 30
           type: string
-          description: Окрас питомца fullDto
+          description: Окрас питомца
           example: Черный
         sign:
           maxLength: 150
           type: string
-          description: Чип, Клеймо, Особые приметы fullDto
+          description: Чип, Клеймо, Особые приметы
           example: Клеймо
         isExhibition:
           type: boolean
-          description: Выставочная ли собака? shortDto
+          description: Выставочная ли собака?
           example: true
         vetVisitDate:
           type: string
-          description: Дата последнего посещения ветврача (в формате "yyyy-MM-dd"), должно быть в прошлом fullDto
-          example: '2023-06-09'
+          description: >-
+            Дата последнего посещения ветврача (в формате "dd.MM.yyyy"), должно
+            быть в прошлом
+          example: 09.06.2023
         vetVisitReason:
           maxLength: 250
           type: string
-          description: Причина последнего посещения врача fullDto
+          description: Причина последнего посещения врача
           example: Ушиб лапы
         vaccine:
           maxLength: 250
           type: string
-          description: Даты последних прививок, названия вакцин shortDto
+          description: Даты последних прививок, названия вакцин
           example: 1.11.2023 антиклещ
         parasites:
           maxLength: 250
           type: string
-          description: Дата обработки от глистов/паразитов fullDto
+          description: Дата обработки от глистов/паразитов
           example: 22.11.2023
         fleaMite:
           maxLength: 250
           type: string
-          description: Даты обработки от блох/клещей с указанием препарата fullDto
+          description: Даты обработки от блох/клещей с указанием препарата
           example: 22.11.2023 антиклещ
         surgery:
           maxLength: 250
           type: string
-          description: Перенесенные операции (кастрация) fullDto
+          description: Перенесенные операции (кастрация)
           example: Кастрация
         pastDisease:
           maxLength: 500
           type: string
-          description: Перенесенные заболевания fullDto
+          description: Перенесенные заболевания
           example: пиелонефрит
         healthСharacteristic:
           maxLength: 500
@@ -1125,197 +1196,209 @@ components:
           example: 1.11.2023
         allergy:
           type: boolean
-          description: Есть ли аллергия? fullDto
+          description: Есть ли аллергия?
           example: true
         allergyType:
           maxLength: 250
           type: string
-          description: Если предыдущее поле true, тогда в этом поле описание на что аллергия fullDto
+          description: >-
+            Если предыдущее поле true, тогда в этом поле описание на что
+            аллергия
           example: На молоко
         chronicDisease:
           type: boolean
-          description: Есть ли у питомца хронические заболевания? shortDto
+          description: Есть ли у питомца хронические заболевания?
           example: true
         chronicDiseaseType:
           maxLength: 500
           type: string
-          description: Если предыдущее поле true, тогда в этом поле описание какие хронические заболевания есть shortDto
+          description: >-
+            Если предыдущее поле true, тогда в этом поле описание какие
+            хронические заболевания есть
           example: пиелонефрит
         heatDate:
           type: string
-          description: Предполагаемая дата очередной течки (для сук)(в формате "yyyy-MM-dd"), должно быть в будущем fullDto
-          example: '2023-06-09'
+          description: >-
+            Предполагаемая дата очередной течки (для сук)(в формате
+            "dd.MM.yyyy"), должно быть в будущем
+          example: 09.11.2023
         vetData:
           maxLength: 500
           type: string
-          description: Контакты ветврача, к которому следует обращаться в случае необходимости fullDto
+          description: >-
+            Контакты ветврача, к которому следует обращаться в случае
+            необходимости
           example: 89000000000 Иван Иваныч Иванов
         stayWithoutMaster:
           maxLength: 500
           type: string
-          description: Есть ли опыт разлуки с хозяином? fullDto
+          description: Есть ли опыт разлуки с хозяином?
           example: Да, разлучается спокойно
         stayAlone:
           maxLength: 250
           type: string
-          description: Умеет ли питомец спокойно оставаться один? shortDto
+          description: Умеет ли питомец спокойно оставаться один?
           example: нет, воет, когда остаётся один
         specialCare:
           maxLength: 500
           type: string
-          description: Требуется ли спец уход, какой? shortDto
+          description: Требуется ли спец уход, какой?
           example: да, нужно расчёсывать шерсть два раза в день
         barkHowl:
           maxLength: 250
           type: string
-          description: Лает / воет в одиночестве? fullDto
+          description: Лает / воет в одиночестве?
           example: да
         furnitureDamage:
           maxLength: 250
           type: string
-          description: Портит ли вещи, мебель? fullDto
+          description: Портит ли вещи, мебель?
           example: нет
         foodFromTable:
           maxLength: 250
           type: string
-          description: Ворует ли еду со стола? fullDto
+          description: Ворует ли еду со стола?
           example: нет
         defecateAtHome:
           maxLength: 250
           type: string
-          description: Справляет ли  нужду дома? fullDto
+          description: Справляет ли  нужду дома?
           example: нет
         markAtHome:
           maxLength: 250
           type: string
-          description: Метит дома? fullDto
+          description: Метит дома?
           example: нет
         newPeople:
           maxLength: 500
           type: string
-          description: Как относится к незнакомым людям? shortDto
+          description: Как относится к незнакомым людям?
           example: дружелюбно
         isBitePeople:
           type: boolean
-          description: Ваша собака когда-нибудь кого-нибудь кусала? fullDto
+          description: Ваша собака когда-нибудь кого-нибудь кусала?
           example: true
         reasonOfBite:
           maxLength: 250
           type: string
-          description: Если предыдущее поле true, тогда в этом поле причина укуса fullDto
+          description: Если предыдущее поле true, тогда в этом поле причина укуса
           example: Дразнил
         playWithDogs:
           maxLength: 500
           type: string
-          description: Играет / гуляет с другими собаками? fullDto
+          description: Играет / гуляет с другими собаками?
           example: да
         isDogTraining:
           type: boolean
-          description: Прошел ли питомец курс послушания? shortDto
+          description: Прошел ли питомец курс послушания?
           example: true
         trainingName:
           maxLength: 500
           type: string
-          description: Если предыдущее поле true, тогда в этом поле название курс послушания shortDto
+          description: >-
+            Если предыдущее поле true, тогда в этом поле название курс
+            послушания
           example: Послушная собака
         like:
           maxLength: 500
           type: string
-          description: Что любит fullDto
+          description: Что любит
           example: Когда гладят по голове
         notLike:
           maxLength: 500
           type: string
-          description: Что не любит fullDto
+          description: Что не любит
           example: Когда трогают хвост
         toys:
           maxLength: 500
           type: string
-          description: Любимые игрушки, игры питомца fullDto
+          description: Любимые игрушки, игры питомца
           example: Мячик
         badHabit:
           maxLength: 250
           type: string
-          description: Вредные привычки fullDto
+          description: Вредные привычки
           example: Разбрасывает еду из миски
         walking:
           maxLength: 250
           type: string
-          description: Сколько раз в день питомец привык гулять?/гуляет ли на улице fullDto
+          description: Сколько раз в день питомец привык гулять?/гуляет ли на улице
           example: три раза
         morningWalking:
           maxLength: 150
           type: string
-          description: Привычное время прогулок Утро fullDto
+          description: Привычное время прогулок Утро
           example: 6 утра
         dayWalking:
           maxLength: 150
           type: string
-          description: Привычное время прогулок День fullDto
+          description: Привычное время прогулок День
           example: В 2 часа дня
         eveningWalking:
           maxLength: 150
           type: string
-          description: Привычное время прогулок Вечер fullDto
+          description: Привычное время прогулок Вечер
           example: В 8 часов вечера
         feedingQuantity:
           type: integer
-          description: Количество кормлений в день (От 1 до 9) fullDto
+          description: 'Количество кормлений в день (От 1 до 9) '
           format: int32
           example: 7
         feedType:
           maxLength: 250
           type: string
-          description: Вид корма (сухой / натуралка/консервы) shortDto
+          description: Вид корма (сухой / натуралка/консервы)
           example: сухой корм
         feedName:
           maxLength: 250
           type: string
-          description: Название корма\консерв fullDto
-          example: "Довольный пёс"
+          description: Название корма/консерв
+          example: Довольный пёс
         feedComposition:
           maxLength: 250
           type: string
-          description: Состав корма/консерв fullDto
+          description: Состав корма/консерв
           example: говядина и овощи
         feedingRate:
           maxLength: 250
           type: string
-          description: Норма на 1 кормление fullDto
+          description: Норма на 1 кормление
           example: 100 г
         feedingPractice:
           maxLength: 500
           type: string
-          description: Особенности кормления fullDto
+          description: Особенности кормления
           example: без особенностей
         treat:
           maxLength: 250
           type: string
-          description: Разрешенные лакомства и их количество fullDto
+          description: Разрешенные лакомства и их количество
           example: сахар
         isMedicine:
           type: boolean
-          description: Необходимы ли лекарства, витамины? fullDto
+          description: Необходимы ли лекарства, витамины?
           example: true
         medicineRegimen:
           maxLength: 500
           type: string
-          description: Если предыдущее поле true, тогда в этом поле название, режим приема лекарств/витаминов и доза fullDto
+          description: >-
+            Если предыдущее поле true, тогда в этом поле название, режим приема
+            лекарств/витаминов и доза
           example: Здоровая собака
         additionalData:
           maxLength: 1000
           type: string
-          description: Дополнительные комментарии, особенности поведения fullDto
+          description: Дополнительные комментарии, особенности поведения
           example: Любит, чтоб чесали животик
     OwnerShortDto:
-      description : Краткое Дто клиента
+      description: Краткое Дто клиента
       type: object
       properties:
-        name: 
+        name:
           maxLength: 30
           minLength: 1
           type: string
-          description: ФИО хозяина питомца shortDto
+          description: ФИО хозяина питомца
           example: Иванов И.И.
         rating:
           type: integer
