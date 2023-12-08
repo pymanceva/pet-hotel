@@ -14,6 +14,7 @@ paths:
       tags:
         - owner-controller
       summary: Добавление нового клиента (собственника зверушки)
+      description: Добавление нового клиента может осуществляться только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
       operationId: addOwner
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
@@ -40,7 +41,7 @@ paths:
                 message: "Error: Field mainPhone must not be blank."
                 timestamp: 2023-12-03 09:10:50
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
         403:
           description: Недостаточно прав для совершения действия.
           content:
@@ -51,7 +52,7 @@ paths:
                 message: "User with role=FINANCIAL, hasn't access for edit this information"
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
         404:
           description: Объект не найден.
           content:
@@ -62,7 +63,7 @@ paths:
                 message: "user with id=5 not found"
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
         409:
           description: Ошибка уникальности полей базы данных.
           content:
@@ -73,7 +74,7 @@ paths:
                 message: "Attempt to insert duplicate key row in object owner with unique index owner_main_phone."
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
         500:
           description: Внутренняя ошибка сервера.
           content:
@@ -84,12 +85,13 @@ paths:
                 message: []
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
 
     get:
       tags:
         - owner-controller
       summary: Получение списка всех пользователей
+      description: Получение списка всех пользователей может осуществляться только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
       operationId: getAllOwners
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
@@ -112,7 +114,7 @@ paths:
                 message: ""
                 timestamp: 2023-12-03 09:10:50
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
         403:
           description: Недостаточно прав для совершения действия.
           content:
@@ -123,7 +125,7 @@ paths:
                 message: "User with role=FINANCIAL, hasn't access for browse this information"
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
         404:
           description: Объект не найден.
           content:
@@ -134,7 +136,7 @@ paths:
                 message: "owner with id=42 not found"
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
         500:
           description: Внутренняя ошибка сервера.
           content:
@@ -145,13 +147,15 @@ paths:
                 message: []
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
 
   /owners/{id}:
     get:
       tags:
         - owner-controller
       summary: Получение пользователя по id
+      description: >-
+        Получение пользователя по id может осуществляться только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
       operationId: getOwnerById
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
@@ -178,7 +182,7 @@ paths:
                 message: ""
                 timestamp: 2023-12-03 09:10:50
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
         403:
           description: Недостаточно прав для совершения действия.
           content:
@@ -189,7 +193,7 @@ paths:
                 message: "User with role=FINANCIAL, hasn't access for browse this information"
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
         404:
           description: Объект не найден.
           content:
@@ -200,7 +204,7 @@ paths:
                 message: "owner with id=42 not found"
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
         500:
           description: Объект не найден.
           content:
@@ -211,11 +215,13 @@ paths:
                 message: []
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
     delete:
       tags:
         - owner-controller
       summary: Удаление пользователя по id
+      description: >-
+        Удаление пользователя по id не может осуществляться пользователями - данный эндпоинт является служебным.
       operationId: deleteOwnerById
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
@@ -228,7 +234,7 @@ paths:
       responses:
         204:
           description: NO_CONTENT
-          
+
         400:
           description: Запрос составлен неверно.
           content:
@@ -239,7 +245,7 @@ paths:
                 message: ""
                 timestamp: 2023-12-03 09:10:50
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
         403:
           description: Недостаточно прав для совершения действия.
           content:
@@ -250,7 +256,7 @@ paths:
                 message: "User with role=FINANCIAL, hasn't access for browse this information"
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
         404:
           description: Объект не найден.
           content:
@@ -261,7 +267,7 @@ paths:
                 message: "owner with id=42 not found"
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
         500:
           description: Внутренняя ошибка сервера.
           content:
@@ -272,12 +278,14 @@ paths:
                 message: []
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
     patch:
       tags:
         - owner-controller
-      summary: Изменить данные пользователя
+      summary: Изменить данные клиента
       operationId: updateOwner
+      description: >-
+        Изменение данных клиента может осуществляться только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
         - name: id
@@ -309,7 +317,7 @@ paths:
                 message: ""
                 timestamp: 2023-12-03 09:10:50
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
         403:
           description: Недостаточно прав для совершения действия.
           content:
@@ -320,7 +328,7 @@ paths:
                 message: "User with role=FINANCIAL, hasn't access for browse this information"
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
         404:
           description: Объект не найден.
           content:
@@ -331,7 +339,18 @@ paths:
                 message: "owner with id=42 not found"
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
+        409:
+          description: Ошибка уникальности полей базы данных.
+          content:
+            application/json:
+              example:
+                status: CONFLICT
+                reason: integrity constraint has been violated.
+                message: "Attempt to insert duplicate key row in object owner with unique index owner_main_phone."
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
           description: Объект не найден.
           content:
@@ -342,7 +361,7 @@ paths:
                 message: []
                 timestamp: 2023-12-03 09:10:55
               schema:
-                $ref: '#/components/schemas/ErrorDto'
+                $ref: '#/components/schemas/Error'
 
 components:
   parameters:
@@ -352,16 +371,17 @@ components:
       in: header
       required: true
       schema:
-        type: string
+        type: integer
+        format: int64
 
 
   schemas:
     NewOwnerDto:
       title: NewOwnerDto
       type: object
-      required: [ name, mainPhone ]
+      required: [ name, mainPhone, rating ]
       properties:
-        surname:
+        lastname:
           description: Фамилия клиента
           type: string
           maxLength: 20
@@ -389,6 +409,7 @@ components:
           description: Дополнительный номер телефона клиента
           type: string
           pattern: ^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$
+          uniqueItems: true
           example: "+71234567890"
         otherContacts:
           description: Прочие контакты клиента
@@ -426,7 +447,7 @@ components:
           type: integer
           format: int64
           example: 103
-        surname:
+        lastname:
           description: Фамилия клиента
           type: string
           example: Сумкин
@@ -472,14 +493,9 @@ components:
       title: UpdateOwnerDto
       description: DTO для обновления данных пользователя
       type: object
-      required: [ id ]
+      required: [ rating ]
       properties:
-        id:
-          description: Id клиента
-          type: integer
-          format: int64
-          example: 228
-        surname:
+        lastname:
           description: Фамилия клиента
           type: string
           maxLength: 20
@@ -507,6 +523,7 @@ components:
           description: Дополнительный номер телефона клиента
           type: string
           pattern: ^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$
+          uniqueItems: true
           example: "+71234567890"
         otherContacts:
           description: Прочие контакты клиента
@@ -535,8 +552,8 @@ components:
           default: 0
           example: 3
 
-    ErrorDto:
-      title: ErrorDto
+    Error:
+      title: Error
       description: Сведения об ошибке
       type: object
       properties:
@@ -637,7 +654,6 @@ components:
             type: string
             description: Cтектрейс или описание ошибок
             example: "[]"
-
 
 
 

@@ -654,7 +654,3 @@ components:
             type: string
             description: Cтектрейс или описание ошибок
             example: "[]"
-
-
-
-
