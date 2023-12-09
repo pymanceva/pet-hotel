@@ -84,7 +84,13 @@ paths:
         '500':
           description: Internal Server Error. Все прочие неотлавливаемые исключения.
           content:
-            '*/*':
+            application/json:
+              example:
+                error: '[]'
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error
+                message: []
+                timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
   /bookings/{id}:
@@ -149,7 +155,13 @@ paths:
         '500':
           description: Internal Server Error. Все прочие неотлавливаемые исключения.
           content:
-            '*/*':
+            application/json:
+              example:
+                error: '[]'
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error
+                message: [ ]
+                timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
@@ -209,7 +221,13 @@ paths:
         '500':
           description: Internal Server Error. Все прочие неотлавливаемые исключения.
           content:
-            '*/*':
+            application/json:
+              example:
+                error: '[]'
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error
+                message: [ ]
+                timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
     patch:
@@ -291,7 +309,13 @@ paths:
         '500':
           description: Internal Server Error. Все прочие неотлавливаемые исключения.
           content:
-            '*/*':
+            application/json:
+              example:
+                error: '[]'
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error
+                message: [ ]
+                timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
 components:
