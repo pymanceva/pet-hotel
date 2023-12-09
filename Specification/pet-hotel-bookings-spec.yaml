@@ -15,7 +15,7 @@ paths:
       tags:
         - booking-controller
       operationId: addBooking
-      description: Добавление нового бронирования. Доступно только пользователям с ролью ROLE_BOSS и ROLE_ADminimum.
+      description: Добавление нового бронирования. Доступно только пользователям с ролью ROLE_BOSS и ROLE_ADMIN.
       summary: Добавить новое бронирование
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
@@ -98,7 +98,7 @@ paths:
       tags:
         - booking-controller
       operationId: getBookingById
-      description: Получение бронирования по ID. Доступно только для пользователей с ролью ROLE_BOSS или ROLE_ADminimum.
+      description: Получение бронирования по ID. Доступно только для пользователей с ролью ROLE_BOSS или ROLE_ADMIN.
       summary: Получить информацию о бронировании
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
@@ -162,7 +162,7 @@ paths:
       tags:
         - booking-controller
       operationId: deleteBookingById
-      description: Удаление существующего бронирования. Доступно только пользователям ROLE_BOSS и ROLE_ADminimum.
+      description: Удаление существующего бронирования. Доступно только пользователям ROLE_BOSS и ROLE_ADMIN.
       summary: Удалить информацию о бронировании (безвозвратно)
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
@@ -222,7 +222,7 @@ paths:
       tags:
         - booking-controller
       operationId: updateBooking
-      description: Редактирование существующего бронирования. Доступно пользователям ROLE_BOSS и ROLE_ADminimum.
+      description: Редактирование существующего бронирования. Доступно пользователям ROLE_BOSS и ROLE_ADMIN.
       summary: Изменить информацию об имеющемся бронировании
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
