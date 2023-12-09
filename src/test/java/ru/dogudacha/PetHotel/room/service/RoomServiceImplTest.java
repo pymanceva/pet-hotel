@@ -239,7 +239,6 @@ public class RoomServiceImplTest {
                 .area(10.0)
                 .number("new standard room")
                 .type(RoomTypes.SMALL)
-                .isVisible(false)
                 .build();
 
         RoomDto updatedRoomDto = RoomDto.builder()
@@ -319,7 +318,6 @@ public class RoomServiceImplTest {
     @Test
     void updateRoom_whenRequesterBossAndRoomFoundAndAvailableNewFieldNotNull_thenUpdateAllFieldsThanId() {
         UpdateRoomDto newRoomDto = UpdateRoomDto.builder()
-                .isVisible(false)
                 .build();
 
         RoomDto updatedRoomDto = RoomDto.builder()
@@ -366,7 +364,6 @@ public class RoomServiceImplTest {
                 .area(10.0)
                 .number("new standard room")
                 .type(RoomTypes.SMALL)
-                .isVisible(false)
                 .build();
 
         RoomDto updatedRoomDto = RoomDto.builder()
