@@ -15,7 +15,7 @@ paths:
       tags:
         - booking-controller
       operationId: addBooking
-      description: Добавление нового бронирования. Доступно только пользователям с ролью ROLE_BOSS и ROLE_ADMIN.
+      description: Добавление нового бронирования. Доступно только пользователям с ролью ROLE_BOSS и ROLE_ADminimum.
       summary: Добавить новое бронирование
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
@@ -98,17 +98,11 @@ paths:
       tags:
         - booking-controller
       operationId: getBookingById
-      description: Получение бронирования по ID. Доступно только для пользователей с ролью ROLE_BOSS или ROLE_ADMIN.
+      description: Получение бронирования по ID. Доступно только для пользователей с ролью ROLE_BOSS или ROLE_ADminimum.
       summary: Получить информацию о бронировании
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
-        - name: id
-          in: path
-          description: ID бронирования
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/bookingId'
       responses:
         '200':
           description: OK
@@ -168,17 +162,11 @@ paths:
       tags:
         - booking-controller
       operationId: deleteBookingById
-      description: Удаление существующего бронирования. Доступно только пользователям ROLE_BOSS и ROLE_ADMIN.
+      description: Удаление существующего бронирования. Доступно только пользователям ROLE_BOSS и ROLE_ADminimum.
       summary: Удалить информацию о бронировании (безвозвратно)
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
-        - name: id
-          in: path
-          description: ID бронирования
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/bookingId'
       responses:
         '204':
           description: No Content
@@ -234,17 +222,11 @@ paths:
       tags:
         - booking-controller
       operationId: updateBooking
-      description: Редактирование существующего бронирования. Доступно пользователям ROLE_BOSS и ROLE_ADMIN.
+      description: Редактирование существующего бронирования. Доступно пользователям ROLE_BOSS и ROLE_ADminimum.
       summary: Изменить информацию об имеющемся бронировании
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
-        - name: id
-          in: path
-          description: ID бронирования
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/bookingId'
       requestBody:
         content:
           application/json:
@@ -324,6 +306,14 @@ components:
       name: X-PetHotel-User-Id
       description: Id пользователя, осуществляющего запрос
       in: header
+      required: true
+      schema:
+        type: integer
+        format: int64
+    bookingId:
+      name: booking-Id
+      description: ID бронирования
+      in: path
       required: true
       schema:
         type: integer
@@ -468,6 +458,12 @@ components:
           description: Время выезда в формате "HH:mm"
           example: 15:00
           type: string
+        daysAmount:
+          description: Количество дней пребывания = Дата окончания бронирования-Дата начала бронирования +1.
+          example: 31
+          type: integer
+          format: int64
+          minimum: 1
         status:
           description: Статус бронирования (Первичное, Подтвержденное, Заселен, Выселен, Отменено). По умолчанию для бронирования типа TYPE_BOOKING устанавливается статус STATUS_INITIAL. Если поле isPrepaid=true - статус STATUS_CONFIRMED. Для бронирования типа TYPE_CLOSING устанавливается статус STATUS_CONFIRMED. Остальные статусы присваиваются пользователем вручную.
           example: STATUS_CONFIRMED
@@ -493,28 +489,28 @@ components:
           type: string
         price:
           description: Цена за сутки.
-          example: 1000
+          example: 999.99
           type: number
           format: double
-          min: 0
-          max: 999999.99
-          default: 0
+          minimum: 0.00
+          maximum: 999999.99
+          default: 0.00
         amount:
           description: Стоимость за весь период бронирования.
-          example: 1000
+          example: 999.99
           type: number
           format: double
-          min: 0
-          max: 9999999.99
-          default: 0
+          minimum: 0.00
+          maximum: 9999999.99
+          default: 0.00
         prepaymentAmount:
           description: Сумма предоплаты.
-          example: 1000
+          example: 999.99
           type: number
           format: double
-          min: 0
-          max: 999999.99
-          default: 0
+          minimum: 0.00
+          maximum: 999999.99
+          default: 0.00
         isPrepaid:
           type: boolean
           description: Внесена ли предоплата
@@ -587,28 +583,28 @@ components:
           type: string
         price:
           description: Цена за сутки.
-          example: 1000
+          example: 999.99
           type: number
           format: double
-          min: 0
-          max: 999999.99
-          default: 0
+          minimum: 0.00
+          maximum: 999999.99
+          default: 0.00
         amount:
           description: Стоимость за весь период бронирования.
-          example: 1000
+          example: 999.99
           type: number
           format: double
-          min: 0
-          max: 9999999.99
-          default: 0
+          minimum: 0.00
+          maximum: 9999999.99
+          default: 0.00
         prepaymentAmount:
           description: Сумма предоплаты.
-          example: 1000
+          example: 999.99
           type: number
           format: double
-          min: 0
-          max: 999999.99
-          default: 0
+          minimum: 0.00
+          maximum: 999999.99
+          default: 0.00
         isPrepaid:
           type: boolean
           description: Внесена ли предоплата
@@ -679,28 +675,28 @@ components:
           type: string
         price:
           description: Цена за сутки.
-          example: 1000
+          example: 999.99
           type: number
           format: double
-          min: 0
-          max: 999999.99
-          default: 0
+          minimum: 0.00
+          maximum: 999999.99
+          default: 0.00
         amount:
           description: Стоимость за весь период бронирования.
-          example: 1000
+          example: 999.99
           type: number
           format: double
-          min: 0
-          max: 9999999.99
-          default: 0
+          minimum: 0.00
+          maximum: 9999999.99
+          default: 0.00
         prepaymentAmount:
           description: Сумма предоплаты.
-          example: 1000
+          example: 999.99
           type: number
           format: double
-          min: 0
-          max: 999999.99
-          default: 0
+          minimum: 0.00
+          maximum: 999999.99
+          default: 0.00
         isPrepaid:
           type: boolean
           description: Внесена ли предоплата
@@ -740,10 +736,10 @@ components:
           example: 1F
         area:
           description: Площадь номера
-          minimum: 0
+          minimum: 0.00
           type: number
           format: double
-          example: 6
+          example: 6.50
         Category:
           $ref: '#/components/schemas/CategoryDto'
         description:
