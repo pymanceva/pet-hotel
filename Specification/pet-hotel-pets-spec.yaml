@@ -17,7 +17,7 @@ paths:
       description: >-
         Обратите внимание: добавить нового питомца может пользователь с ролью
         admin или boss
-      operationId: Добавление нового питомца
+      operationId: addPet
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
       requestBody:
@@ -114,16 +114,10 @@ paths:
       tags:
         - pet-controller
       summary: Получение питомца по его идентификатору
-      operationId: Получение питомца по его идентификатору
+      operationId: getPetById
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
-        - description: id питомца
-          in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/petId'
       responses:
         '200':
           description: OK
@@ -199,16 +193,10 @@ paths:
         - pet-controller
       summary: Удаление питомца по его идентификатору
       description: 'Обратите внимание: удаление питомца не должно быть доступно пользователю'
-      operationId: Удаление питомца
+      operationId: deletePet
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
-        - description: id питомца
-          name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/petId'
       responses:
         '204':
           description: Питомец удалён
@@ -282,16 +270,10 @@ paths:
       description: >-
         Обратите внимание: изменить данные о питомце может пользователь с ролью
         admin или boss
-      operationId: Изменение данных о питомце
+      operationId: updatePet
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
-        - description: id питомца
-          name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/petId'
       requestBody:
         content:
           application/json:
@@ -387,6 +369,14 @@ components:
       name: X-PetHotel-User-Id
       description: Id пользователя осуществляющего запрос
       in: header
+      required: true
+      schema:
+        type: integer
+        format: int64
+    petId:
+      name: pet-Id
+      description: ID питомца
+      in: path
       required: true
       schema:
         type: integer
