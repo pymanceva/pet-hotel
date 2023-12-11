@@ -6,7 +6,7 @@ info:
 
 servers:
   - url: http://localhost:8080
-    description: Local server fo develop
+    description: Local server for develop
 
 paths:
   /owners:
