@@ -20,7 +20,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
       responses:
-        '200':
+        200:
           description: OK
           content:
             '*/*':
@@ -28,28 +28,48 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UserDto'
-        '400':
-          description: Bad Request
+        400:
+          description: Запрос составлен неверно.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Error: Field mainPhone must not be blank."
+                timestamp: 2023-12-03 09:10:50
               schema:
                 $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden
+        403:
+          description: Недостаточно прав для совершения действия.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
+        404:
+          description: Объект не найден.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal Server Error
+        500:
+          description: Внутренняя ошибка сервера.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
     post:
@@ -77,34 +97,59 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/UserDto'
-        '400':
-          description: Bad Request
+        400:
+          description: Запрос составлен неверно.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Error: Field mainPhone must not be blank."
+                timestamp: 2023-12-03 09:10:50
               schema:
                 $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden
+        403:
+          description: Недостаточно прав для совершения действия.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for edit this information"
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
+        404:
+          description: Объект не найден.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
+        409:
+          description: Ошибка уникальности полей базы данных.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: CONFLICT
+                reason: integrity constraint has been violated.
+                message: "Attempt to insert duplicate key row in object owner with unique index user_email."
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal Server Error
+        500:
+          description: Внутренняя ошибка сервера.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
   /users/{id}:
@@ -128,28 +173,48 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/UserDto'
-        '400':
-          description: Bad Request
+        400:
+          description: Запрос составлен неверно.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Error: Field mainPhone must not be blank."
+                timestamp: 2023-12-03 09:10:50
               schema:
                 $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden
+        403:
+          description: Недостаточно прав для совершения действия.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
+        404:
+          description: Объект не найден.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal Server Error
+        500:
+          description: Внутренняя ошибка сервера.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
@@ -168,28 +233,48 @@ paths:
       responses:
         '204':
           description: No Content
-        '400':
-          description: Bad Request
+        400:
+          description: Запрос составлен неверно.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Error: Field mainPhone must not be blank."
+                timestamp: 2023-12-03 09:10:50
               schema:
                 $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden
+        403:
+          description: Недостаточно прав для совершения действия.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for edit this information"
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
+        404:
+          description: Объект не найден.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal Server Error
+        500:
+          description: Внутренняя ошибка сервера.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
     patch:
@@ -218,34 +303,59 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/UserDto'
-        '400':
-          description: Bad Request
+        400:
+          description: Запрос составлен неверно.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Error: Field mainPhone must not be blank."
+                timestamp: 2023-12-03 09:10:50
               schema:
                 $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden
+        403:
+          description: Недостаточно прав для совершения действия.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for edit this information"
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
+        404:
+          description: Объект не найден.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
+        409:
+          description: Ошибка уникальности полей базы данных.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: CONFLICT
+                reason: integrity constraint has been violated.
+                message: "Attempt to insert duplicate key row in object owner with unique index user_email."
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal Server Error
+        500:
+          description: Внутренняя ошибка сервера.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
   /users/{id}/state:
@@ -277,34 +387,59 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/UserDto'
-        '400':
-          description: Bad Request
+        400:
+          description: Запрос составлен неверно.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Error: Field mainPhone must not be blank."
+                timestamp: 2023-12-03 09:10:50
               schema:
                 $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden
+        403:
+          description: Недостаточно прав для совершения действия.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for edit this information"
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
+        404:
+          description: Объект не найден.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
-        '409':
-          description: Conflict
+        409:
+          description: Ошибка уникальности полей базы данных.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: CONFLICT
+                reason: integrity constraint has been violated.
+                message: "Attempt to insert duplicate key row in object owner with unique index user_email."
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal Server Error
+        500:
+          description: Внутренняя ошибка сервера.
           content:
-            '*/*':
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
 components:
