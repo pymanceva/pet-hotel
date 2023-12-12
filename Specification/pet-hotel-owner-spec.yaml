@@ -384,7 +384,7 @@ components:
         lastname:
           description: Фамилия клиента
           type: string
-          maxLength: 20
+          maxLength: 30
           minLength: 2
           example: Сумкин
         name:

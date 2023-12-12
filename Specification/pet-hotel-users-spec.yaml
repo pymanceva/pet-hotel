@@ -381,7 +381,7 @@ paths:
             type: boolean
           example: true
       responses:
-        '204':
+        200:
           description: OK
           content:
             '*/*':
@@ -417,17 +417,6 @@ paths:
                 status: NOT_FOUND
                 reason: The required object was not found.
                 message: "user with id=42 not found"
-                timestamp: 2023-12-03 09:10:55
-              schema:
-                $ref: '#/components/schemas/Error'
-        409:
-          description: Ошибка уникальности полей базы данных.
-          content:
-            application/json:
-              example:
-                status: CONFLICT
-                reason: integrity constraint has been violated.
-                message: "Attempt to insert duplicate key row in object owner with unique index user_email."
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -548,10 +537,6 @@ components:
           type: string
           format: date-time
     UserDto:
-      required:
-        - email
-        - firstName
-        - role
       type: object
       properties:
         id:
@@ -661,7 +646,7 @@ components:
         lastName:
           description: Фамилия пользователя
           type: string
-          maxLength: 20
+          maxLength: 30
           minLength: 2
           example: Бздонская-Мусоргская
         firstName:
@@ -676,6 +661,12 @@ components:
           maxLength: 15
           minLength: 2
           example: Ильинична
+        password:
+          description: Пароль для входа в учётную запись
+          type: string
+          maxLength: 10
+          minLength: 5
+          example: bzdon_pwd
         email:
           description: Электронная почта
           type: string
