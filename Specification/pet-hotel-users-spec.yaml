@@ -51,7 +51,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         404:
-          description: Объект не найден.
+          description: >- 
+            Объект не найден.
+            Ошибка может возникнуть в следующих случаях:
+            1. не найден пользователь от имени которого производится запрос - requester;
+            2. не найден пользователь в отношении которого производится запрос - user.
           content:
             application/json:
               example:
@@ -120,7 +124,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         404:
-          description: Объект не найден.
+          description: >-
+            Объект не найден.
+            Ошибка может возникнуть в следующих случаях:
+            1. не найден пользователь от имени которого производится запрос - requester.
           content:
             application/json:
               example:
@@ -196,7 +203,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         404:
-          description: Объект не найден.
+          description: >-
+            Объект не найден.
+            Ошибка может возникнуть в следующих случаях:
+            1. не найден пользователь от имени которого производится запрос - requester;
+            2. не найден пользователь в отношении которого производится запрос - user.
           content:
             application/json:
               example:
@@ -256,7 +267,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         404:
-          description: Объект не найден.
+          description: >-
+            Объект не найден.
+            Ошибка может возникнуть в следующих случаях:
+            1. не найден пользователь от имени которого производится запрос - requester;
+            2. не найден пользователь в отношении которого производится запрос - user.
           content:
             application/json:
               example:
@@ -326,7 +341,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         404:
-          description: Объект не найден.
+          description: >-
+            Объект не найден.
+            Ошибка может возникнуть в следующих случаях:
+            1. не найден пользователь от имени которого производится запрос - requester;
+            2. не найден пользователь в отношении которого производится запрос - user.
           content:
             application/json:
               example:
@@ -410,7 +429,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         404:
-          description: Объект не найден.
+          description: >-
+            Объект не найден.
+            Ошибка может возникнуть в следующих случаях:
+            1. не найден пользователь от имени которого производится запрос - requester;
+            2. не найден пользователь в отношении которого производится запрос - user.
           content:
             application/json:
               example:
@@ -538,6 +561,11 @@ components:
           format: date-time
     UserDto:
       type: object
+      required:
+        - email
+        - firstName
+        - role
+        - isActive
       properties:
         id:
           type: integer
@@ -589,11 +617,11 @@ components:
           example: true
 
     NewUserDto:
+      type: object
       required:
         - email
         - firstName
         - role
-      type: object
       properties:
         lastName:
           description: Фамилия пользователя
