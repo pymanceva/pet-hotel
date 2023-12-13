@@ -6,7 +6,7 @@ info:
 
 servers:
   - url: http://localhost:8080
-    description: Local server fo develop
+    description: Local server for develop
 
 paths:
   /owners:
@@ -384,7 +384,7 @@ components:
         lastname:
           description: Фамилия клиента
           type: string
-          maxLength: 20
+          maxLength: 30
           minLength: 2
           example: Сумкин
         name:
