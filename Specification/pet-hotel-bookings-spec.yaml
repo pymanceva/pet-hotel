@@ -767,11 +767,12 @@ components:
           maxLength: 20
           minLength: 1
           type: string
-          uniqueItems: true
           description: Название категории
           example: Номер для собак
+          uniqueItems: true
         text:
-          maxLength: 2500
-          description: Название категории
+          type: string
+          description: Описание категории
+          maxLength: 250
           example: Номер для собак, антивандальная отделка, оснащен лежаками, мисками.
 
