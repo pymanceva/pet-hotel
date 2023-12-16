@@ -2,8 +2,11 @@ package ru.dogudacha.PetHotel.pet.dto;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import ru.dogudacha.PetHotel.comment.dto.CommentDto;
 import ru.dogudacha.PetHotel.pet.model.Sex;
 import ru.dogudacha.PetHotel.pet.model.TypeOfDiet;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,5 +25,4 @@ public class PetDto {
     private Boolean isTakesMedications;
     private Boolean isContact; //гуляет ли с другими животными
     private Boolean isPhotographed; // согласие владельца на фото и видео
-    private String comments;
 }

@@ -2,6 +2,10 @@ package ru.dogudacha.PetHotel.pet.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.dogudacha.PetHotel.comment.model.Comment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Getter
@@ -35,6 +39,7 @@ public class Pet {
     private Boolean isContact; //гуляет ли с другими животными
     @Column(name = "photographed_pet", nullable = false)
     private Boolean isPhotographed; // согласие владельца на фото и видео
-    @Column(name = "comments_pet", nullable = false, length = 1000)
-    private String comments;
+    @OneToMany(mappedBy = "pet",
+            orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 }

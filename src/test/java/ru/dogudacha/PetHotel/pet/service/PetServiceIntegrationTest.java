@@ -51,7 +51,6 @@ public class PetServiceIntegrationTest {
             .isTakesMedications(false)
             .isContact(true)
             .isPhotographed(true)
-            .comments("Like play with ball.")
             .build();
 
     final Pet pet = Pet.builder()
@@ -64,7 +63,6 @@ public class PetServiceIntegrationTest {
             .isTakesMedications(false)
             .isContact(true)
             .isPhotographed(true)
-            .comments("Like play with ball.")
             .build();
 
     final Pet pet2 = Pet.builder()
@@ -77,7 +75,6 @@ public class PetServiceIntegrationTest {
             .isTakesMedications(false)
             .isContact(true)
             .isPhotographed(true)
-            .comments("Like play with mouse.")
             .build();
 
     final UpdatePetDto updatePetDto = UpdatePetDto.builder()
@@ -90,7 +87,6 @@ public class PetServiceIntegrationTest {
             .isTakesMedications(true)
             .isContact(false)
             .isPhotographed(false)
-            .comments("Like play with small ball.")
             .build();
 
     @Test
