@@ -921,22 +921,22 @@ public class PetServiceImplTest {
     void deletePetById_whenDeletePetByBoss_thenDeletedPet() {
         when(mockUserRepository.findById(requesterBoss.getId())).thenReturn(Optional.of(requesterBoss));
         when(mockPetRepository.findById(any())).thenReturn(Optional.of(pet));
-        doNothing().when(mockPetRepository).deleteById(any());
+        when(mockPetRepository.deletePetById(any())).thenReturn(1);
 
         petService.deletePetById(requesterBoss.getId(), pet.getId());
 
-        verify(mockPetRepository, times(1)).deleteById(any());
+        verify(mockPetRepository, times(1)).deletePetById(any());
     }
 
     @Test
     void deletePetById_whenDeletePetByAdmin_thenDeletedPet() {
         when(mockUserRepository.findById(requesterAdmin.getId())).thenReturn(Optional.of(requesterAdmin));
         when(mockPetRepository.findById(any())).thenReturn(Optional.of(pet));
-        doNothing().when(mockPetRepository).deleteById(any());
+        when(mockPetRepository.deletePetById(any())).thenReturn(1);
 
         petService.deletePetById(requesterAdmin.getId(), pet.getId());
 
-        verify(mockPetRepository, times(1)).deleteById(any());
+        verify(mockPetRepository, times(1)).deletePetById(any());
     }
 
     @Test
@@ -955,7 +955,7 @@ public class PetServiceImplTest {
 
     @Test
     void deletePetById_whenDeletePetPetByBossAndPetNotFound_thenNotFoundExceptionThrown() {
-        String error = String.format("Pet with id = %d not found", pet.getId());
+        String error = String.format("pet with id=%d not found", 0);
         when(mockUserRepository.findById(requesterBoss.getId())).thenReturn(Optional.of(requesterBoss));
         when(mockPetRepository.findById(any())).thenThrow(new NotFoundException(error));
 
@@ -969,7 +969,7 @@ public class PetServiceImplTest {
 
     @Test
     void deletePetById_whenDeletePetByAdminAndPetNotFound_thenNotFoundExceptionThrown() {
-        String error = String.format("Pet with id = %d not found", pet.getId());
+        String error = String.format("pet with id=%d not found", 0);
         when(mockUserRepository.findById(requesterAdmin.getId())).thenReturn(Optional.of(requesterAdmin));
         when(mockPetRepository.findById(any())).thenThrow(new NotFoundException(error));
 

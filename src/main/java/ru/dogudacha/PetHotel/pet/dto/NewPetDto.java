@@ -25,13 +25,13 @@ public class NewPetDto {
     @Length(min = 1, max = 30, message = "validation breed size error")
     @NotBlank(message = "Field: breed. Error: must not be blank.")
     private String breed; // порода
-    @PastOrPresent(message = "Field: birthDate. Error: must be past or present.")
+    @Past(message = "Field: birthDate. Error: must be past.")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     @NotNull(message = "Field: birthDate. Error: must not be blank.")
     private LocalDate birthDate;
     @NotNull(message = "Field: sex. Error: must not be null.")
     private Sex sex;
-    @Length(max = 30, message = "validation sex size error")
+    @Length(max = 30, message = "validation color size error")
     private String color;
     @Length(max = 150, message = "validation sign size error")
     private String sign;
@@ -61,7 +61,6 @@ public class NewPetDto {
     private Boolean isChronicDisease;
     @Length(max = 500, message = "validation chronicDiseaseType size error")
     private String chronicDiseaseType;
-    @FutureOrPresent(message = "Field: vetVisitDate. Error: must be future or present.")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private LocalDate heatDate;
     @Length(max = 500, message = "validation vetData size error")

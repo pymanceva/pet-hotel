@@ -1,0 +1,713 @@
+openapi: 3.0.1
+info:
+  title: 'PetHotel: Users Specification'
+  description: Документация раздела по работе с пользователями
+  version: v1
+servers:
+  - url: http://localhost:8080
+    description: Local server for develop
+tags:
+  - description: API для работы с пользователями.
+    name: user-controller
+paths:
+  /users:
+    get:
+      tags:
+        - user-controller
+      operationId: getAllUsers
+      description: Получение списка всех пользователей. Доступно только для пользователей с ролью BOSS или ADMIN.
+      summary: Получить список всех пользователей
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+      responses:
+        200:
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDto'
+        400:
+          description: Запрос составлен неверно.
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Error: Field mainPhone must not be blank."
+                timestamp: 2023-12-03 09:10:50
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: Недостаточно прав для совершения действия.
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: >- 
+            Объект не найден.
+            Ошибка может возникнуть в следующих случаях:
+            1. не найден пользователь от имени которого производится запрос - requester;
+            2. не найден пользователь в отношении которого производится запрос - user.
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - user-controller
+      operationId: addUser
+      description: >-
+        Добавление нового пользователя. 
+        Создание пользователей с ролью USER и FINANCIAL доступно только пользователям BOSS и ADMIN. 
+        Пользователя ADMIN может создавать только BOSS. 
+        Пользователя BOSS создать нельзя (его добавляют вручную разработчики).
+      summary: Добавить нового пользователя
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        400:
+          description: Запрос составлен неверно.
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Error: Field mainPhone must not be blank."
+                timestamp: 2023-12-03 09:10:50
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: Недостаточно прав для совершения действия.
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for edit this information"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: >-
+            Объект не найден.
+            Ошибка может возникнуть в следующих случаях:
+            1. не найден пользователь от имени которого производится запрос - requester.
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        409:
+          description: Ошибка уникальности полей базы данных.
+          content:
+            application/json:
+              example:
+                status: CONFLICT
+                reason: integrity constraint has been violated.
+                message: "Attempt to insert duplicate key row in object owner with unique index user_email."
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/{id}:
+    get:
+      tags:
+        - user-controller
+      operationId: getUserById
+      description: >-
+        Получение пользователя по ID. 
+        Информация о пользователях ADMIN, USER и FINANCIAL доступна только для пользователей с ролью BOSS или ADMIN. 
+        Информацию о пользователе BOSS может просматривать только он сам. 
+        Для пользователей USER и FINANCIAL доступна информация о самом себе.
+      summary: Получить информацию о пользователе
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        400:
+          description: Запрос составлен неверно.
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Error: Field mainPhone must not be blank."
+                timestamp: 2023-12-03 09:10:50
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: Недостаточно прав для совершения действия.
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: >-
+            Объект не найден.
+            Ошибка может возникнуть в следующих случаях:
+            1. не найден пользователь от имени которого производится запрос - requester;
+            2. не найден пользователь в отношении которого производится запрос - user.
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - user-controller
+      operationId: deleteUserById
+      description: >-
+        Удаление существующего пользователя. 
+        Удаление пользователей с ролью USER и FINANCIAL доступно только пользователям BOSS и ADMIN. 
+        Пользователя ADMIN может удалить только BOSS. 
+        Пользователя BOSS удалить нельзя (его удаляют вручную разработчики).
+      summary: Удалить информацию о пользователе (безвозвратно)
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '204':
+          description: No Content
+        400:
+          description: Запрос составлен неверно.
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Error: Field mainPhone must not be blank."
+                timestamp: 2023-12-03 09:10:50
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: Недостаточно прав для совершения действия.
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for edit this information"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: >-
+            Объект не найден.
+            Ошибка может возникнуть в следующих случаях:
+            1. не найден пользователь от имени которого производится запрос - requester;
+            2. не найден пользователь в отношении которого производится запрос - user.
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - user-controller
+      operationId: updateUser
+      description: >-
+        Редактирование существующего пользователя. 
+        Каждый пользователь может редактировать сам себя. 
+        Кроме того, редактирование пользователей с ролью USER и FINANCIAL доступно пользователям BOSS и ADMIN,
+        а пользователя ADMIN может редактировать BOSS.
+      summary: Изменить информацию об имеющемся пользователе
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        400:
+          description: Запрос составлен неверно.
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Error: Field mainPhone must not be blank."
+                timestamp: 2023-12-03 09:10:50
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: Недостаточно прав для совершения действия.
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for edit this information"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: >-
+            Объект не найден.
+            Ошибка может возникнуть в следующих случаях:
+            1. не найден пользователь от имени которого производится запрос - requester;
+            2. не найден пользователь в отношении которого производится запрос - user.
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        409:
+          description: Ошибка уникальности полей базы данных.
+          content:
+            application/json:
+              example:
+                status: CONFLICT
+                reason: integrity constraint has been violated.
+                message: "Attempt to insert duplicate key row in object owner with unique index user_email."
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/{id}/state:
+    patch:
+      tags:
+        - user-controller
+      operationId: setUserState
+      description: >-
+        Редактирование состояния учётной записи пользователя - Активна / Заблокирована.
+        Редактирование пользователей с ролью USER и FINANCIAL доступно пользователям BOSS и ADMIN,
+        а пользователя ADMIN может редактировать только BOSS.
+      summary: Изменить состояние учётной записи пользователя - Активна / Заблокирована.
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - $ref: '#/components/parameters/userId'
+        - name: isActive
+          in: query
+          description: >-
+            Состояние, которое должно быть присвоено пользователю. isActive=true - учётная запись активна,
+            isActive=false - учётная запись заблокирована.
+          required: true
+          schema:
+            type: boolean
+          example: true
+      responses:
+        200:
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        400:
+          description: Запрос составлен неверно.
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: "Error: Field mainPhone must not be blank."
+                timestamp: 2023-12-03 09:10:50
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: Недостаточно прав для совершения действия.
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for edit this information"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: >-
+            Объект не найден.
+            Ошибка может возникнуть в следующих случаях:
+            1. не найден пользователь от имени которого производится запрос - requester;
+            2. не найден пользователь в отношении которого производится запрос - user.
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=42 not found"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  parameters:
+    requesterHeader:
+      name: X-PetHotel-User-Id
+      description: Id пользователя осуществляющего запрос
+      in: header
+      required: true
+      schema:
+        type: integer
+        format: int64
+    userId:
+      name: id
+      in: path
+      description: ID пользователя в отношении которого совершается действие
+      required: true
+      schema:
+        type: integer
+        format: int64
+  schemas:
+    Error:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+        reason:
+          type: string
+        httpStatus:
+          type: string
+          enum:
+            - 100 CONTINUE
+            - 101 SWITCHING_PROTOCOLS
+            - 102 PROCESSING
+            - 103 EARLY_HINTS
+            - 103 CHECKPOINT
+            - 200 OK
+            - 201 CREATED
+            - 202 ACCEPTED
+            - 203 NON_AUTHORITATIVE_INFORMATION
+            - 204 NO_CONTENT
+            - 205 RESET_CONTENT
+            - 206 PARTIAL_CONTENT
+            - 207 MULTI_STATUS
+            - 208 ALREADY_REPORTED
+            - 226 IM_USED
+            - 300 MULTIPLE_CHOICES
+            - 301 MOVED_PERMANENTLY
+            - 302 FOUND
+            - 302 MOVED_TEMPORARILY
+            - 303 SEE_OTHER
+            - 304 NOT_MODIFIED
+            - 305 USE_PROXY
+            - 307 TEMPORARY_REDIRECT
+            - 308 PERMANENT_REDIRECT
+            - 400 BAD_REQUEST
+            - 401 UNAUTHORIZED
+            - 402 PAYMENT_REQUIRED
+            - 403 FORBIDDEN
+            - 404 NOT_FOUND
+            - 405 METHOD_NOT_ALLOWED
+            - 406 NOT_ACCEPTABLE
+            - 407 PROXY_AUTHENTICATION_REQUIRED
+            - 408 REQUEST_TIMEOUT
+            - 409 CONFLICT
+            - 410 GONE
+            - 411 LENGTH_REQUIRED
+            - 412 PRECONDITION_FAILED
+            - 413 PAYLOAD_TOO_LARGE
+            - 413 REQUEST_ENTITY_TOO_LARGE
+            - 414 URI_TOO_LONG
+            - 414 REQUEST_URI_TOO_LONG
+            - 415 UNSUPPORTED_MEDIA_TYPE
+            - 416 REQUESTED_RANGE_NOT_SATISFIABLE
+            - 417 EXPECTATION_FAILED
+            - 418 I_AM_A_TEAPOT
+            - 419 INSUFFICIENT_SPACE_ON_RESOURCE
+            - 420 METHOD_FAILURE
+            - 421 DESTINATION_LOCKED
+            - 422 UNPROCESSABLE_ENTITY
+            - 423 LOCKED
+            - 424 FAILED_DEPENDENCY
+            - 425 TOO_EARLY
+            - 426 UPGRADE_REQUIRED
+            - 428 PRECONDITION_REQUIRED
+            - 429 TOO_MANY_REQUESTS
+            - 431 REQUEST_HEADER_FIELDS_TOO_LARGE
+            - 451 UNAVAILABLE_FOR_LEGAL_REASONS
+            - 500 INTERNAL_SERVER_ERROR
+            - 501 NOT_IMPLEMENTED
+            - 502 BAD_GATEWAY
+            - 503 SERVICE_UNAVAILABLE
+            - 504 GATEWAY_TIMEOUT
+            - 505 HTTP_VERSION_NOT_SUPPORTED
+            - 506 VARIANT_ALSO_NEGOTIATES
+            - 507 INSUFFICIENT_STORAGE
+            - 508 LOOP_DETECTED
+            - 509 BANDWIDTH_LIMIT_EXCEEDED
+            - 510 NOT_EXTENDED
+            - 511 NETWORK_AUTHENTICATION_REQUIRED
+        timeStamp:
+          type: string
+          format: date-time
+    UserDto:
+      type: object
+      required:
+        - email
+        - firstName
+        - role
+        - isActive
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        lastName:
+          description: Фамилия пользователя
+          type: string
+          maxLength: 30
+          minLength: 2
+          example: Пёсиков
+        firstName:
+          description: Имя пользователя
+          type: string
+          maxLength: 15
+          minLength: 2
+          example: Пётр
+        middleName:
+          description: Отчество пользователя
+          type: string
+          maxLength: 15
+          minLength: 2
+          example: Евграфович
+        email:
+          description: Электронная почта
+          type: string
+          maxLength: 254
+          minLength: 6
+          example: pesikov.p@dog.ru
+        password:
+          description: Пароль для входа в учётную запись
+          type: string
+          maxLength: 10
+          minLength: 5
+          example: pes_pwd
+        role:
+          description: Роль (определяет уровень доступа)
+          type: string
+          enum:
+            - ROLE_BOSS
+            - ROLE_ADMIN
+            - ROLE_USER
+            - ROLE_FINANCIAL
+          example: ROLE_ADMIN
+        isActive:
+          description: Состояние учётной записи (активна/заблокирована)
+          type: boolean
+          default: true
+          example: true
+
+    NewUserDto:
+      type: object
+      required:
+        - email
+        - firstName
+        - role
+      properties:
+        lastName:
+          description: Фамилия пользователя
+          type: string
+          maxLength: 30
+          minLength: 2
+          example: Пёсиков
+        firstName:
+          description: Имя пользователя
+          type: string
+          maxLength: 15
+          minLength: 2
+          example: Пётр
+        middleName:
+          description: Отчество пользователя
+          type: string
+          maxLength: 15
+          minLength: 2
+          example: Евграфович
+        password:
+          description: Пароль для входа в учётную запись
+          type: string
+          maxLength: 10
+          minLength: 5
+          example: pes_pwd
+        email:
+          description: Электронная почта
+          type: string
+          maxLength: 254
+          minLength: 6
+          example: pesikov.p@dog.ru
+        role:
+          description: Роль (определяет уровень доступа)
+          type: string
+          enum:
+            - ROLE_BOSS
+            - ROLE_ADMIN
+            - ROLE_USER
+            - ROLE_FINANCIAL
+          example: ROLE_ADMIN
+        isActive:
+          description: Состояние учётной записи (активна/заблокирована)
+          type: boolean
+          default: true
+          example: true
+
+    UpdateUserDto:
+      type: object
+      properties:
+        lastName:
+          description: Фамилия пользователя
+          type: string
+          maxLength: 30
+          minLength: 2
+          example: Бздонская-Мусоргская
+        firstName:
+          description: Имя пользователя
+          type: string
+          maxLength: 15
+          minLength: 2
+          example: Элеонора
+        middleName:
+          description: Отчество пользователя
+          type: string
+          maxLength: 15
+          minLength: 2
+          example: Ильинична
+        password:
+          description: Пароль для входа в учётную запись
+          type: string
+          maxLength: 10
+          minLength: 5
+          example: bzdon_pwd
+        email:
+          description: Электронная почта
+          type: string
+          maxLength: 254
+          minLength: 6
+          example: melady@cat.ru
+        role:
+          description: Роль (определяет уровень доступа)
+          type: string
+          enum:
+            - ROLE_BOSS
+            - ROLE_ADMIN
+            - ROLE_USER
+            - ROLE_FINANCIAL
+          example: ROLE_ADMIN
+

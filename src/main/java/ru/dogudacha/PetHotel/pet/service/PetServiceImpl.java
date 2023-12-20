@@ -239,8 +239,12 @@ public class PetServiceImpl implements PetService {
     public void deletePetById(Long requesterId, Long petId) {
         User requester = findUserById(requesterId);
         checkAccess(requester);
-        getPetIfExists(petId);
-        petRepository.deleteById(petId);
+
+        int result = petRepository.deletePetById(petId);
+
+        if (result == 0) {
+            throw new NotFoundException(String.format("pet with id=%d not found", petId));
+        }
         log.info("PetService: deletePetById, requesterId={}, petId={}", requesterId, petId);
     }
 
