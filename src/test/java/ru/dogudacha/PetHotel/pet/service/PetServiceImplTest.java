@@ -18,7 +18,6 @@ import ru.dogudacha.PetHotel.pet.model.Pet;
 import ru.dogudacha.PetHotel.pet.model.Sex;
 import ru.dogudacha.PetHotel.pet.model.TypeOfDiet;
 import ru.dogudacha.PetHotel.pet.repository.PetRepository;
-import ru.dogudacha.PetHotel.pet.service.PetServiceImpl;
 import ru.dogudacha.PetHotel.user.model.Roles;
 import ru.dogudacha.PetHotel.user.model.User;
 import ru.dogudacha.PetHotel.user.repository.UserRepository;
@@ -50,21 +49,21 @@ public class PetServiceImplTest {
 
     final User requesterBoss = User.builder()
             .email("boss@mail.ru")
-            .name("boss")
+            .firstName("boss")
             .id(1L)
             .role(Roles.ROLE_BOSS)
             .build();
 
     final User requesterAdmin = User.builder()
             .email("admin@mail.ru")
-            .name("admin")
+            .firstName("admin")
             .id(2L)
             .role(Roles.ROLE_ADMIN)
             .build();
 
     final User requesterUser = User.builder()
             .email("user@mail.ru")
-            .name("user")
+            .firstName("user")
             .id(3L)
             .role(Roles.ROLE_USER)
             .build();

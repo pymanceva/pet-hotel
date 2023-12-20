@@ -52,21 +52,21 @@ public class PetControllerTest {
 
     final User requesterBoss = User.builder()
             .email("boss@mail.ru")
-            .name("boss")
+            .firstName("boss")
             .id(1L)
             .role(Roles.ROLE_BOSS)
             .build();
 
     final User requesterAdmin = User.builder()
             .email("admin@mail.ru")
-            .name("admin")
+            .firstName("admin")
             .id(2L)
             .role(Roles.ROLE_ADMIN)
             .build();
 
     final User requesterUser = User.builder()
             .email("user@mail.ru")
-            .name("user")
+            .firstName("user")
             .id(3L)
             .role(Roles.ROLE_USER)
             .build();

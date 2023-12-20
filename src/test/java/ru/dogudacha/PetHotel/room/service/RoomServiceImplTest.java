@@ -33,28 +33,28 @@ public class RoomServiceImplTest {
     private final User boss = User.builder()
             .email("boss@pethotel.ru")
             .id(1L)
-            .name("boss")
+            .firstName("boss")
             .role(Roles.ROLE_BOSS)
             .build();
 
     private final User admin = User.builder()
             .email("admin@pethotel.ru")
             .id(2L)
-            .name("admin")
+            .firstName("admin")
             .role(Roles.ROLE_ADMIN)
             .build();
 
     private final User user = User.builder()
             .email("user@pethotel.ru")
             .id(2L)
-            .name("user")
+            .firstName("user")
             .role(Roles.ROLE_USER)
             .build();
 
     private final User financial = User.builder()
             .email("financial@pethotel.ru")
             .id(2L)
-            .name("financial")
+            .firstName("financial")
             .role(Roles.ROLE_FINANCIAL)
             .build();
 

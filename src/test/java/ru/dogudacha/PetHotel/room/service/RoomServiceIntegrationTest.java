@@ -32,9 +32,13 @@ public class RoomServiceIntegrationTest {
     private final RoomService service;
 
     final User requesterAdmin = User.builder()
+            .lastName("Кружкин")
+            .firstName("admin")
+            .middleName("Петрович")
             .email("admin@mail.ru")
-            .name("admin")
+            .password("admin_pwd")
             .role(Roles.ROLE_ADMIN)
+            .isActive(true)
             .build();
 
     final RoomDto roomDto = RoomDto.builder()
