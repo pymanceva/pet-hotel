@@ -1,7 +1,6 @@
 package ru.dogudacha.PetHotel.user.dto;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,6 +31,5 @@ public class UpdateUserDto {
     @Size(min = 6, max = 254, message = "validation email size error")
     private String email;
 
-    @NotNull(message = "Field: role. Error: must not be null.")
     private Roles role;
 }

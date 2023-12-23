@@ -76,12 +76,18 @@ public class UserServiceImpl implements UserService {
         User requester = findUserById(requesterId);
         User user = findUserById(userId);
 
+        if (user.getRole().equals(Roles.ROLE_BOSS)) {
+            throw new AccessDeniedException("User with role=ROLE_BOSS can't delete");
+        }
+
         checkAccessForEdit(requester, user);
 
-        userRepository.deleteById(userId);
+        Integer result = userRepository.deleteUserById(userId);
+        if (result == 0) {
+            throw new NotFoundException(String.format("user with id=%d not found", userId));
+        }
         log.info("UserService: deleteUserById, requesterId={} userId={}", requesterId, user);
     }
-
 
     @Transactional
     @Override
@@ -127,13 +133,6 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserDto(updatedUser);
     }
 
-
-    private User findUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("user with id=%d not found", userId)));
-    }
-
-    //TODO
     @Override
     public UserDto setUserState(Long requesterId, Long userId, Boolean isActive) {
         User requester = findUserById(requesterId);
@@ -146,15 +145,24 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserDto(updatedUser);
     }
 
-    private void checkAccessForEdit(User requester, User newUser) {
+    private void checkAccessForEdit(User requester, Roles role) {
         if (requester.getRole().ordinal() < 2 &&
-                (newUser.getRole() == null ||
-                        (requester.getRole().ordinal() < newUser.getRole().ordinal()))
+                (role == null ||
+                        (requester.getRole().ordinal() < role.ordinal()))
         ) {
             return;
         }
         throw new AccessDeniedException(String.format("User with role=%s, can't access for edit this information",
                 requester.getRole()));
+    }
+
+    private User findUserById(long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException(String.format("user with id=%d not found", userId)));
+    }
+
+    private void checkAccessForEdit(User requester, User user) {
+        checkAccessForEdit(requester, user.getRole());
     }
 
     private void checkAccessForBrowse(User requester, Roles role) {

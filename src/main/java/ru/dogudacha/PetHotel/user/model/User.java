@@ -15,15 +15,15 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "last_name_users", nullable = false)
+    @Column(name = "last_name_users")
     private String lastName;
     @Column(name = "first_name_users", nullable = false)
     private String firstName;
-    @Column(name = "middle_name_users", nullable = false)
+    @Column(name = "middle_name_users")
     private String middleName;
     @Column(name = "email_users", nullable = false)
     private String email;
-    @Column(name = "password_users", nullable = false)
+    @Column(name = "password_users")
     private String password;
     @Column(name = "role_users", nullable = false)
     @Enumerated(EnumType.STRING)
