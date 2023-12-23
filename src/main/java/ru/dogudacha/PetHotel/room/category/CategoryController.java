@@ -31,15 +31,15 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public CategoryDto getCategoryById(@RequestHeader(USER_ID) Long requesterId,
-                                       @PathVariable("id") long catId) {
+                                       @PathVariable("id") Long catId) {
         log.info("CategoryController: GET/getCategoryById, requesterId={}, catId={}", requesterId, catId);
         return categoryService.getCategoryById(requesterId, catId);
     }
 
     @PatchMapping("/{id}")
     public CategoryDto updateCategoryById(@RequestHeader(USER_ID) Long requesterId,
-                                          @RequestBody UpdateCategoryDto updateCategoryDto,
-                                          @PathVariable("id") long catId) {
+                                          @RequestBody @Valid UpdateCategoryDto updateCategoryDto,
+                                          @PathVariable("id") Long catId) {
         log.info("CategoryController: PATCH/updateCategoryById, requesterId={}, catId={}, requestBody={}",
                 requesterId, catId, updateCategoryDto);
         return categoryService.updateCategoryById(requesterId, catId, updateCategoryDto);

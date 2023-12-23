@@ -96,7 +96,8 @@ public class CategoryServiceImpl implements CategoryService {
         log.info("CategoryService: deleteCategoryById, userId={}, catId={}", userId, catId);
     }
 
-    private Category findCategoryById(Long id) {
+    //@Named("idToCategory")
+    public Category findCategoryById(Long id) {
         return categoryRepository.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("category with id=%d is not found", id)));
     }

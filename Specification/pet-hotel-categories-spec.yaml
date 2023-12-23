@@ -68,7 +68,7 @@ paths:
               example:
                 status: INTERNAL_SERVER_ERROR
                 reason: Internal Server Error.
-                message: []
+                message: [ ]
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -145,7 +145,7 @@ paths:
               example:
                 status: INTERNAL_SERVER_ERROR
                 reason: Internal Server Error.
-                message: []
+                message: [ ]
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -207,7 +207,7 @@ paths:
               example:
                 status: INTERNAL_SERVER_ERROR
                 reason: Internal Server Error.
-                message: []
+                message: [ ]
                 timestamp: 2023-01-01 00:00:00
               schema:
                 $ref: '#/components/schemas/Error'
@@ -263,7 +263,7 @@ paths:
               example:
                 status: INTERNAL_SERVER_ERROR
                 reason: Internal Server Error.
-                message: []
+                message: [ ]
                 timestamp: 2023-01-01 00:00:00
               schema:
                 $ref: '#/components/schemas/Error'
@@ -340,7 +340,7 @@ paths:
               example:
                 status: INTERNAL_SERVER_ERROR
                 reason: Internal Server Error.
-                message: []
+                message: [ ]
                 timestamp: 2023-01-01 00:00:00
               schema:
                 $ref: '#/components/schemas/Error'
@@ -478,7 +478,7 @@ components:
       type: object
       properties:
         name:
-          description: Название категории
+          description: Название категории. Не должно быть пустым. Допускаются буквы, цифры, спецсимволы.
           maxLength: 20
           minLength: 1
           type: string
@@ -493,6 +493,7 @@ components:
       type: object
       properties:
         name:
+          description: Название категории. В случае наличия поля - не должно быть пустым. Допускаются буквы, цифры, спецсимволы.
           maxLength: 20
           minLength: 1
           type: string
