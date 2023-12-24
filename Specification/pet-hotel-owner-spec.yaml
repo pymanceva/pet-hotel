@@ -2,7 +2,7 @@ openapi: '3.0.1'
 info:
   title: 'PetHotel: Owners Specification'
   description: Pet hotel owners
-  version: 'v1'
+  version: 'v3'
 
 servers:
   - url: http://localhost:8080
