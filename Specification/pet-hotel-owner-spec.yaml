@@ -7,6 +7,8 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local server for develop
+  - url: http://212.109.192.9:8080
+    description: backend server для тестирования кода и работы фронтэнда
 
 paths:
   /owners:
