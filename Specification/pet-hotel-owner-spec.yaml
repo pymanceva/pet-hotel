@@ -488,6 +488,11 @@ components:
           type: integer
           format: int32
           example: 3
+        registrationDate:
+          description: Дата регистрации клиента
+          type: string
+          format: date-time
+          example: 23.12.2023 12:00
 
     UpdateOwnerDto:
       title: UpdateOwnerDto
