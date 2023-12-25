@@ -9,9 +9,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
+import ru.dogudacha.PetHotel.room.category.dto.CategoryDto;
+import ru.dogudacha.PetHotel.room.dto.NewRoomDto;
 import ru.dogudacha.PetHotel.room.dto.RoomDto;
 import ru.dogudacha.PetHotel.room.dto.UpdateRoomDto;
-import ru.dogudacha.PetHotel.room.model.RoomTypes;
 import ru.dogudacha.PetHotel.room.service.RoomService;
 
 import java.util.List;
@@ -33,14 +34,25 @@ public class RoomControllerIntegrationTest {
             .id(roomId)
             .area(5.0)
             .number("standard room")
-            .type(RoomTypes.SMALL)
+            .categoryDto(new CategoryDto(1L, "name", "description"))
             .isVisible(true)
+            .build();
+    private final NewRoomDto newRoomDto = NewRoomDto.builder()
+            .area(5.0)
+            .number("standard room")
+            .categoryId(1L)
+            .isVisible(true)
+            .build();
+    private final UpdateRoomDto updateRoomDto = UpdateRoomDto.builder()
+            .area(10.0)
+            .number("updated room")
+            .categoryId(1L)
             .build();
     private final RoomDto hiddenRoomDto = RoomDto.builder()
             .id(roomId)
             .area(5.0)
             .number("standard room")
-            .type(RoomTypes.SMALL)
+            .categoryDto(new CategoryDto(1L, "name", "description"))
             .isVisible(false)
             .build();
     @Autowired
@@ -53,26 +65,26 @@ public class RoomControllerIntegrationTest {
     @Test
     @SneakyThrows
     void addRoom() {
-        when(roomService.addRoom(anyLong(), any(RoomDto.class))).thenReturn(roomDto);
+        when(roomService.addRoom(anyLong(), any(NewRoomDto.class))).thenReturn(roomDto);
 
         mockMvc.perform(post("/rooms")
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(roomDto)))
+                        .content(objectMapper.writeValueAsString(newRoomDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", is(roomDto.getId()), Long.class))
                 .andExpect(jsonPath("$.area", is(roomDto.getArea()), Double.class))
                 .andExpect(jsonPath("$.number", is(roomDto.getNumber())))
-                .andExpect(jsonPath("$.type", is(roomDto.getType().toString())))
+                .andExpect(jsonPath("$.categoryDto").value(roomDto.getCategoryDto()))
                 .andExpect(jsonPath("$.isVisible", is(roomDto.getIsVisible())));
 
-        verify(roomService).addRoom(anyLong(), any(RoomDto.class));
+        verify(roomService).addRoom(anyLong(), any(NewRoomDto.class));
 
         mockMvc.perform(post("/rooms")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(new RoomDto())))
+                        .content(objectMapper.writeValueAsString(newRoomDto)))
                 .andExpect(status().isBadRequest());
 
         mockMvc.perform(post("/rooms")
@@ -82,7 +94,7 @@ public class RoomControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(new RoomDto())))
                 .andExpect(status().isBadRequest());
 
-        verify(roomService, times(1)).addRoom(anyLong(), any(RoomDto.class));
+        verify(roomService, times(1)).addRoom(anyLong(), any(NewRoomDto.class));
     }
 
     @Test
@@ -97,7 +109,7 @@ public class RoomControllerIntegrationTest {
                 .andExpect(jsonPath("$.id", is(roomDto.getId()), Long.class))
                 .andExpect(jsonPath("$.area", is(roomDto.getArea()), Double.class))
                 .andExpect(jsonPath("$.number", is(roomDto.getNumber())))
-                .andExpect(jsonPath("$.type", is(roomDto.getType().toString())))
+                .andExpect(jsonPath("$.categoryDto").value(roomDto.getCategoryDto()))
                 .andExpect(jsonPath("$.isVisible", is(roomDto.getIsVisible())));
 
         verify(roomService).getRoomById(requesterId, roomId);
@@ -119,12 +131,12 @@ public class RoomControllerIntegrationTest {
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.ALL_VALUE)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(roomDto)))
+                        .content(objectMapper.writeValueAsString(updateRoomDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(roomDto.getId()), Long.class))
                 .andExpect(jsonPath("$.area", is(roomDto.getArea()), Double.class))
                 .andExpect(jsonPath("$.number", is(roomDto.getNumber())))
-                .andExpect(jsonPath("$.type", is(roomDto.getType().toString())))
+                .andExpect(jsonPath("$.categoryDto").value(roomDto.getCategoryDto()))
                 .andExpect(jsonPath("$.isVisible", is(roomDto.getIsVisible())));
 
 
@@ -134,7 +146,7 @@ public class RoomControllerIntegrationTest {
         mockMvc.perform(patch("/rooms/{id}", roomId)
                         .header(requesterHeader, requesterId)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(roomDto)))
+                        .content(objectMapper.writeValueAsString(updateRoomDto)))
                 .andExpect(status().isNotFound());
     }
 
@@ -152,7 +164,7 @@ public class RoomControllerIntegrationTest {
                 .andExpect(jsonPath("$.[0].id", is(roomDto.getId()), Long.class))
                 .andExpect(jsonPath("$.[0].area", is(roomDto.getArea()), Double.class))
                 .andExpect(jsonPath("$.[0].number", is(roomDto.getNumber())))
-                .andExpect(jsonPath("$.[0].type", is(roomDto.getType().toString())))
+                .andExpect(jsonPath("$.[0].categoryDto").value(roomDto.getCategoryDto()))
                 .andExpect(jsonPath("$.[0].isVisible", is(roomDto.getIsVisible())));
     }
 
@@ -168,7 +180,7 @@ public class RoomControllerIntegrationTest {
                 .andExpect(jsonPath("$.id", is(hiddenRoomDto.getId()), Long.class))
                 .andExpect(jsonPath("$.area", is(hiddenRoomDto.getArea()), Double.class))
                 .andExpect(jsonPath("$.number", is(hiddenRoomDto.getNumber())))
-                .andExpect(jsonPath("$.type", is(hiddenRoomDto.getType().toString())))
+                .andExpect(jsonPath("$.categoryDto").value(roomDto.getCategoryDto()))
                 .andExpect(jsonPath("$.isVisible", is(hiddenRoomDto.getIsVisible())));
 
         verify(roomService).hideRoomById(requesterId, roomId);
@@ -193,7 +205,7 @@ public class RoomControllerIntegrationTest {
                 .andExpect(jsonPath("$.id", is(roomDto.getId()), Long.class))
                 .andExpect(jsonPath("$.area", is(roomDto.getArea()), Double.class))
                 .andExpect(jsonPath("$.number", is(roomDto.getNumber())))
-                .andExpect(jsonPath("$.type", is(roomDto.getType().toString())))
+                .andExpect(jsonPath("$.categoryDto").value(roomDto.getCategoryDto()))
                 .andExpect(jsonPath("$.isVisible", is(roomDto.getIsVisible())));
 
         verify(roomService).unhideRoomById(requesterId, roomId);
