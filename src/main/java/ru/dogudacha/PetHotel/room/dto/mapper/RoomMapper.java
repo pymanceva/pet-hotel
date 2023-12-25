@@ -20,7 +20,6 @@ public interface RoomMapper {
     @Mapping(target = "category", ignore = true)
     Room toRoom(RoomDto roomDto);
 
-    //@Mapping(source = "newRoomDto.categoryId", target = "category", qualifiedByName = "idToCategory")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "category", ignore = true)
     Room toRoom(NewRoomDto newRoomDto);
