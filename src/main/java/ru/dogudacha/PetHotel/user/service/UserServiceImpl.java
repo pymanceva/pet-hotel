@@ -116,16 +116,18 @@ public class UserServiceImpl implements UserService {
         if (Objects.isNull(newUser.getMiddleName())) {
             newUser.setMiddleName(oldUser.getMiddleName());
         }
-        if (Objects.isNull(newUser.getEmail())) {
-            newUser.setEmail(oldUser.getEmail());
-        }
         if (Objects.isNull(newUser.getPassword())) {
             newUser.setPassword(oldUser.getPassword());
+        }
+        if (Objects.isNull(newUser.getEmail())) {
+            newUser.setEmail(oldUser.getEmail());
         }
         if (Objects.isNull(newUser.getRole()) || updateBySelf) {
             newUser.setRole(oldUser.getRole());
         }
-
+        if (Objects.isNull(newUser.getIsActive()) || updateBySelf) {
+            newUser.setIsActive(oldUser.getIsActive());
+        }
         User updatedUser = userRepository.save(newUser);
         log.info("UserService: updateUser, requesterId={}, userId={}, to updateUserDto={}",
                 requesterId, userId, updateUserDto);

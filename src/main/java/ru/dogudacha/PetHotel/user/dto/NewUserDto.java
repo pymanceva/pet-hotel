@@ -16,7 +16,6 @@ import ru.dogudacha.PetHotel.user.model.Roles;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NewUserDto {
-    @NotBlank(message = "Field: lastName. Error: must not be blank.")
     @Size(min = 2, max = 30, message = "validation name size error")
     private String lastName;
 
@@ -24,7 +23,6 @@ public class NewUserDto {
     @Size(min = 2, max = 15, message = "validation name size error")
     private String firstName;
 
-    @NotBlank(message = "Field: middleName. Error: must not be blank.")
     @Size(min = 2, max = 15, message = "validation name size error")
     private String middleName;
 
@@ -39,5 +37,6 @@ public class NewUserDto {
     @NotNull(message = "Field: role. Error: must not be null.")
     private Roles role;
 
-    private Boolean isActive;
+    @Builder.Default
+    private Boolean isActive = true;
 }

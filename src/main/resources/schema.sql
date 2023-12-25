@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users
     first_name_users  VARCHAR(15)                             NOT NULL,
     middle_name_users VARCHAR(15),
     email_users       VARCHAR(254)                            NOT NULL,
-    password_users    VARCHAR(10)                             NOT NULL,
+    password_users    VARCHAR(10),
     role_users        VARCHAR(16)                             NOT NULL,
     active_users      BOOLEAN DEFAULT TRUE                    NOT NULL,
     CONSTRAINT pk_user PRIMARY KEY (id_users),

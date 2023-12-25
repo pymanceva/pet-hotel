@@ -14,6 +14,7 @@ import lombok.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_users")
     private Long id;
     @Column(name = "last_name_users")
     private String lastName;
