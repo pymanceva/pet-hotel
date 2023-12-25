@@ -1,12 +1,13 @@
 package ru.dogudacha.PetHotel.room.service;
 
+import ru.dogudacha.PetHotel.room.dto.NewRoomDto;
 import ru.dogudacha.PetHotel.room.dto.RoomDto;
 import ru.dogudacha.PetHotel.room.dto.UpdateRoomDto;
 
 import java.util.Collection;
 
 public interface RoomService {
-    RoomDto addRoom(Long userId, RoomDto roomDto);
+    RoomDto addRoom(Long userId, NewRoomDto newRoomDto);
 
     RoomDto getRoomById(Long userId, Long roomId);
 

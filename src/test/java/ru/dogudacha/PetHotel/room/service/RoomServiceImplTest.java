@@ -10,11 +10,15 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import ru.dogudacha.PetHotel.exception.AccessDeniedException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
+import ru.dogudacha.PetHotel.room.category.dto.CategoryDto;
+import ru.dogudacha.PetHotel.room.category.dto.mapper.CategoryMapper;
+import ru.dogudacha.PetHotel.room.category.model.Category;
+import ru.dogudacha.PetHotel.room.category.repository.CategoryRepository;
+import ru.dogudacha.PetHotel.room.dto.NewRoomDto;
 import ru.dogudacha.PetHotel.room.dto.RoomDto;
 import ru.dogudacha.PetHotel.room.dto.UpdateRoomDto;
 import ru.dogudacha.PetHotel.room.dto.mapper.RoomMapper;
 import ru.dogudacha.PetHotel.room.model.Room;
-import ru.dogudacha.PetHotel.room.model.RoomTypes;
 import ru.dogudacha.PetHotel.room.repository.RoomRepository;
 import ru.dogudacha.PetHotel.user.model.Roles;
 import ru.dogudacha.PetHotel.user.model.User;
@@ -58,11 +62,23 @@ public class RoomServiceImplTest {
             .role(Roles.ROLE_FINANCIAL)
             .build();
 
+    final Category category = Category.builder()
+            .id(1L)
+            .name("name")
+            .description("description")
+            .build();
+
+    final CategoryDto categoryDto = CategoryDto.builder()
+            .id(1L)
+            .name("name")
+            .description("description")
+            .build();
+
     private final Room room = Room.builder()
             .id(1L)
             .area(5.0)
             .number("standard room")
-            .type(RoomTypes.SMALL)
+            .category(new Category(1L, "name", "description"))
             .isVisible(true)
             .build();
 
@@ -70,7 +86,14 @@ public class RoomServiceImplTest {
             .id(1L)
             .area(5.0)
             .number("standard room")
-            .type(RoomTypes.SMALL)
+            .categoryDto(new CategoryDto(1L, "name", "description"))
+            .isVisible(true)
+            .build();
+
+    private final NewRoomDto newRoomDto = NewRoomDto.builder()
+            .area(5.0)
+            .number("standard room")
+            .categoryId(1L)
             .isVisible(true)
             .build();
 
@@ -78,7 +101,7 @@ public class RoomServiceImplTest {
             .id(1L)
             .area(5.0)
             .number("standard room")
-            .type(RoomTypes.SMALL)
+            .category(new Category(1L, "name", "description"))
             .isVisible(false)
             .build();
 
@@ -86,7 +109,7 @@ public class RoomServiceImplTest {
             .id(1L)
             .area(5.0)
             .number("standard room")
-            .type(RoomTypes.SMALL)
+            .categoryDto(new CategoryDto(1L, "name", "description"))
             .isVisible(false)
             .build();
 
@@ -97,21 +120,26 @@ public class RoomServiceImplTest {
     @Mock
     private UserRepository userRepository;
     @Mock
+    private CategoryRepository categoryRepository;
+    @Mock
     private RoomMapper roomMapper;
+    @Mock
+    private CategoryMapper categoryMapper;
 
 
     @Test
     void addRoom_whenAddRoomByBoss_thenRoomAdded() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
         when(roomRepository.save(any(Room.class))).thenReturn(room);
-        when(roomMapper.toRoom(any(RoomDto.class))).thenReturn(room);
+        when(roomMapper.toRoom(any(NewRoomDto.class))).thenReturn(room);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
 
-        RoomDto result = roomService.addRoom(boss.getId(), roomDto);
+        RoomDto result = roomService.addRoom(boss.getId(), newRoomDto);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(roomDto.getType(), result.getType());
+        Assertions.assertEquals(roomDto.getCategoryDto(), result.getCategoryDto());
         Assertions.assertEquals(roomDto.getArea(), result.getArea());
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
@@ -123,15 +151,16 @@ public class RoomServiceImplTest {
     @Test
     void addRoom_whenAddRoomByAdmin_thenRoomAdded() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
         when(roomRepository.save(any(Room.class))).thenReturn(room);
-        when(roomMapper.toRoom(any(RoomDto.class))).thenReturn(room);
+        when(roomMapper.toRoom(any(NewRoomDto.class))).thenReturn(room);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
 
-        RoomDto result = roomService.addRoom(admin.getId(), roomDto);
+        RoomDto result = roomService.addRoom(admin.getId(), newRoomDto);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(roomDto.getType(), result.getType());
+        Assertions.assertEquals(roomDto.getCategoryDto(), result.getCategoryDto());
         Assertions.assertEquals(roomDto.getArea(), result.getArea());
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
@@ -145,7 +174,7 @@ public class RoomServiceImplTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
         assertThrows(AccessDeniedException.class,
-                () -> roomService.addRoom(user.getId(), roomDto));
+                () -> roomService.addRoom(user.getId(), newRoomDto));
     }
 
     @Test
@@ -153,21 +182,20 @@ public class RoomServiceImplTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
 
         assertThrows(AccessDeniedException.class,
-                () -> roomService.addRoom(financial.getId(), roomDto));
+                () -> roomService.addRoom(financial.getId(), newRoomDto));
     }
 
     @Test
     void getRoomById_whenGetRoomByBoss_thenReturnedRoom() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
         when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
-        when(roomMapper.toRoom(any(RoomDto.class))).thenReturn(room);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
 
         RoomDto result = roomService.getRoomById(boss.getId(), room.getId());
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(roomDto.getType(), result.getType());
+        Assertions.assertEquals(roomDto.getCategoryDto(), result.getCategoryDto());
         Assertions.assertEquals(roomDto.getArea(), result.getArea());
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
@@ -180,14 +208,13 @@ public class RoomServiceImplTest {
     void getRoomById_whenGetRoomByAdmin_thenReturnedRoom() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
         when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
-        when(roomMapper.toRoom(any(RoomDto.class))).thenReturn(room);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
 
         RoomDto result = roomService.getRoomById(admin.getId(), room.getId());
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(roomDto.getType(), result.getType());
+        Assertions.assertEquals(roomDto.getCategoryDto(), result.getCategoryDto());
         Assertions.assertEquals(roomDto.getArea(), result.getArea());
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
@@ -200,14 +227,13 @@ public class RoomServiceImplTest {
     void getRoomById_whenGetRoomByFinancial_thenReturnedRoom() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
         when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
-        when(roomMapper.toRoom(any(RoomDto.class))).thenReturn(room);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
 
         RoomDto result = roomService.getRoomById(financial.getId(), room.getId());
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(roomDto.getType(), result.getType());
+        Assertions.assertEquals(roomDto.getCategoryDto(), result.getCategoryDto());
         Assertions.assertEquals(roomDto.getArea(), result.getArea());
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
@@ -235,28 +261,28 @@ public class RoomServiceImplTest {
     @Test
     void updateRoom_whenRequesterBossAndRoomFoundAndAllNewFieldsNotNull_thenUpdateAllFieldsThanId() {
         UpdateRoomDto newRoomDto = UpdateRoomDto.builder()
-                .id(1L)
                 .area(10.0)
                 .number("new standard room")
-                .type(RoomTypes.SMALL)
+                .categoryId(1L)
                 .build();
 
         RoomDto updatedRoomDto = RoomDto.builder()
                 .id(1L)
                 .area(10.0)
                 .number("new standard room")
-                .type(RoomTypes.SMALL)
+                .categoryDto(new CategoryDto(1L, "name", "description"))
                 .isVisible(false)
                 .build();
 
         Room newRoom = Room.builder()
                 .area(10.0)
                 .number("new standard room")
-                .type(RoomTypes.SMALL)
+                .category(new Category(1L, "name", "description"))
                 .isVisible(false)
                 .build();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
         when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
         when(roomRepository.save(any(Room.class))).thenReturn(newRoom);
         when(roomMapper.toRoom(any(UpdateRoomDto.class))).thenReturn(room);
@@ -266,7 +292,7 @@ public class RoomServiceImplTest {
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(updatedRoomDto.getType(), result.getType());
+        Assertions.assertEquals(updatedRoomDto.getCategoryDto(), result.getCategoryDto());
         Assertions.assertEquals(updatedRoomDto.getArea(), result.getArea());
         Assertions.assertFalse(result.getIsVisible());
         Assertions.assertEquals(updatedRoomDto.getNumber(), result.getNumber());
@@ -275,15 +301,16 @@ public class RoomServiceImplTest {
     }
 
     @Test
-    void updateRoom_whenRequesterBossAndRoomFoundAndPriceNewFieldNotNull_thenUpdateAllFieldsThanId() {
+    void updateRoom_whenRequesterBossAndRoomFoundAndAreaNewFieldNotNull_thenUpdateAllFieldsThanId() {
         UpdateRoomDto newRoomDto = UpdateRoomDto.builder()
+                .area(10.0)
                 .build();
 
         RoomDto updatedRoomDto = RoomDto.builder()
                 .id(1L)
-                .area(5.0)
+                .area(10.0)
                 .number("standard room")
-                .type(RoomTypes.SMALL)
+                .categoryDto(new CategoryDto(1L, "name", "description"))
                 .isVisible(true)
                 .build();
 
@@ -291,13 +318,15 @@ public class RoomServiceImplTest {
                 .build();
 
         Room newRoom = Room.builder()
-                .area(5.0)
+                .area(10.0)
                 .number("standard room")
-                .type(RoomTypes.SMALL)
+                .category(new Category(1L, "name", "description"))
                 .isVisible(true)
                 .build();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+        when(categoryMapper.toCategoryDto(any(Category.class))).thenReturn(categoryDto);
         when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
         when(roomRepository.save(any(Room.class))).thenReturn(newRoom);
         when(roomMapper.toRoom(any(UpdateRoomDto.class))).thenReturn(updatedRoom);
@@ -307,7 +336,7 @@ public class RoomServiceImplTest {
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(updatedRoomDto.getType(), result.getType());
+        Assertions.assertEquals(updatedRoomDto.getCategoryDto(), result.getCategoryDto());
         Assertions.assertEquals(updatedRoomDto.getArea(), result.getArea());
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(updatedRoomDto.getNumber(), result.getNumber());
@@ -316,15 +345,16 @@ public class RoomServiceImplTest {
     }
 
     @Test
-    void updateRoom_whenRequesterBossAndRoomFoundAndAvailableNewFieldNotNull_thenUpdateAllFieldsThanId() {
+    void updateRoom_whenRequesterBossAndRoomFoundAndnNumberNewFieldNotNull_thenUpdateAllFieldsThanId() {
         UpdateRoomDto newRoomDto = UpdateRoomDto.builder()
+                .number("new standard room")
                 .build();
 
         RoomDto updatedRoomDto = RoomDto.builder()
                 .id(1L)
                 .area(5.0)
-                .number("standard room")
-                .type(RoomTypes.SMALL)
+                .number("new standard room")
+                .categoryDto(new CategoryDto(1L, "name", "description"))
                 .isVisible(false)
                 .build();
 
@@ -335,11 +365,12 @@ public class RoomServiceImplTest {
         Room newRoom = Room.builder()
                 .area(5.0)
                 .number("standard room")
-                .type(RoomTypes.SMALL)
+                .category(new Category(1L, "name", "description"))
                 .isVisible(false)
                 .build();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
         when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
         when(roomRepository.save(any(Room.class))).thenReturn(newRoom);
         when(roomMapper.toRoom(any(UpdateRoomDto.class))).thenReturn(updatedRoom);
@@ -349,7 +380,7 @@ public class RoomServiceImplTest {
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(updatedRoomDto.getType(), result.getType());
+        Assertions.assertEquals(updatedRoomDto.getCategoryDto(), result.getCategoryDto());
         Assertions.assertEquals(updatedRoomDto.getArea(), result.getArea());
         Assertions.assertFalse(result.getIsVisible());
         Assertions.assertEquals(updatedRoomDto.getNumber(), result.getNumber());
@@ -360,28 +391,28 @@ public class RoomServiceImplTest {
     @Test
     void updateRoom_whenRequesterAdminAndRoomFoundAndAllNewFieldsNotNull_thenUpdateAllFieldsThanId() {
         UpdateRoomDto newRoomDto = UpdateRoomDto.builder()
-                .id(1L)
                 .area(10.0)
                 .number("new standard room")
-                .type(RoomTypes.SMALL)
+                .categoryId(1L)
                 .build();
 
         RoomDto updatedRoomDto = RoomDto.builder()
                 .id(1L)
                 .area(10.0)
                 .number("new standard room")
-                .type(RoomTypes.SMALL)
+                .categoryDto(new CategoryDto(1L, "name", "description"))
                 .isVisible(false)
                 .build();
 
         Room newRoom = Room.builder()
                 .area(10.0)
                 .number("new standard room")
-                .type(RoomTypes.SMALL)
+                .category(new Category(1L, "name", "description"))
                 .isVisible(false)
                 .build();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
         when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
         when(roomRepository.save(any(Room.class))).thenReturn((newRoom));
         when(roomMapper.toRoom(any(UpdateRoomDto.class))).thenReturn(room);
@@ -391,7 +422,7 @@ public class RoomServiceImplTest {
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(updatedRoomDto.getType(), result.getType());
+        Assertions.assertEquals(updatedRoomDto.getCategoryDto(), result.getCategoryDto());
         Assertions.assertEquals(updatedRoomDto.getArea(), result.getArea());
         Assertions.assertFalse(result.getIsVisible());
         Assertions.assertEquals(updatedRoomDto.getNumber(), result.getNumber());
@@ -436,7 +467,7 @@ public class RoomServiceImplTest {
     void getAllRooms_whenGetAllRoomsByBossAndTrue_thenReturnAllRooms() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
         when(roomRepository.getAllRooms(anyBoolean())).thenReturn(Optional.of(List.of(room)));
-        when(roomMapper.toListRoomDto(anyList())).thenReturn(List.of(roomDto));
+        when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
 
         Collection<RoomDto> resultCollection = roomService.getAllRooms(boss.getId(), room.getIsVisible());
         List<RoomDto> result = resultCollection.stream().toList();
@@ -444,7 +475,7 @@ public class RoomServiceImplTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.size());
         Assertions.assertEquals(1L, result.get(0).getId());
-        Assertions.assertEquals(roomDto.getType(), result.get(0).getType());
+        Assertions.assertEquals(roomDto.getCategoryDto(), result.get(0).getCategoryDto());
         Assertions.assertEquals(roomDto.getArea(), result.get(0).getArea());
         Assertions.assertTrue(result.get(0).getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.get(0).getNumber());
@@ -457,7 +488,7 @@ public class RoomServiceImplTest {
     void getAllRooms_whenGetAllRoomsByAdmin_thenReturnAllRooms() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
         when(roomRepository.getAllRooms(anyBoolean())).thenReturn(Optional.of(List.of(room)));
-        when(roomMapper.toListRoomDto(anyList())).thenReturn(List.of(roomDto));
+        when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
 
         Collection<RoomDto> resultCollection = roomService.getAllRooms(admin.getId(), room.getIsVisible());
         List<RoomDto> result = resultCollection.stream().toList();
@@ -465,7 +496,7 @@ public class RoomServiceImplTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.size());
         Assertions.assertEquals(1L, result.get(0).getId());
-        Assertions.assertEquals(roomDto.getType(), result.get(0).getType());
+        Assertions.assertEquals(roomDto.getCategoryDto(), result.get(0).getCategoryDto());
         Assertions.assertEquals(roomDto.getArea(), result.get(0).getArea());
         Assertions.assertTrue(result.get(0).getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.get(0).getNumber());
@@ -478,7 +509,7 @@ public class RoomServiceImplTest {
     void getAllRooms_whenGetAllRoomsByFinancial_thenReturnAllRooms() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
         when(roomRepository.getAllRooms(anyBoolean())).thenReturn(Optional.of(List.of(room)));
-        when(roomMapper.toListRoomDto(anyList())).thenReturn(List.of(roomDto));
+        when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
 
         Collection<RoomDto> resultCollection = roomService.getAllRooms(financial.getId(), room.getIsVisible());
         List<RoomDto> result = resultCollection.stream().toList();
@@ -486,7 +517,7 @@ public class RoomServiceImplTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.size());
         Assertions.assertEquals(1L, result.get(0).getId());
-        Assertions.assertEquals(roomDto.getType(), result.get(0).getType());
+        Assertions.assertEquals(roomDto.getCategoryDto(), result.get(0).getCategoryDto());
         Assertions.assertEquals(roomDto.getArea(), result.get(0).getArea());
         Assertions.assertTrue(result.get(0).getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.get(0).getNumber());
@@ -514,7 +545,7 @@ public class RoomServiceImplTest {
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(hiddenRoomDto.getType(), result.getType());
+        Assertions.assertEquals(hiddenRoomDto.getCategoryDto(), result.getCategoryDto());
         Assertions.assertEquals(hiddenRoomDto.getArea(), result.getArea());
         Assertions.assertFalse(result.getIsVisible());
         Assertions.assertEquals(hiddenRoomDto.getNumber(), result.getNumber());
@@ -533,7 +564,7 @@ public class RoomServiceImplTest {
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(hiddenRoomDto.getType(), result.getType());
+        Assertions.assertEquals(hiddenRoomDto.getCategoryDto(), result.getCategoryDto());
         Assertions.assertEquals(hiddenRoomDto.getArea(), result.getArea());
         Assertions.assertFalse(result.getIsVisible());
         Assertions.assertEquals(hiddenRoomDto.getNumber(), result.getNumber());
@@ -585,7 +616,7 @@ public class RoomServiceImplTest {
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(roomDto.getType(), result.getType());
+        Assertions.assertEquals(roomDto.getCategoryDto(), result.getCategoryDto());
         Assertions.assertEquals(roomDto.getArea(), result.getArea());
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
@@ -604,7 +635,7 @@ public class RoomServiceImplTest {
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(roomDto.getType(), result.getType());
+        Assertions.assertEquals(roomDto.getCategoryDto(), result.getCategoryDto());
         Assertions.assertEquals(roomDto.getArea(), result.getArea());
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());

@@ -2,6 +2,7 @@ package ru.dogudacha.PetHotel.room.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.dogudacha.PetHotel.room.category.model.Category;
 
 @Builder
 @Getter
@@ -14,17 +15,18 @@ import lombok.*;
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_room")
+    @Column(name = "id_rooms")
     private Long id;
-    @Column(name = "number_room", nullable = false)
+    @Column(name = "number_rooms", nullable = false)
     private String number;
-    @Column(name = "area_room")
+    @Column(name = "area_rooms")
     private Double area;
-    @Column(name = "type_room", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private RoomTypes type;
-    @Column(name = "description_room")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id_rooms")
+    @ToString.Exclude
+    private Category category;
+    @Column(name = "description_rooms")
     private String description;
-    @Column(name = "visible_room")
+    @Column(name = "visible_rooms")
     private Boolean isVisible;
 }
