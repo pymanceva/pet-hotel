@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>ru.dogudacha</groupId>
 	<artifactId>PetHotel</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.0.6-SNAPSHOT</version>
 	<name>PetHotel</name>
 	<description>Booking app for pets hotel</description>
 	<properties>
