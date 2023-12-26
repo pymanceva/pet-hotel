@@ -2,11 +2,13 @@ openapi: '3.0.1'
 info:
   title: 'PetHotel: Owners Specification'
   description: Pet hotel owners
-  version: 'v1'
+  version: 'v3'
 
 servers:
   - url: http://localhost:8080
     description: Local server for develop
+  - url: http://212.109.192.9:8080
+    description: backend server для тестирования кода и работы фронтэнда
 
 paths:
   /owners:
@@ -488,6 +490,11 @@ components:
           type: integer
           format: int32
           example: 3
+        registrationDate:
+          description: Дата регистрации клиента
+          type: string
+          format: date-time
+          example: 23.12.2023 12:00
 
     UpdateOwnerDto:
       title: UpdateOwnerDto

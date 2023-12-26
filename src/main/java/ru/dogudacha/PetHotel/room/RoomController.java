@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.dogudacha.PetHotel.room.dto.NewRoomDto;
 import ru.dogudacha.PetHotel.room.dto.RoomDto;
 import ru.dogudacha.PetHotel.room.dto.UpdateRoomDto;
 import ru.dogudacha.PetHotel.room.service.RoomService;
@@ -24,22 +25,22 @@ public class RoomController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public RoomDto addRoom(@RequestHeader(USER_ID) Long requesterId,
-                           @RequestBody @Valid RoomDto roomDto) {
-        log.info("RoomController: POST/addRoom, requesterId={}, room={}", requesterId, roomDto);
-        return roomService.addRoom(requesterId, roomDto);
+                           @RequestBody @Valid NewRoomDto newRoomDto) {
+        log.info("RoomController: POST/addRoom, requesterId={}, room={}", requesterId, newRoomDto);
+        return roomService.addRoom(requesterId, newRoomDto);
     }
 
     @GetMapping("/{id}")
     public RoomDto getRoomById(@RequestHeader(USER_ID) Long requesterId,
-                               @PathVariable("id") long roomId) {
+                               @PathVariable("id") Long roomId) {
         log.info("RoomController: GET/getRoomById, requesterId={}, roomId={}", requesterId, roomId);
         return roomService.getRoomById(requesterId, roomId);
     }
 
     @PatchMapping("/{id}")
     public RoomDto updateRoom(@RequestHeader(USER_ID) Long requesterId,
-                              @RequestBody UpdateRoomDto roomDto,
-                              @PathVariable("id") long roomId) {
+                              @RequestBody @Valid UpdateRoomDto roomDto,
+                              @PathVariable("id") Long roomId) {
         log.info("RoomController: PATCH/updateRoom, requesterId={}, roomId={}, requestBody={}",
                 requesterId, roomId, roomDto);
         return roomService.updateRoom(requesterId, roomId, roomDto);
@@ -54,7 +55,7 @@ public class RoomController {
 
     @PatchMapping("/{id}/hide")
     public RoomDto hideRoomById(@RequestHeader(USER_ID) Long requesterId,
-                                @PathVariable("id") long roomId) {
+                                @PathVariable("id") Long roomId) {
         log.info("RoomController: PATCH/hideRoomById, requesterId={}, roomId={}",
                 requesterId, roomId);
         return roomService.hideRoomById(requesterId, roomId);
@@ -62,7 +63,7 @@ public class RoomController {
 
     @PatchMapping("/{id}/unhide")
     public RoomDto unhideRoomById(@RequestHeader(USER_ID) Long requesterId,
-                                  @PathVariable("id") long roomId) {
+                                  @PathVariable("id") Long roomId) {
         log.info("RoomController: PATCH/unhideRoomById, requesterId={}, roomId={}",
                 requesterId, roomId);
         return roomService.unhideRoomById(requesterId, roomId);
