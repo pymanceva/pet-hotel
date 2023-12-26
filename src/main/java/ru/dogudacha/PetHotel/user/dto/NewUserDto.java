@@ -1,9 +1,6 @@
 package ru.dogudacha.PetHotel.user.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,16 +14,20 @@ import ru.dogudacha.PetHotel.user.model.Roles;
 @NoArgsConstructor
 public class NewUserDto {
     @Size(min = 2, max = 30, message = "validation name size error")
+    @Pattern(regexp = "^(?=.*[a-zA-Zа-яёЁА-Я\\d_\\S]).+$")
     private String lastName;
 
     @NotBlank(message = "Field: firstName. Error: must not be blank.")
     @Size(min = 2, max = 15, message = "validation name size error")
+    @Pattern(regexp = "^(?=.*[a-zA-Z\\d_\\S]).+$")
     private String firstName;
 
     @Size(min = 2, max = 15, message = "validation name size error")
+    @Pattern(regexp = "^(?=.*[a-zA-Z\\d_\\S]).+$")
     private String middleName;
 
     @Size(min = 5, max = 10, message = "validation password size error")
+    @Pattern(regexp = "^(?=.*[a-zA-Z\\d_\\S]).+(\\S)$")
     private String password;
 
     @Email(message = "Field: email. Error: must be email format.")
