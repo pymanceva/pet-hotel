@@ -9,3 +9,7 @@ https://nkiblyk.kaiten.ru/space/167883/card/25885927
 0.0.5:
 Реализована работа с категориями номеров по ТЗ:
 https://nkiblyk.kaiten.ru/space/167883/card/26311401
+
+0.0.6:
+Реализована работа с питомцами по ТЗ:
+https://docs.google.com/document/d/1l4dELV7vZi2YMXWBppTEneTQ0VyG9SCHWPlP2seWwZQ/edit?usp=drive_link
