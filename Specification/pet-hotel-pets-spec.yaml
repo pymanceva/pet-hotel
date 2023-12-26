@@ -483,7 +483,7 @@ components:
     NewPetDto:
       description: Дто для создания нового питомца
       required:
-        - owner
+        - ownerId
         - type
         - name
         - breed
@@ -578,7 +578,7 @@ components:
           type: string
           description: Перенесенные заболевания
           example: пиелонефрит
-        healthСharacteristic:
+        healthCharacteristic:
           maxLength: 500
           type: string
           description: Особенности состояния здоровья питомца (ФИП)
@@ -882,7 +882,7 @@ components:
           type: string
           description: Перенесенные заболевания
           example: пиелонефрит
-        healthСharacteristic:
+        healthCharacteristic:
           maxLength: 500
           type: string
           description: Особенности состояния здоровья питомца (ФИП)
@@ -1174,7 +1174,7 @@ components:
           type: string
           description: Перенесенные заболевания
           example: пиелонефрит
-        healthСharacteristic:
+        healthCharacteristic:
           maxLength: 500
           type: string
           description: Особенности состояния здоровья питомца (ФИП)
