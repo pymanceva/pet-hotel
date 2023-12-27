@@ -14,8 +14,6 @@ import ru.dogudacha.PetHotel.user.model.Roles;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateUserDto {
-    private Long id;
-
     @Size(min = 2, max = 30, message = "validation name size error")
     @Pattern(regexp = "^(?=.*[a-zA-Z\\d_\\S]).+$")
     private String lastName;
