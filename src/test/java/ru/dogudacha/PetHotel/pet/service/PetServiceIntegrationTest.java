@@ -37,9 +37,13 @@ public class PetServiceIntegrationTest {
     private static final LocalDate HEAT_DATE = LocalDate.now().plusMonths(1);
 
     final User requesterAdmin = User.builder()
+            .lastName("Кружкин")
+            .firstName("admin")
+            .middleName("Петрович")
             .email("admin@mail.ru")
-            .name("admin")
+            .password("admin_pwd")
             .role(Roles.ROLE_ADMIN)
+            .isActive(true)
             .build();
 
     final NewPetDto newPetDto = NewPetDto.builder()
@@ -277,6 +281,7 @@ public class PetServiceIntegrationTest {
 
     @Test
     void createPet() {
+        System.out.println(requesterAdmin.toString());
         em.persist(requesterAdmin);
         PetDto actualPet = service.addPet(requesterAdmin.getId(), newPetDto);
 

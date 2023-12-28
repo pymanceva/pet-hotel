@@ -6,6 +6,10 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local server for develop
+  - url: http://212.109.192.9:8080
+    description: Удалённый backend сервер для тестирования и работы frontend. 
+      По вопросам работы сервера обращаться к Руслану
+
 tags:
   - description: API для работы с пользователями.
     name: user-controller
@@ -55,7 +59,6 @@ paths:
             Объект не найден.
             Ошибка может возникнуть в следующих случаях:
             1. не найден пользователь от имени которого производится запрос - requester;
-            2. не найден пользователь в отношении которого производится запрос - user.
           content:
             application/json:
               example:

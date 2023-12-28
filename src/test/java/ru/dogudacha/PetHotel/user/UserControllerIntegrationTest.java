@@ -9,7 +9,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
-import ru.dogudacha.PetHotel.user.UserController;
+import ru.dogudacha.PetHotel.user.controller.UserController;
+import ru.dogudacha.PetHotel.user.dto.NewUserDto;
 import ru.dogudacha.PetHotel.user.dto.UpdateUserDto;
 import ru.dogudacha.PetHotel.user.dto.UserDto;
 import ru.dogudacha.PetHotel.user.model.Roles;
@@ -41,12 +42,13 @@ class UserControllerIntegrationTest {
     long userId = 2L;
     long requesterId = 1L;
     private final String requesterHeader = "X-PetHotel-User-Id";
-    UserDto userDto = new UserDto(userId, "userName", "user@mail.ru", Roles.ROLE_ADMIN);
+    UserDto userDto = new UserDto(userId, "userLastName", "userFirstName", "userMiddleName",
+            "user@mail.ru", "user_pwd", Roles.ROLE_ADMIN, true);
 
     @Test
     @SneakyThrows
     void addUser() {
-        when(userService.addUser(anyLong(), any(UserDto.class))).thenReturn(userDto);
+        when(userService.addUser(anyLong(), any(NewUserDto.class))).thenReturn(userDto);
 
         mockMvc.perform(post("/users")
                         .header(requesterHeader, requesterId)
@@ -55,26 +57,30 @@ class UserControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
-                .andExpect(jsonPath("$.name", is(userDto.getName())))
+                .andExpect(jsonPath("$.lastName", is(userDto.getLastName())))
+                .andExpect(jsonPath("$.firstName", is(userDto.getFirstName())))
+                .andExpect(jsonPath("$.middleName", is(userDto.getMiddleName())))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())))
-                .andExpect(jsonPath("$.role", is(userDto.getRole().toString())));
+                .andExpect(jsonPath("$.password", is(userDto.getPassword())))
+                .andExpect(jsonPath("$.role", is(userDto.getRole().toString())))
+                .andExpect(jsonPath("$.isActive", is(userDto.getIsActive())));
 
-        verify(userService).addUser(anyLong(), any(UserDto.class));
+        verify(userService).addUser(anyLong(), any(NewUserDto.class));
 
         mockMvc.perform(post("/users")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(new UserDto())))
+                        .content(objectMapper.writeValueAsString(new NewUserDto())))
                 .andExpect(status().isBadRequest());
 
         mockMvc.perform(post("/users")
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(new UserDto())))
+                        .content(objectMapper.writeValueAsString(new NewUserDto())))
                 .andExpect(status().isBadRequest());
 
-        verify(userService, times(1)).addUser(anyLong(), any(UserDto.class));
+        verify(userService, times(1)).addUser(anyLong(), any(NewUserDto.class));
     }
 
     @Test
@@ -87,9 +93,13 @@ class UserControllerIntegrationTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
-                .andExpect(jsonPath("$.name", is(userDto.getName())))
+                .andExpect(jsonPath("$.lastName", is(userDto.getLastName())))
+                .andExpect(jsonPath("$.firstName", is(userDto.getFirstName())))
+                .andExpect(jsonPath("$.middleName", is(userDto.getMiddleName())))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())))
-                .andExpect(jsonPath("$.role", is(userDto.getRole().toString())));
+                .andExpect(jsonPath("$.password", is(userDto.getPassword())))
+                .andExpect(jsonPath("$.role", is(userDto.getRole().toString())))
+                .andExpect(jsonPath("$.isActive", is(userDto.getIsActive())));
 
         verify(userService).getUserById(requesterId, userId);
 
@@ -114,9 +124,13 @@ class UserControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
-                .andExpect(jsonPath("$.name", is(userDto.getName())))
+                .andExpect(jsonPath("$.lastName", is(userDto.getLastName())))
+                .andExpect(jsonPath("$.firstName", is(userDto.getFirstName())))
+                .andExpect(jsonPath("$.middleName", is(userDto.getMiddleName())))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())))
-                .andExpect(jsonPath("$.role", is(userDto.getRole().toString())));
+                .andExpect(jsonPath("$.password", is(userDto.getPassword())))
+                .andExpect(jsonPath("$.role", is(userDto.getRole().toString())))
+                .andExpect(jsonPath("$.isActive", is(userDto.getIsActive())));
 
 
         when(userService.updateUser(anyLong(), eq(userId), any(UpdateUserDto.class)))
@@ -140,9 +154,13 @@ class UserControllerIntegrationTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(userDto.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].name", is(userDto.getName())))
+                .andExpect(jsonPath("$.[0].lastName", is(userDto.getLastName())))
+                .andExpect(jsonPath("$.[0].firstName", is(userDto.getFirstName())))
+                .andExpect(jsonPath("$.[0].middleName", is(userDto.getMiddleName())))
                 .andExpect(jsonPath("$.[0].email", is(userDto.getEmail())))
-                .andExpect(jsonPath("$.[0].role", is(userDto.getRole().toString())));
+                .andExpect(jsonPath("$.[0].password", is(userDto.getPassword())))
+                .andExpect(jsonPath("$.[0].role", is(userDto.getRole().toString())))
+                .andExpect(jsonPath("$.[0].isActive", is(userDto.getIsActive())));
     }
 
     @Test
@@ -165,5 +183,59 @@ class UserControllerIntegrationTest {
                 .andExpect(status().isNotFound());
 
         verify(userService, times(2)).deleteUserById(requesterId, userId);
+    }
+
+    @Test
+    @SneakyThrows
+    void setUserState() {
+        UserDto activeUserDto = userDto;
+        activeUserDto.setIsActive(true);
+        when(userService.setUserState(anyLong(), eq(userId), eq(true))).thenReturn(activeUserDto);
+
+        mockMvc.perform(patch("/users/{id}/state", userId)
+                        .header(requesterHeader, requesterId)
+                        .param("isActive", String.valueOf(true))
+                        .accept(MediaType.ALL_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(activeUserDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(activeUserDto.getId()), Long.class))
+                .andExpect(jsonPath("$.lastName", is(activeUserDto.getLastName())))
+                .andExpect(jsonPath("$.firstName", is(activeUserDto.getFirstName())))
+                .andExpect(jsonPath("$.middleName", is(activeUserDto.getMiddleName())))
+                .andExpect(jsonPath("$.email", is(activeUserDto.getEmail())))
+                .andExpect(jsonPath("$.password", is(activeUserDto.getPassword())))
+                .andExpect(jsonPath("$.role", is(activeUserDto.getRole().toString())))
+                .andExpect(jsonPath("$.isActive", is(activeUserDto.getIsActive())));
+
+        UserDto notActiveUserDto = userDto;
+        notActiveUserDto.setIsActive(false);
+        when(userService.setUserState(anyLong(), eq(userId), eq(false))).thenReturn(notActiveUserDto);
+
+        mockMvc.perform(patch("/users/{id}/state", userId)
+                        .header(requesterHeader, requesterId)
+                        .param("isActive", String.valueOf(false))
+                        .accept(MediaType.ALL_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(notActiveUserDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(notActiveUserDto.getId()), Long.class))
+                .andExpect(jsonPath("$.lastName", is(notActiveUserDto.getLastName())))
+                .andExpect(jsonPath("$.firstName", is(notActiveUserDto.getFirstName())))
+                .andExpect(jsonPath("$.middleName", is(notActiveUserDto.getMiddleName())))
+                .andExpect(jsonPath("$.email", is(notActiveUserDto.getEmail())))
+                .andExpect(jsonPath("$.password", is(notActiveUserDto.getPassword())))
+                .andExpect(jsonPath("$.role", is(notActiveUserDto.getRole().toString())))
+                .andExpect(jsonPath("$.isActive", is(false)));
+
+        when(userService.setUserState(anyLong(), eq(userId), eq(true)))
+                .thenThrow(NotFoundException.class);
+
+        mockMvc.perform(patch("/users/{userId}/state", userId)
+                        .header(requesterHeader, requesterId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isNotFound());
+
     }
 }
