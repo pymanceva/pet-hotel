@@ -26,16 +26,18 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto addUser(@RequestHeader(value = USER_ID) Long requesterId,
                            @RequestBody @Valid NewUserDto userDto
+
     ) {
         log.info("UserController: POST/addUser, requesterId={}, user={}", requesterId, userDto);
         return userService.addUser(requesterId, userDto);
     }
 
     @GetMapping
-    public Collection<UserDto> getAllUsers(@RequestHeader(value = USER_ID) Long requesterId
+    public Collection<UserDto> getAllUsers(@RequestHeader(value = USER_ID) Long requesterId,
+                                           @RequestParam(value = "isActive", required = false) Boolean isActive
     ) {
-        log.info("UserController: GET/getAllUsers, requesterId={}", requesterId);
-        return userService.getAllUsers(requesterId);
+        log.info("UserController: GET/getAllUsers, requesterId={}, isActive={}", requesterId, isActive);
+        return userService.getAllUsers(requesterId, isActive);
     }
 
 
@@ -68,8 +70,8 @@ public class UserController {
 
     @PatchMapping("/{id}/state")
     public UserDto setUserState(@RequestHeader(value = USER_ID) Long requesterId,
-                              @PathVariable(value = "id") Long userId,
-                              @RequestParam(value = "isActive", defaultValue = "true") Boolean isActive
+                                @PathVariable(value = "id") Long userId,
+                                @RequestParam(value = "isActive", defaultValue = "true") Boolean isActive
     ) {
         log.info("UserController: PATCH/setUserState, requesterId={}, userId={}, isActive={}",
                 requesterId, userId, isActive);

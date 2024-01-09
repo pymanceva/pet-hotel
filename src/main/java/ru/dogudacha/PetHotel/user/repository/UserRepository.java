@@ -10,5 +10,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<List<User>> findAllByRoleInAndIsActive(List<Roles> roles, Boolean isActive);
 
+    Optional<List<User>> findAllByRoleIn(List<Roles> roles);
+
     Integer deleteUserById(Long userId);
 }

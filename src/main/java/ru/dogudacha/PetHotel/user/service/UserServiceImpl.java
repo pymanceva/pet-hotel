@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<UserDto> getAllUsers(Long requesterId) {
+    public List<UserDto> getAllUsers(Long requesterId, Boolean isActive) {
         User requester = findUserById(requesterId);
 
         checkAccessForBrowse(requester, Roles.ROLE_ADMIN);
@@ -34,10 +34,14 @@ public class UserServiceImpl implements UserService {
         List<Roles> roles =
                 Arrays.asList(Roles.values()).subList(requester.getRole().ordinal(), Roles.values().length);
 
-        List<User> allUsers =
-                userRepository.findAllByRoleInAndIsActive(roles, true).orElse(Collections.emptyList());
-
-        log.info("UserService: getAllUsers, requesterId={}, usersList size={}", requesterId, allUsers.size());
+        List<User> allUsers;
+        if (Objects.isNull(isActive)) {
+            allUsers = userRepository.findAllByRoleIn(roles).orElse(Collections.emptyList());
+        } else {
+            allUsers = userRepository.findAllByRoleInAndIsActive(roles, isActive).orElse(Collections.emptyList());
+        }
+        log.info("UserService: getAllUsers, requesterId={}, isActive={}, usersList size={}",
+                requesterId, isActive, allUsers.size());
         return userMapper.map(allUsers);
     }
 
