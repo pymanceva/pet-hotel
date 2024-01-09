@@ -6,6 +6,7 @@ import ru.dogudacha.PetHotel.pet.model.Sex;
 import ru.dogudacha.PetHotel.pet.model.TypeOfPet;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -77,4 +78,6 @@ public class PetDto {
     private Boolean isMedicine;
     private String medicineRegimen;
     private String additionalData;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
+    private LocalDateTime registrationDate;
 }

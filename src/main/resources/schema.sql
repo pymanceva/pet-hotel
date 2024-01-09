@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS pets
     medicine_pets                  BOOLEAN                                         ,
     medicine_regimen_pets          VARCHAR(500)                                    ,
     additional_data_pets           VARCHAR(1000)                                   ,
+    registration_date_pets         TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW() ,
     CONSTRAINT pk_pet PRIMARY KEY (id_pets)
 );
 

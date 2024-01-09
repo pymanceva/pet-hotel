@@ -39,7 +39,7 @@ public interface PetMapper {
         return null;
     }
 
-    //    @Mapping(source = "newPetDto.ownerId", target = "owner", qualifiedBy = IdToUser.class)
+//    @Mapping(source = "newPetDto.ownerId", target = "owner", qualifiedBy = IdToUser.class)
     @Mapping(target = "id", ignore = true)
     Pet toPet(NewPetDto newPetDto);
 
