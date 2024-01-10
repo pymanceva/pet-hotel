@@ -6,6 +6,10 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local server for develop
+  - url: http://212.109.192.9:8080
+    description: Удалённый backend сервер для тестирования и работы frontend. 
+      По вопросам работы сервера обращаться к Руслану
+
 tags:
   - description: API для работы с пользователями.
     name: user-controller
@@ -19,6 +23,17 @@ paths:
       summary: Получить список всех пользователей
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
+        - name: isActive
+          in: query
+          description: >-
+            Состояние учётной записи
+            1. isActive=true - вернуть все активные учётные данные,
+            2. isActive=false - вернуть все заблокированные учётные данные,
+            3. isActive=null (или опущен) - вернуть всех пользователей независимо от статуса.
+          required: false
+          schema:
+            type: boolean
+          example: true
       responses:
         200:
           description: OK
@@ -55,7 +70,6 @@ paths:
             Объект не найден.
             Ошибка может возникнуть в следующих случаях:
             1. не найден пользователь от имени которого производится запрос - requester;
-            2. не найден пользователь в отношении которого производится запрос - user.
           content:
             application/json:
               example:
@@ -298,9 +312,11 @@ paths:
       operationId: updateUser
       description: >-
         Редактирование существующего пользователя. 
-        Каждый пользователь может редактировать сам себя. 
+        Каждый пользователь может редактировать сам себя (за исключением изменения своей роли). 
         Кроме того, редактирование пользователей с ролью USER и FINANCIAL доступно пользователям BOSS и ADMIN,
         а пользователя ADMIN может редактировать BOSS.
+        Пользователи не могут установить роль равную своей или выше неё.
+        Состояние учётной записи (isActive) редактируется другим эндпоинтом.
       summary: Изменить информацию об имеющемся пользователе
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
