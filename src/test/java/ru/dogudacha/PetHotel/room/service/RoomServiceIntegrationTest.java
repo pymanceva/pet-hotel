@@ -31,9 +31,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 public class RoomServiceIntegrationTest {
     final User requesterAdmin = User.builder()
+            .lastName("Кружкин")
+            .firstName("admin")
+            .middleName("Петрович")
             .email("admin@mail.ru")
-            .name("admin")
+            .password("admin_pwd")
             .role(Roles.ROLE_ADMIN)
+            .isActive(true)
             .build();
     final Category category = Category.builder()
             .name("name")
