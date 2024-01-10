@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: 'PetHotel: Bookings Specification'
   description: Документация раздела по работе с бронированиями
-  version: v1
+  version: v2
 servers:
   - url: http://localhost:8080
     description: Generated server url
@@ -431,7 +431,6 @@ components:
         - prepaymentAmount
         - isPrepaid
         - room
-        - pets
       type: object
       properties:
         id:

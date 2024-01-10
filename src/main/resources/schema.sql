@@ -78,8 +78,8 @@ CREATE TABLE IF NOT EXISTS pets
     CONSTRAINT pk_pet PRIMARY KEY (id_pets)
 );
 
-INSERT INTO pets (birth_date_pets, breed_pets, name_pets, sex_pets, type_pets)
-     VALUES ('09.06.2023', 'Спаниель', 'Барбос', 'FEMALE', 'DOG');
+--INSERT INTO pets (birth_date_pets, breed_pets, name_pets, sex_pets, type_pets)
+--VALUES ('09.06.2023', 'Спаниель', 'Барбос', 'FEMALE', 'DOG');
 
 CREATE TABLE IF NOT EXISTS categories
 (
@@ -90,8 +90,8 @@ CREATE TABLE IF NOT EXISTS categories
     CONSTRAINT UQ_CATEGORY_NAME UNIQUE(name_categories)
 );
 
-INSERT INTO categories (name_categories, description_categories)
-VALUES ('Номер для собак', 'Номер для собак, антивандальная отделка, оснащен лежаками, мисками');
+--INSERT INTO categories (name_categories, description_categories)
+--VALUES ('Номер для собак', 'Номер для собак, антивандальная отделка, оснащен лежаками, мисками');
 
 CREATE TABLE IF NOT EXISTS rooms
 (
@@ -107,8 +107,8 @@ CREATE TABLE IF NOT EXISTS rooms
     CONSTRAINT positive_room_area CHECK (area_rooms >= 0)
 );
 
-INSERT INTO rooms (number_rooms, area_rooms, category_id_rooms, description_rooms, visible_rooms)
-VALUES ('1F', 10, 1, 'Номер с отдельным входом', true);
+--INSERT INTO rooms (number_rooms, area_rooms, category_id_rooms, description_rooms, visible_rooms)
+--VALUES ('1F', 10, 1, 'Номер с отдельным входом', true);
 
 CREATE TABLE IF NOT EXISTS bookings
 (
