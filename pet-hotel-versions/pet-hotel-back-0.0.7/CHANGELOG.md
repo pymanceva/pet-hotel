@@ -21,8 +21,8 @@ https://docs.google.com/document/d/1l4dELV7vZi2YMXWBppTEneTQ0VyG9SCHWPlP2seWwZQ/
 - получение списка пользователей
     - всех активных
     - всех отключенных
-    - всех независимо от статуса
-- изменение состояния учётной записи
+    - всех независимо от статуса(isActive)
+- изменение статуса(isActive) учётной записи
 
 Карточка: *<https://nkiblyk.kaiten.ru/26310859>*  
 Api: *<https://github.com/pymanceva/pet-hotel/blob/develop/Specification/pet-hotel-users-spec.yaml>*

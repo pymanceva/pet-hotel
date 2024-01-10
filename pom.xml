@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>ru.dogudacha</groupId>
-	<artifactId>PetHotel</artifactId>
+	<artifactId>Modgy</artifactId>
 	<version>0.0.7-SNAPSHOT</version>
-	<name>PetHotel</name>
+	<name>Modgy</name>
 	<description>Booking app for pets hotel</description>
 	<properties>
 		<java.version>17</java.version>
