@@ -31,19 +31,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = UserController.class)
 class UserControllerIntegrationTest {
 
+    private final String requesterHeader = "X-PetHotel-User-Id";
+    long userId = 2L;
+    long requesterId = 1L;
+    UserDto userDto = new UserDto(userId, "userLastName", "userFirstName", "userMiddleName",
+            "user@mail.ru", "user_pwd", Roles.ROLE_ADMIN, true);
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
-
     @MockBean
     private UserService userService;
-
-    long userId = 2L;
-    long requesterId = 1L;
-    private final String requesterHeader = "X-PetHotel-User-Id";
-    UserDto userDto = new UserDto(userId, "userLastName", "userFirstName", "userMiddleName",
-            "user@mail.ru", "user_pwd", Roles.ROLE_ADMIN, true);
 
     @Test
     @SneakyThrows
@@ -147,7 +145,7 @@ class UserControllerIntegrationTest {
     @Test
     @SneakyThrows
     void getAllUsers() {
-        when(userService.getAllUsers(anyLong())).thenReturn(List.of(userDto));
+        when(userService.getAllUsers(anyLong(), any())).thenReturn(List.of(userDto));
 
         mockMvc.perform(get("/users")
                         .header(requesterHeader, requesterId)

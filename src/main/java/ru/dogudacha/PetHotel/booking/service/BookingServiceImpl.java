@@ -50,10 +50,12 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toSet());
         newBooking.setPets(pets);
 
-        if (newBooking.getIsPrepaid() | newBooking.getType().equals(TypesBooking.TYPE_CLOSING)) {
-            newBooking.setStatus(StatusBooking.STATUS_CONFIRMED);
-        } else {
-            newBooking.setStatus(StatusBooking.STATUS_INITIAL);
+        if (newBooking.getStatus() == null) {
+            if (newBooking.getIsPrepaid() | newBooking.getType().equals(TypesBooking.TYPE_CLOSING)) {
+                newBooking.setStatus(StatusBooking.STATUS_CONFIRMED);
+            } else {
+                newBooking.setStatus(StatusBooking.STATUS_INITIAL);
+            }
         }
 
         Booking addedBooking = bookingRepository.save(newBooking);
@@ -137,6 +139,8 @@ public class BookingServiceImpl implements BookingService {
 
         if (updateBookingDto.getRoomId() != null) {
             newBooking.setRoom(findRoomById(updateBookingDto.getRoomId()));
+        } else {
+            newBooking.setRoom(oldBooking.getRoom());
         }
 
         if (updateBookingDto.getPetIds() != null) {
@@ -144,6 +148,8 @@ public class BookingServiceImpl implements BookingService {
                     .map(this::findPetById)
                     .collect(Collectors.toSet());
             newBooking.setPets(pets);
+        } else {
+            newBooking.setPets(oldBooking.getPets());
         }
 
         if (newBooking.getStatus().equals(StatusBooking.STATUS_INITIAL) & newBooking.getIsPrepaid()) {

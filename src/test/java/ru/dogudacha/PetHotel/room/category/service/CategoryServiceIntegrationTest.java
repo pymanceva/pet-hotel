@@ -31,8 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class CategoryServiceIntegrationTest {
     final User requesterAdmin = User.builder()
             .email("admin@mail.ru")
-            .name("admin")
+            .firstName("admin")
             .role(Roles.ROLE_ADMIN)
+            .isActive(true)
             .build();
     final NewCategoryDto newCategoryDto = NewCategoryDto.builder()
             .name("Dog room")
