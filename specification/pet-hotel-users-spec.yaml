@@ -27,8 +27,8 @@ paths:
           in: query
           description: >-
             Состояние учётной записи
-            1. isActive=true - вернуть все активные учётные данные,
-            2. isActive=false - вернуть все заблокированные учётные данные,
+            1. isActive=true - вернуть все активные учётные записи,
+            2. isActive=false - вернуть все заблокированные учётные записи,
             3. isActive=null (или опущен) - вернуть всех пользователей независимо от статуса.
           required: false
           schema:
@@ -48,9 +48,10 @@ paths:
           content:
             application/json:
               example:
-                status: BAD_REQUEST
+                errors: []
+                message: "Error: Field firstName must not be blank."
                 reason: Incorrectly made request.
-                message: "Error: Field mainPhone must not be blank."
+                status: BAD_REQUEST
                 timestamp: 2023-12-03 09:10:50
               schema:
                 $ref: '#/components/schemas/Error'
@@ -59,9 +60,10 @@ paths:
           content:
             application/json:
               example:
-                status: FORBIDDEN
-                reason: Operation is denied for this user.
+                errors: []
                 message: "User with role=FINANCIAL, hasn't access for browse this information"
+                reason: Operation is denied for this user.
+                status: FORBIDDEN
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -73,9 +75,10 @@ paths:
           content:
             application/json:
               example:
-                status: NOT_FOUND
-                reason: The required object was not found.
+                errors: []
                 message: "user with id=42 not found"
+                reason: The required object was not found.
+                status: NOT_FOUND
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -84,9 +87,10 @@ paths:
           content:
             application/json:
               example:
-                status: INTERNAL_SERVER_ERROR
-                reason: Internal Server Error.
+                errors: []
                 message: []
+                reason: Internal Server Error.
+                status: INTERNAL_SERVER_ERROR
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -120,9 +124,10 @@ paths:
           content:
             application/json:
               example:
-                status: BAD_REQUEST
+                errors: []
+                message: "Error: Field firstName must not be blank."
                 reason: Incorrectly made request.
-                message: "Error: Field mainPhone must not be blank."
+                status: BAD_REQUEST
                 timestamp: 2023-12-03 09:10:50
               schema:
                 $ref: '#/components/schemas/Error'
@@ -131,9 +136,10 @@ paths:
           content:
             application/json:
               example:
-                status: FORBIDDEN
-                reason: Operation is denied for this user.
+                errors: []
                 message: "User with role=FINANCIAL, hasn't access for edit this information"
+                reason: Operation is denied for this user.
+                status: FORBIDDEN
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -145,9 +151,10 @@ paths:
           content:
             application/json:
               example:
-                status: NOT_FOUND
-                reason: The required object was not found.
+                errors: []
                 message: "user with id=42 not found"
+                reason: The required object was not found.
+                status: NOT_FOUND
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -156,9 +163,10 @@ paths:
           content:
             application/json:
               example:
-                status: CONFLICT
-                reason: integrity constraint has been violated.
+                errors: []
                 message: "Attempt to insert duplicate key row in object owner with unique index user_email."
+                reason: integrity constraint has been violated.
+                status: CONFLICT
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -167,9 +175,10 @@ paths:
           content:
             application/json:
               example:
-                status: INTERNAL_SERVER_ERROR
-                reason: Internal Server Error.
+                errors: []
                 message: []
+                reason: Internal Server Error.
+                status: INTERNAL_SERVER_ERROR
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -199,9 +208,10 @@ paths:
           content:
             application/json:
               example:
-                status: BAD_REQUEST
+                errors: []
+                message: "Error: Field firstName must not be blank."
                 reason: Incorrectly made request.
-                message: "Error: Field mainPhone must not be blank."
+                status: BAD_REQUEST
                 timestamp: 2023-12-03 09:10:50
               schema:
                 $ref: '#/components/schemas/Error'
@@ -210,9 +220,10 @@ paths:
           content:
             application/json:
               example:
-                status: FORBIDDEN
-                reason: Operation is denied for this user.
+                errors: []
                 message: "User with role=FINANCIAL, hasn't access for browse this information"
+                reason: Operation is denied for this user.
+                status: FORBIDDEN
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -225,9 +236,10 @@ paths:
           content:
             application/json:
               example:
-                status: NOT_FOUND
-                reason: The required object was not found.
+                errors: []
                 message: "user with id=42 not found"
+                reason: The required object was not found.
+                status: NOT_FOUND
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -236,9 +248,10 @@ paths:
           content:
             application/json:
               example:
-                status: INTERNAL_SERVER_ERROR
-                reason: Internal Server Error.
+                errors: []
                 message: []
+                reason: Internal Server Error.
+                status: INTERNAL_SERVER_ERROR
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -263,9 +276,10 @@ paths:
           content:
             application/json:
               example:
-                status: BAD_REQUEST
+                errors: []
+                message: "Error: Field firstName must not be blank."
                 reason: Incorrectly made request.
-                message: "Error: Field mainPhone must not be blank."
+                status: BAD_REQUEST
                 timestamp: 2023-12-03 09:10:50
               schema:
                 $ref: '#/components/schemas/Error'
@@ -274,9 +288,10 @@ paths:
           content:
             application/json:
               example:
-                status: FORBIDDEN
-                reason: Operation is denied for this user.
+                errors: []
                 message: "User with role=FINANCIAL, hasn't access for edit this information"
+                reason: Operation is denied for this user.
+                status: FORBIDDEN
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -289,9 +304,10 @@ paths:
           content:
             application/json:
               example:
-                status: NOT_FOUND
-                reason: The required object was not found.
+                errors: []
                 message: "user with id=42 not found"
+                reason: The required object was not found.
+                status: NOT_FOUND
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -300,9 +316,10 @@ paths:
           content:
             application/json:
               example:
-                status: INTERNAL_SERVER_ERROR
-                reason: Internal Server Error.
+                errors: []
                 message: []
+                reason: Internal Server Error.
+                status: INTERNAL_SERVER_ERROR
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -339,9 +356,10 @@ paths:
           content:
             application/json:
               example:
-                status: BAD_REQUEST
+                errors: []
+                message: "Error: Field firstName must not be blank."
                 reason: Incorrectly made request.
-                message: "Error: Field mainPhone must not be blank."
+                status: BAD_REQUEST
                 timestamp: 2023-12-03 09:10:50
               schema:
                 $ref: '#/components/schemas/Error'
@@ -350,9 +368,10 @@ paths:
           content:
             application/json:
               example:
-                status: FORBIDDEN
-                reason: Operation is denied for this user.
+                errors: []
                 message: "User with role=FINANCIAL, hasn't access for edit this information"
+                reason: Operation is denied for this user.
+                status: FORBIDDEN
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -365,9 +384,10 @@ paths:
           content:
             application/json:
               example:
-                status: NOT_FOUND
-                reason: The required object was not found.
+                errors: []
                 message: "user with id=42 not found"
+                reason: The required object was not found.
+                status: NOT_FOUND
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -376,9 +396,10 @@ paths:
           content:
             application/json:
               example:
-                status: CONFLICT
-                reason: integrity constraint has been violated.
+                errors: []
                 message: "Attempt to insert duplicate key row in object owner with unique index user_email."
+                reason: integrity constraint has been violated.
+                status: CONFLICT
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -387,9 +408,10 @@ paths:
           content:
             application/json:
               example:
-                status: INTERNAL_SERVER_ERROR
-                reason: Internal Server Error.
+                errors: []
                 message: []
+                reason: Internal Server Error.
+                status: INTERNAL_SERVER_ERROR
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -427,9 +449,10 @@ paths:
           content:
             application/json:
               example:
-                status: BAD_REQUEST
+                errors: []
+                message: "Error: Field firstName must not be blank."
                 reason: Incorrectly made request.
-                message: "Error: Field mainPhone must not be blank."
+                status: BAD_REQUEST
                 timestamp: 2023-12-03 09:10:50
               schema:
                 $ref: '#/components/schemas/Error'
@@ -438,9 +461,10 @@ paths:
           content:
             application/json:
               example:
-                status: FORBIDDEN
-                reason: Operation is denied for this user.
+                errors: []
                 message: "User with role=FINANCIAL, hasn't access for edit this information"
+                reason: Operation is denied for this user.
+                status: FORBIDDEN
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -453,9 +477,10 @@ paths:
           content:
             application/json:
               example:
-                status: NOT_FOUND
-                reason: The required object was not found.
+                errors: []
                 message: "user with id=42 not found"
+                reason: The required object was not found.
+                status: NOT_FOUND
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -464,9 +489,10 @@ paths:
           content:
             application/json:
               example:
-                status: INTERNAL_SERVER_ERROR
-                reason: Internal Server Error.
+                errors: []
                 message: []
+                reason: Internal Server Error.
+                status: INTERNAL_SERVER_ERROR
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
