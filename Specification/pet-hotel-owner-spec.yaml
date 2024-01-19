@@ -51,7 +51,7 @@ paths:
               example:
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
-                message: "User with role=FINANCIAL, hasn't access for edit this information"
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -62,7 +62,7 @@ paths:
               example:
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: "user with id=5 not found"
+                message: "User with id=5 is not found"
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -124,7 +124,7 @@ paths:
               example:
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
-                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -135,7 +135,7 @@ paths:
               example:
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: "owner with id=42 not found"
+                message: "Owner with id=42 is not found"
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -192,7 +192,7 @@ paths:
               example:
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
-                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -203,7 +203,7 @@ paths:
               example:
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: "owner with id=42 not found"
+                message: "Owner with id=42 is not found"
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -255,7 +255,7 @@ paths:
               example:
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
-                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -266,7 +266,7 @@ paths:
               example:
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: "owner with id=42 not found"
+                message: "Owner with id=42 is not found"
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -327,7 +327,7 @@ paths:
               example:
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
-                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -338,7 +338,7 @@ paths:
               example:
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: "owner with id=42 not found"
+                message: "Owner with id=42 is not found"
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'

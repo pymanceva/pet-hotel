@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.dogudacha.PetHotel.exception.AccessDeniedException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
 import ru.dogudacha.PetHotel.room.category.dto.CategoryDto;
 import ru.dogudacha.PetHotel.room.category.dto.NewCategoryDto;
@@ -12,8 +11,7 @@ import ru.dogudacha.PetHotel.room.category.dto.UpdateCategoryDto;
 import ru.dogudacha.PetHotel.room.category.dto.mapper.CategoryMapper;
 import ru.dogudacha.PetHotel.room.category.model.Category;
 import ru.dogudacha.PetHotel.room.category.repository.CategoryRepository;
-import ru.dogudacha.PetHotel.user.model.User;
-import ru.dogudacha.PetHotel.user.repository.UserRepository;
+import ru.dogudacha.PetHotel.utility.UtilityService;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,12 +23,12 @@ import java.util.Objects;
 public class CategoryServiceImpl implements CategoryService {
     final private CategoryRepository categoryRepository;
     final private CategoryMapper categoryMapper;
-    private final UserRepository userRepository;
+    final private UtilityService utilityService;
 
     @Transactional
     @Override
     public CategoryDto addCategory(Long userId, NewCategoryDto newCategoryDto) {
-        checkAdminAccess(userId);
+        utilityService.checkBossAdminAccess(userId);
 
         Category newCategory = categoryMapper.toCategory(newCategoryDto);
         Category addedCategory = categoryRepository.save(newCategory);
@@ -41,9 +39,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     @Override
     public CategoryDto updateCategoryById(Long userId, Long catId, UpdateCategoryDto updateCategoryDto) {
-        checkAdminAccess(userId);
+        utilityService.checkBossAdminAccess(userId);
 
-        Category oldCategory = findCategoryById(catId);
+        Category oldCategory = utilityService.getCategoryIfExists(catId);
         Category newCategory = categoryMapper.toCategory(updateCategoryDto);
         newCategory.setId(oldCategory.getId());
 
@@ -65,9 +63,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     @Override
     public CategoryDto getCategoryById(Long userId, Long catId) {
-        checkAdminAccess(userId);
+        utilityService.checkBossAdminAccess(userId);
 
-        Category category = findCategoryById(catId);
+        Category category = utilityService.getCategoryIfExists(catId);
         log.info("CategoryService: getCategoryById, userId={}, catId={}", userId, catId);
         return categoryMapper.toCategoryDto(category);
     }
@@ -75,7 +73,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     @Override
     public Collection<CategoryDto> getAllCategories(Long userId) {
-        checkAdminAccess(userId);
+        utilityService.checkBossAdminAccess(userId);
 
         List<Category> allCategories = categoryRepository.findAll();
         log.info("CategoryService: getAllCategories, userId={}, list size={}", userId, allCategories.size());
@@ -85,7 +83,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     @Override
     public void deleteCategoryById(Long userId, Long catId) {
-        checkAdminAccess(userId);
+        utilityService.checkBossAdminAccess(userId);
 
         int result = categoryRepository.deleteCategoryById(catId);
 
@@ -94,24 +92,5 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         log.info("CategoryService: deleteCategoryById, userId={}, catId={}", userId, catId);
-    }
-
-    public Category findCategoryById(Long id) {
-        return categoryRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("category with id=%d is not found", id)));
-    }
-
-    private User findUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("user with id=%d is not found", userId)));
-    }
-
-    private void checkAdminAccess(Long userId) {
-        User user = findUserById(userId);
-
-        if (user.getRole().ordinal() >= 2) {
-            throw new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                    user.getRole()));
-        }
     }
 }

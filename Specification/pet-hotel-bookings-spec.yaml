@@ -5,7 +5,10 @@ info:
   version: v1
 servers:
   - url: http://localhost:8080
-    description: Generated server url
+    description: Local server for develop
+  - url: http://212.109.192.9:8080
+    description: Удалённый backend сервер для тестирования и работы frontend.
+      По вопросам работы сервера обращаться к Руслану
 tags:
   - description: API для работы с бронированиями.
     name: booking-controller
@@ -65,7 +68,7 @@ paths:
                 error: '[]'
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: "user with id=1 is not found"
+                message: "User with id=1 is not found"
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -142,7 +145,7 @@ paths:
                 error: '[]'
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: "user with id=1 is not found"
+                message: "User with id=1 is not found"
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -202,7 +205,7 @@ paths:
                 error: '[]'
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: "user with id=1 is not found"
+                message: "User with id=1 is not found"
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -272,7 +275,7 @@ paths:
                 error: '[]'
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: "user with id=1 is not found"
+                message: "User with id=1 is not found"
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'

@@ -13,6 +13,7 @@ import ru.dogudacha.PetHotel.user.dto.mapper.UserMapper;
 import ru.dogudacha.PetHotel.user.model.Roles;
 import ru.dogudacha.PetHotel.user.model.User;
 import ru.dogudacha.PetHotel.user.repository.UserRepository;
+import ru.dogudacha.PetHotel.utility.UtilityService;
 
 import java.util.*;
 
@@ -23,13 +24,14 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    final private UtilityService utilityService;
 
     @Transactional(readOnly = true)
     @Override
     public List<UserDto> getAllUsers(Long requesterId, Boolean isActive) {
-        User requester = findUserById(requesterId);
+        User requester = utilityService.getUserIfExists(requesterId);
 
-        checkAccessForBrowse(requester, Roles.ROLE_ADMIN);
+        utilityService.checkHigherOrEqualOrdinalRoleAccess(requester, Roles.ROLE_ADMIN);
 
         List<Roles> roles =
                 Arrays.asList(Roles.values()).subList(requester.getRole().ordinal(), Roles.values().length);
@@ -48,10 +50,10 @@ public class UserServiceImpl implements UserService {
     @Transactional()
     @Override
     public UserDto addUser(Long requesterId, NewUserDto newUserDto) {
-        User requester = findUserById(requesterId);
+        User requester = utilityService.getUserIfExists(requesterId);
         User newUser = userMapper.toUser(newUserDto);
 
-        checkAccessForEdit(requester, newUser);
+        utilityService.checkHigherOrdinalRoleAccess(requester, newUser);
 
         User addedUser = userRepository.save(newUser);
         log.info("userService: addUser, requesterId={}, newUserDto={},  newUser={}",
@@ -62,13 +64,13 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public UserDto getUserById(Long requesterId, Long userId) {
-        User requester = findUserById(requesterId);
+        User requester = utilityService.getUserIfExists(requesterId);
         if (userId.equals(requesterId)) {
             log.info("UserService: getUserById, requesterId ={}, by userId={}", requesterId, userId);
             return userMapper.toUserDto(requester);
         }
-        User user = findUserById(userId);
-        checkAccessForBrowse(requester, user);
+        User user = utilityService.getUserIfExists(userId);
+        utilityService.checkHigherOrEqualOrdinalRoleAccess(requester, user);
 
         log.info("UserService: getUserById, requesterId ={}, by userId={}", requesterId, userId);
         return userMapper.toUserDto(user);
@@ -77,14 +79,14 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void deleteUserById(Long requesterId, Long userId) {
-        User requester = findUserById(requesterId);
-        User user = findUserById(userId);
+        User requester = utilityService.getUserIfExists(requesterId);
+        User user = utilityService.getUserIfExists(userId);
 
         if (user.getRole().equals(Roles.ROLE_BOSS)) {
             throw new AccessDeniedException("User with role=ROLE_BOSS can't delete");
         }
 
-        checkAccessForEdit(requester, user);
+        utilityService.checkHigherOrdinalRoleAccess(requester, user);
 
         Integer result = userRepository.deleteUserById(userId);
         if (result == 0) {
@@ -97,7 +99,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(Long requesterId, Long userId, UpdateUserDto updateUserDto) {
         boolean updateBySelf = requesterId.equals(userId);
-        User requester = findUserById(requesterId);
+        User requester = utilityService.getUserIfExists(requesterId);
 
         User newUser = userMapper.toUser(updateUserDto);
         newUser.setId(userId);
@@ -106,9 +108,9 @@ public class UserServiceImpl implements UserService {
         if (updateBySelf) {
             oldUser = requester;
         } else {
-            checkAccessForEdit(requester, newUser);
-            oldUser = findUserById(userId);
-            checkAccessForEdit(requester, oldUser);
+            utilityService.checkHigherOrdinalRoleAccess(requester, newUser);
+            oldUser = utilityService.getUserIfExists(userId);
+            utilityService.checkHigherOrdinalRoleAccess(requester, oldUser);
         }
 
         if (Objects.isNull(newUser.getLastName())) {
@@ -141,46 +143,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto setUserState(Long requesterId, Long userId, Boolean isActive) {
-        User requester = findUserById(requesterId);
-        User user = findUserById(userId);
-        checkAccessForEdit(requester, user);
+        User requester = utilityService.getUserIfExists(requesterId);
+        User user = utilityService.getUserIfExists(userId);
+        utilityService.checkHigherOrdinalRoleAccess(requester, user);
 
         user.setIsActive(isActive);
 
         User updatedUser = userRepository.save(user);
         return userMapper.toUserDto(updatedUser);
-    }
-
-    private void checkAccessForEdit(User requester, Roles role) {
-        if (requester.getRole().ordinal() < 2 &&
-                (role == null ||
-                        (requester.getRole().ordinal() < role.ordinal()))
-        ) {
-            return;
-        }
-        throw new AccessDeniedException(String.format("User with role=%s, can't access for edit this information",
-                requester.getRole()));
-    }
-
-    private User findUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("user with id=%d not found", userId)));
-    }
-
-    private void checkAccessForEdit(User requester, User user) {
-        checkAccessForEdit(requester, user.getRole());
-    }
-
-    private void checkAccessForBrowse(User requester, Roles role) {
-        if (requester.getRole().ordinal() < 2 &&
-                requester.getRole().ordinal() <= role.ordinal()) {
-            return;
-        }
-        throw new AccessDeniedException(String.format("User with role=%s, can't access for browsing this information",
-                requester.getRole()));
-    }
-
-    private void checkAccessForBrowse(User requester, User user) {
-        checkAccessForBrowse(requester, user.getRole());
     }
 }

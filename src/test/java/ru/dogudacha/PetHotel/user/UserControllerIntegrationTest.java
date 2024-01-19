@@ -147,7 +147,7 @@ class UserControllerIntegrationTest {
     @Test
     @SneakyThrows
     void getAllUsers() {
-        when(userService.getAllUsers(anyLong())).thenReturn(List.of(userDto));
+        when(userService.getAllUsers(anyLong(), any())).thenReturn(List.of(userDto));
 
         mockMvc.perform(get("/users")
                         .header(requesterHeader, requesterId)

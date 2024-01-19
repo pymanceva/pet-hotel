@@ -9,6 +9,7 @@ import ru.dogudacha.PetHotel.pet.dto.NewPetDto;
 import ru.dogudacha.PetHotel.pet.dto.PetDto;
 import ru.dogudacha.PetHotel.pet.dto.UpdatePetDto;
 import ru.dogudacha.PetHotel.pet.service.PetService;
+import ru.dogudacha.PetHotel.utility.UtilityService;
 
 
 @CrossOrigin
@@ -17,26 +18,25 @@ import ru.dogudacha.PetHotel.pet.service.PetService;
 @RequiredArgsConstructor
 @Slf4j
 public class PetController {
-    private static final String USER_ID = "X-PetHotel-User-Id";
     private final PetService petService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PetDto addPet(@RequestHeader(USER_ID) Long requesterId,
+    public PetDto addPet(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                          @RequestBody @Valid NewPetDto newPetDto) {
         log.info("PetController: POST/addPet, requesterId={}", requesterId);
         return petService.addPet(requesterId, newPetDto);
     }
 
     @GetMapping("/{id}")
-    public PetDto getPetById(@RequestHeader(USER_ID) Long requesterId,
+    public PetDto getPetById(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                              @PathVariable(value = "id") Long petId) {
         log.info("PetController: GET/getPetById, requesterId={}, petId={}", requesterId, petId);
         return petService.getPetById(requesterId, petId);
     }
 
     @PatchMapping("/{id}")
-    public PetDto updatePet(@RequestHeader(USER_ID) Long requesterId,
+    public PetDto updatePet(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                             @RequestBody @Valid UpdatePetDto updatePetDto,
                             @PathVariable(value = "id") Long petId) {
         log.info("PetController: PATCH/updatePet, requesterId={}, petId={}", requesterId, petId);
@@ -45,7 +45,7 @@ public class PetController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePetById(@RequestHeader(USER_ID) Long requesterId,
+    public void deletePetById(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                               @PathVariable(value = "id") Long petId) {
         log.info("PetController: DELETE/deletePetById, requesterId= {}, petId={}", requesterId, petId);
         petService.deletePetById(requesterId, petId);
