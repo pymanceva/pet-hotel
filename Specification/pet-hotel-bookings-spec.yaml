@@ -313,7 +313,7 @@ components:
         type: integer
         format: int64
     bookingId:
-      name: booking-Id
+      name: id
       description: ID бронирования
       in: path
       required: true
@@ -530,9 +530,11 @@ components:
         room:
           $ref: '#/components/schemas/RoomDto'
         pets:
+          description: Список питомцев в бронировании
           type: array
           items:
             $ref: '#/components/schemas/PetDto'
+          uniqueItems: true
     NewBookingDto:
       required:
         - type
@@ -624,12 +626,12 @@ components:
           format: int64
           description: Id бронируемого номера
           example: 1
-        petIds:
-          description: Список id питомцев в бронировании
+        pets:
+          description: Список питомцев в бронировании
           type: array
           items:
-            type: integer
-            format: int64
+            $ref: '#/components/schemas/PetDto'
+          uniqueItems: true
     UpdateBookingDto:
       type: object
       properties:
@@ -719,12 +721,12 @@ components:
           format: int64
           description: Id бронируемого номера
           example: 1
-        petIds:
-          description: Список id питомцев в бронировании
+        pets:
+          description: Список питомцев в бронировании
           type: array
           items:
-            type: integer
-            format: int64
+            $ref: '#/components/schemas/PetDto'
+          uniqueItems: true
     RoomDto:
       required:
         - number

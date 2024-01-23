@@ -96,7 +96,7 @@ public class BookingServiceIntegrationTest {
             .roomId(1L)
             .checkInDate(LocalDate.now())
             .checkOutDate(LocalDate.now().plusDays(7))
-            .petIds(List.of(1L))
+            .pets(List.of(petDto))
             .build();
     private final BookingDto bookingDto = BookingDto.builder()
             .type(TypesBooking.TYPE_BOOKING)
@@ -127,7 +127,6 @@ public class BookingServiceIntegrationTest {
         em.persist(room);
         em.persist(pet);
         newBookingDto.setRoomId(room.getId());
-        newBookingDto.setPetIds(List.of(pet.getId()));
 
         BookingDto result = service.addBooking(requesterAdmin.getId(), newBookingDto);
 

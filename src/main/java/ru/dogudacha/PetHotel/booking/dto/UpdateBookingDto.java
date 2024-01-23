@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.dogudacha.PetHotel.booking.model.ReasonOfStopBooking;
 import ru.dogudacha.PetHotel.booking.model.StatusBooking;
+import ru.dogudacha.PetHotel.pet.dto.PetDto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -46,5 +47,5 @@ public class UpdateBookingDto {
     private String comment;
     private String fileUrl;
     private Long roomId;
-    private Collection<Long> petIds;
+    private Collection<PetDto> pets;
 }

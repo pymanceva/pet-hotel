@@ -45,7 +45,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class BookingServiceImplTest {
-    final PetDto petDto = PetDto.builder()
+    private final PetDto petDto = PetDto.builder()
             .id(1L)
             .type(TypeOfPet.DOG)
             .name("Шарик")
@@ -53,7 +53,7 @@ public class BookingServiceImplTest {
             .birthDate(LocalDate.of(2023, 1, 1))
             .sex(Sex.FEMALE)
             .build();
-    final Pet pet = Pet.builder()
+    private final Pet pet = Pet.builder()
             .id(1L)
             .type(TypeOfPet.DOG)
             .name("Шарик")
@@ -108,7 +108,7 @@ public class BookingServiceImplTest {
             .roomId(1L)
             .checkInDate(LocalDate.now())
             .checkOutDate(LocalDate.now().plusDays(7))
-            .petIds(List.of(1L))
+            .pets(List.of(petDto))
             .build();
     private final Long bookingId = 1L;
     private final Booking booking = Booking.builder()
@@ -237,17 +237,6 @@ public class BookingServiceImplTest {
     void addBooking_whenAddBookingAndRoomNotFound_thenNotFoundException() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
         when(roomRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class,
-                () -> bookingService.addBooking(user.getId(), newBookingDto));
-    }
-
-    @Test
-    void addBooking_whenAddBookingAndPetNotFound_thenNotFoundException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
-        when(bookingMapper.toBooking(any(NewBookingDto.class))).thenReturn(booking);
-        when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
-        when(petRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.addBooking(user.getId(), newBookingDto));
