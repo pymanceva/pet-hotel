@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dogudacha.PetHotel.user.dto.NewUserDto;
 import ru.dogudacha.PetHotel.user.dto.UpdateUserDto;
@@ -23,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest
 @ActiveProfiles("test")
+@Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class UserServiceIntegrationTest {
     private final EntityManager em;
     private final UserService service;
@@ -37,9 +39,9 @@ public class UserServiceIntegrationTest {
             .isActive(true)
             .build();
 
-    final String userFirstName = "new User FirstName";
-    final String userMiddleName = "new User MiddleName";
-    final String userLastName = "new User LastName";
+    final String userFirstName = "newFirstName";
+    final String userMiddleName = "newMiddleName";
+    final String userLastName = "newLastName";
     final String userEmail = "newUser@mail.com";
     final String userPassword = "user_pwd";
     final Roles userRole = Roles.ROLE_USER;
@@ -66,7 +68,7 @@ public class UserServiceIntegrationTest {
     User user3 = User.builder()
             .firstName("3" + user.getFirstName()).email("3" + user.getEmail()).role(userRole3).isActive(true)
             .build();
-    NewUserDto newUserDto = new NewUserDto(userLastName, userFirstName, userMiddleName, userEmail, userPassword,
+    NewUserDto newUserDto = new NewUserDto(userLastName, userFirstName, userMiddleName, userPassword, userEmail,
             userRole, isActive);
 
     UpdateUserDto updateUserDto = UpdateUserDto.builder()

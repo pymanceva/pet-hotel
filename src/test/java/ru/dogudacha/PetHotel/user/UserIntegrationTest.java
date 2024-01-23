@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
 @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-public class IntegrationTest {
+public class UserIntegrationTest {
     @Autowired
     private final UserController userController;
 
