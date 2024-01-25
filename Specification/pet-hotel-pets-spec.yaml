@@ -374,7 +374,7 @@ components:
         type: integer
         format: int64
     petId:
-      name: pet-Id
+      name: id
       description: ID питомца
       in: path
       required: true
@@ -527,7 +527,7 @@ components:
             - MALE
             - HERMAPHRODITE
           description: Пол питомца
-          example: Женский
+          example: FEMALE
         color:
           maxLength: 30
           type: string
@@ -831,7 +831,7 @@ components:
             - MALE
             - HERMAPHRODITE
           description: Пол питомца
-          example: Женский
+          example: FEMALE
         color:
           maxLength: 30
           type: string
@@ -1088,6 +1088,10 @@ components:
           type: string
           description: Дополнительные комментарии, особенности поведения
           example: Любит, чтоб чесали животик
+        registrationDate:
+          type: string
+          description: Дата регистрации (в формате "dd.MM.yyyy"), должно быть в прошлом
+          example: 09.12.2023
     UpdatePetDto:
       description: Дто для изменения данных питомца
       type: object
@@ -1123,7 +1127,7 @@ components:
             - MALE
             - HERMAPHRODITE
           description: Пол питомца
-          example: Женский
+          example: FEMALE
         color:
           maxLength: 30
           type: string

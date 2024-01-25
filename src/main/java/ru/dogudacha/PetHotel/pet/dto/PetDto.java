@@ -7,6 +7,7 @@ import ru.dogudacha.PetHotel.pet.model.TypeOfPet;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 
 @Getter
 @Setter
@@ -80,4 +81,16 @@ public class PetDto {
     private String additionalData;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
     private LocalDateTime registrationDate;
+
+    public static final Comparator<PetDto> PET_COMPARATOR =
+            Comparator.comparing((PetDto::getName))
+                    .thenComparing((PetDto::getType))
+                    .thenComparing((PetDto::getBreed))
+                    .thenComparing((PetDto::getRegistrationDate));
+
+
+    public static Comparator<PetDto> getComparator() {
+        return PET_COMPARATOR;
+    }
+
 }

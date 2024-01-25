@@ -2,13 +2,15 @@ package ru.dogudacha.PetHotel.pet.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.support.PagedListHolder;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dogudacha.PetHotel.exception.AccessDeniedException;
-import ru.dogudacha.PetHotel.exception.ConflictException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
 import ru.dogudacha.PetHotel.pet.dto.NewPetDto;
 import ru.dogudacha.PetHotel.pet.dto.PetDto;
+import ru.dogudacha.PetHotel.pet.dto.PetFilterParams;
 import ru.dogudacha.PetHotel.pet.dto.UpdatePetDto;
 import ru.dogudacha.PetHotel.pet.mapper.PetMapper;
 import ru.dogudacha.PetHotel.pet.model.Pet;
@@ -16,7 +18,11 @@ import ru.dogudacha.PetHotel.pet.repository.PetRepository;
 import ru.dogudacha.PetHotel.user.model.User;
 import ru.dogudacha.PetHotel.user.repository.UserRepository;
 
+import java.util.List;
 import java.util.Objects;
+
+import static java.util.stream.Collectors.toList;
+import static ru.dogudacha.PetHotel.pet.dto.PetDto.getComparator;
 
 @Service
 @RequiredArgsConstructor
@@ -246,6 +252,44 @@ public class PetServiceImpl implements PetService {
             throw new NotFoundException(String.format("pet with id=%d not found", petId));
         }
         log.info("PetService: deletePetById, requesterId={}, petId={}", requesterId, petId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PetDto> getPetsBySearch(Long requesterId, String text, Integer page, Integer size) {
+        User requester = findUserById(requesterId);
+        checkAccess(requester);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        if (text == null) {
+            Page<Pet> pets = petRepository.findAll(PageRequest.of(0, size, Sort.by(Sort.Order.desc("registrationDate"))));
+            List<PetDto> petsDto = pets.stream()
+                    .map(petMapper::toPetDto)
+                    .sorted(getComparator())
+                    .toList();
+
+            log.info("PetService: getPetsBySearch, requesterId={}, page={}, size={}", requesterId, page, size);
+            return new PageImpl<>(petsDto, pageable, petsDto.size());
+        } else {
+            PetFilterParams params = PetFilterParams.builder()
+                    .name(text)
+                    .build();
+
+            List<Pet> pets = petRepository.findAllPetsByParams(params);
+            List<PetDto> petsDto = pets.stream()
+                    .map(petMapper::toPetDto)
+                    .sorted(getComparator())
+                    .collect(toList());
+
+            PagedListHolder<PetDto> pagedListHolder = new PagedListHolder<>(petsDto);
+            pagedListHolder.setPageSize(size);
+            pagedListHolder.setPage(page);
+
+            log.info("PetService: getPetsBySearch, requesterId={}, text={}, page={}, size={}", requesterId, text, page, size);
+            return new PageImpl<>(pagedListHolder.getPageList(), pageable, pets.size());
+        }
+
     }
 
     private User findUserById(long userId) {
