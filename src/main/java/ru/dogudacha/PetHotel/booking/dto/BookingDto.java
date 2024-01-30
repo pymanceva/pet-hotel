@@ -12,7 +12,7 @@ import ru.dogudacha.PetHotel.room.dto.RoomDto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Collection;
+import java.util.List;
 
 @Builder
 @Data
@@ -36,5 +36,5 @@ public class BookingDto {
     private String comment;
     private String fileUrl;
     private RoomDto room;
-    private Collection<PetDto> pets;
+    private List<PetDto> pets;
 }

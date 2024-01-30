@@ -35,7 +35,6 @@ import ru.dogudacha.PetHotel.user.repository.UserRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -108,7 +107,7 @@ public class BookingServiceImplTest {
             .roomId(1L)
             .checkInDate(LocalDate.now())
             .checkOutDate(LocalDate.now().plusDays(7))
-            .pets(List.of(petDto))
+            .petIds(List.of(1L))
             .build();
     private final Long bookingId = 1L;
     private final Booking booking = Booking.builder()
@@ -122,7 +121,7 @@ public class BookingServiceImplTest {
             .prepaymentAmount(0.0)
             .isPrepaid(false)
             .room(room)
-            .pets(Set.of(pet))
+            .pets(List.of(pet))
             .build();
     private final BookingDto bookingDto = BookingDto.builder()
             .id(bookingId)
@@ -136,7 +135,46 @@ public class BookingServiceImplTest {
             .prepaymentAmount(0.0)
             .isPrepaid(false)
             .room(roomDto)
-            .pets(Set.of(petDto))
+            .pets(List.of(petDto))
+            .build();
+    private final UpdateBookingDto updateBookingDto = UpdateBookingDto.builder()
+            .price(1000.00)
+            .amount(7000.00)
+            .prepaymentAmount(1000.00)
+            .isPrepaid(true)
+            .build();
+    private final BookingDto updatedBookingDto = BookingDto.builder()
+            .id(bookingId)
+            .type(TypesBooking.TYPE_BOOKING)
+            .checkInDate(LocalDate.now())
+            .checkOutDate(LocalDate.now().plusDays(7))
+            .daysOfBooking(7)
+            .status(StatusBooking.STATUS_INITIAL)
+            .price(1000.00)
+            .amount(7000.00)
+            .prepaymentAmount(1000.00)
+            .isPrepaid(true)
+            .room(roomDto)
+            .pets(List.of(petDto))
+            .build();
+    private final Booking newBooking = Booking.builder()
+            .price(1000.00)
+            .amount(7000.00)
+            .prepaymentAmount(1000.00)
+            .isPrepaid(true)
+            .build();
+    private final Booking updatedBooking = Booking.builder()
+            .id(bookingId)
+            .type(TypesBooking.TYPE_BOOKING)
+            .checkInDate(LocalDate.now())
+            .checkOutDate(LocalDate.now().plusDays(7))
+            .status(StatusBooking.STATUS_INITIAL)
+            .price(1000.00)
+            .amount(7000.00)
+            .prepaymentAmount(1000.00)
+            .isPrepaid(true)
+            .room(room)
+            .pets(List.of(pet))
             .build();
     @InjectMocks
     private BookingServiceImpl bookingService;
@@ -156,7 +194,7 @@ public class BookingServiceImplTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
         when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
         when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
-        when(petRepository.findById(anyLong())).thenReturn(Optional.of(pet));
+        when(petRepository.findAllByIdIn(any())).thenReturn(Optional.of(List.of(pet)));
         when(bookingMapper.toBooking(any(NewBookingDto.class))).thenReturn(booking);
         when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(bookingDto);
 
@@ -185,7 +223,7 @@ public class BookingServiceImplTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
         when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
         when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
-        when(petRepository.findById(anyLong())).thenReturn(Optional.of(pet));
+        when(petRepository.findAllByIdIn(any())).thenReturn(Optional.of(List.of(pet)));
         when(bookingMapper.toBooking(any(NewBookingDto.class))).thenReturn(booking);
         when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(bookingDto);
 
@@ -329,46 +367,6 @@ public class BookingServiceImplTest {
 
     @Test
     void updateBookingById_whenRequesterBossAndBookingFound_thenUpdateAllFields() {
-        UpdateBookingDto updateBookingDto = UpdateBookingDto.builder()
-                .price(1000.00)
-                .amount(7000.00)
-                .prepaymentAmount(1000.00)
-                .isPrepaid(true)
-                .build();
-        BookingDto updatedBookingDto = BookingDto.builder()
-                .id(bookingId)
-                .type(TypesBooking.TYPE_BOOKING)
-                .checkInDate(LocalDate.now())
-                .checkOutDate(LocalDate.now().plusDays(7))
-                .daysOfBooking(7)
-                .status(StatusBooking.STATUS_INITIAL)
-                .price(1000.00)
-                .amount(7000.00)
-                .prepaymentAmount(1000.00)
-                .isPrepaid(true)
-                .room(roomDto)
-                .pets(List.of(petDto))
-                .build();
-        Booking newBooking = Booking.builder()
-                .price(1000.00)
-                .amount(7000.00)
-                .prepaymentAmount(1000.00)
-                .isPrepaid(true)
-                .build();
-        Booking updatedBooking = Booking.builder()
-                .id(bookingId)
-                .type(TypesBooking.TYPE_BOOKING)
-                .checkInDate(LocalDate.now())
-                .checkOutDate(LocalDate.now().plusDays(7))
-                .status(StatusBooking.STATUS_INITIAL)
-                .price(1000.00)
-                .amount(7000.00)
-                .prepaymentAmount(1000.00)
-                .isPrepaid(true)
-                .room(room)
-                .pets(Set.of(pet))
-                .build();
-
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
         when(bookingMapper.toBooking(any(UpdateBookingDto.class))).thenReturn(newBooking);
@@ -400,46 +398,6 @@ public class BookingServiceImplTest {
 
     @Test
     void updateBookingById_whenRequesterAdminAndBookingFound_thenUpdateAllFields() {
-        UpdateBookingDto updateBookingDto = UpdateBookingDto.builder()
-                .price(1000.00)
-                .amount(7000.00)
-                .prepaymentAmount(1000.00)
-                .isPrepaid(true)
-                .build();
-        BookingDto updatedBookingDto = BookingDto.builder()
-                .id(bookingId)
-                .type(TypesBooking.TYPE_BOOKING)
-                .checkInDate(LocalDate.now())
-                .checkOutDate(LocalDate.now().plusDays(7))
-                .daysOfBooking(7)
-                .status(StatusBooking.STATUS_INITIAL)
-                .price(1000.00)
-                .amount(7000.00)
-                .prepaymentAmount(1000.00)
-                .isPrepaid(true)
-                .room(roomDto)
-                .pets(List.of(petDto))
-                .build();
-        Booking newBooking = Booking.builder()
-                .price(1000.00)
-                .amount(7000.00)
-                .prepaymentAmount(1000.00)
-                .isPrepaid(true)
-                .build();
-        Booking updatedBooking = Booking.builder()
-                .id(bookingId)
-                .type(TypesBooking.TYPE_BOOKING)
-                .checkInDate(LocalDate.now())
-                .checkOutDate(LocalDate.now().plusDays(7))
-                .status(StatusBooking.STATUS_INITIAL)
-                .price(1000.00)
-                .amount(7000.00)
-                .prepaymentAmount(1000.00)
-                .isPrepaid(true)
-                .room(room)
-                .pets(Set.of(pet))
-                .build();
-
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
         when(bookingMapper.toBooking(any(UpdateBookingDto.class))).thenReturn(newBooking);

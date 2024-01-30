@@ -7,7 +7,7 @@ import ru.dogudacha.PetHotel.room.model.Room;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Set;
+import java.util.List;
 
 @Builder
 @Getter
@@ -63,5 +63,5 @@ public class Booking {
             joinColumns = @JoinColumn(name = "id_bookings"),
             inverseJoinColumns = @JoinColumn(name = "id_pets")
     )
-    private Set<Pet> pets;
+    private List<Pet> pets;
 }

@@ -9,19 +9,22 @@ import ru.dogudacha.PetHotel.booking.dto.NewBookingDto;
 import ru.dogudacha.PetHotel.booking.dto.UpdateBookingDto;
 import ru.dogudacha.PetHotel.booking.dto.mapper.BookingMapper;
 import ru.dogudacha.PetHotel.booking.model.Booking;
+import ru.dogudacha.PetHotel.booking.model.ReasonOfStopBooking;
 import ru.dogudacha.PetHotel.booking.model.StatusBooking;
 import ru.dogudacha.PetHotel.booking.model.TypesBooking;
 import ru.dogudacha.PetHotel.booking.repository.BookingRepository;
 import ru.dogudacha.PetHotel.exception.AccessDeniedException;
 import ru.dogudacha.PetHotel.exception.ConflictException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
-import ru.dogudacha.PetHotel.pet.mapper.PetMapper;
+import ru.dogudacha.PetHotel.pet.model.Pet;
+import ru.dogudacha.PetHotel.pet.repository.PetRepository;
 import ru.dogudacha.PetHotel.room.model.Room;
 import ru.dogudacha.PetHotel.room.repository.RoomRepository;
 import ru.dogudacha.PetHotel.user.model.User;
 import ru.dogudacha.PetHotel.user.repository.UserRepository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -30,8 +33,8 @@ import java.util.Objects;
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
-    private final PetMapper petMapper;
     private final RoomRepository roomRepository;
+    private final PetRepository petRepository;
     private final UserRepository userRepository;
 
     @Transactional
@@ -39,6 +42,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto addBooking(Long userId, NewBookingDto newBookingDto) {
         checkAdminAccess(userId);
         checkDates(newBookingDto.getCheckInDate(), newBookingDto.getCheckOutDate());
+        checkReasonWhenTypeClosing(newBookingDto.getType(), newBookingDto.getReasonOfStop());
 
         Booking newBooking = bookingMapper.toBooking(newBookingDto);
 
@@ -52,6 +56,10 @@ public class BookingServiceImpl implements BookingService {
                 newBooking.setStatus(StatusBooking.STATUS_INITIAL);
             }
         }
+
+        List<Pet> pets = petRepository.findAllByIdIn(newBookingDto.getPetIds())
+                .orElseThrow(() -> new ConflictException("At least one pet should be in list"));
+        newBooking.setPets(pets);
 
         Booking addedBooking = bookingRepository.save(newBooking);
 
@@ -138,10 +146,11 @@ public class BookingServiceImpl implements BookingService {
             newBooking.setRoom(oldBooking.getRoom());
         }
 
-        if (Objects.isNull(updateBookingDto.getPets())) {
+        if (Objects.isNull(updateBookingDto.getPetIds())) {
             newBooking.setPets(oldBooking.getPets());
         } else {
-            newBooking.setPets(petMapper.toPet(updateBookingDto.getPets()));
+            newBooking.setPets(petRepository.findAllByIdIn(updateBookingDto.getPetIds())
+                    .orElseThrow(() -> new ConflictException("At least one pet should be in list")));
         }
 
         if (newBooking.getStatus().equals(StatusBooking.STATUS_INITIAL) & newBooking.getIsPrepaid()) {
@@ -200,6 +209,14 @@ public class BookingServiceImpl implements BookingService {
         if (checkInDate.isAfter(checkOutDate)) {
             throw new ConflictException(String.format("CheckInDate=%s is after CheckOutDate=%s",
                     checkInDate, checkOutDate));
+        }
+    }
+
+    private void checkReasonWhenTypeClosing(TypesBooking type, ReasonOfStopBooking reason) {
+        if (type.equals(TypesBooking.TYPE_CLOSING)) {
+            if (reason == null) {
+                throw new ConflictException("Reason of stop booking cannot be null when Type Booking is CLOSING");
+            }
         }
     }
 }

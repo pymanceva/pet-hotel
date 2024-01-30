@@ -11,11 +11,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.dogudacha.PetHotel.booking.model.ReasonOfStopBooking;
 import ru.dogudacha.PetHotel.booking.model.TypesBooking;
-import ru.dogudacha.PetHotel.pet.dto.PetDto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Collection;
+import java.util.List;
 
 @Builder
 @Data
@@ -52,5 +51,5 @@ public class NewBookingDto {
     private String fileUrl;
     @NotNull
     private Long roomId;
-    private Collection<PetDto> pets;
+    private List<Long> petIds;
 }

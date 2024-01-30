@@ -26,6 +26,7 @@ public interface BookingMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "room", ignore = true)
     @Mapping(target = "status", ignore = true)
+    @Mapping(target = "pets", ignore = true)
     @Mapping(source = "newBookingDto.isPrepaid", target = "isPrepaid", defaultValue = "false")
     @Mapping(source = "newBookingDto.price", target = "price", defaultValue = "0")
     @Mapping(source = "newBookingDto.amount", target = "amount", defaultValue = "0")
@@ -35,5 +36,6 @@ public interface BookingMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "room", ignore = true)
+    @Mapping(target = "pets", ignore = true)
     Booking toBooking(UpdateBookingDto updateBookingDto);
 }

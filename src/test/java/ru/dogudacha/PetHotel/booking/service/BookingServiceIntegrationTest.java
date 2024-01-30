@@ -26,9 +26,8 @@ import ru.dogudacha.PetHotel.user.model.Roles;
 import ru.dogudacha.PetHotel.user.model.User;
 
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -74,7 +73,7 @@ public class BookingServiceIntegrationTest {
             .prepaymentAmount(0.0)
             .isPrepaid(false)
             .room(room)
-            .pets(Set.of(pet))
+            .pets(List.of(pet))
             .build();
     private final RoomDto roomDto = RoomDto.builder()
             .id(1L)
@@ -96,7 +95,7 @@ public class BookingServiceIntegrationTest {
             .roomId(1L)
             .checkInDate(LocalDate.now())
             .checkOutDate(LocalDate.now().plusDays(7))
-            .pets(List.of(petDto))
+            .petIds(List.of(1L))
             .build();
     private final BookingDto bookingDto = BookingDto.builder()
             .type(TypesBooking.TYPE_BOOKING)
@@ -127,6 +126,7 @@ public class BookingServiceIntegrationTest {
         em.persist(room);
         em.persist(pet);
         newBookingDto.setRoomId(room.getId());
+        newBookingDto.setPetIds(List.of(pet.getId()));
 
         BookingDto result = service.addBooking(requesterAdmin.getId(), newBookingDto);
 
@@ -167,7 +167,7 @@ public class BookingServiceIntegrationTest {
 
     @Test
     void updateBooking() {
-        Set<Pet> petList = new HashSet<>();
+        List<Pet> petList = new ArrayList<>();
         petList.add(pet);
         booking.setPets(petList);
 

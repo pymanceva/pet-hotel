@@ -626,11 +626,12 @@ components:
           format: int64
           description: Id бронируемого номера
           example: 1
-        pets:
-          description: Список питомцев в бронировании
+        petIds:
+          description: Список id питомцев в бронировании
           type: array
           items:
-            $ref: '#/components/schemas/PetDto'
+            type: integer
+            format: int64
           uniqueItems: true
     UpdateBookingDto:
       type: object
@@ -721,11 +722,12 @@ components:
           format: int64
           description: Id бронируемого номера
           example: 1
-        pets:
-          description: Список питомцев в бронировании
+        petIds:
+          description: Список id питомцев в бронировании
           type: array
           items:
-            $ref: '#/components/schemas/PetDto'
+            type: integer
+            format: int64
           uniqueItems: true
     RoomDto:
       required:
