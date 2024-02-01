@@ -2,7 +2,6 @@ package ru.dogudacha.PetHotel.pet.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.dogudacha.PetHotel.user.model.User;
 
 import java.time.LocalDate;
 
