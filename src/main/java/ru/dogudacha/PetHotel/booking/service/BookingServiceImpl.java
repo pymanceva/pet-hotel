@@ -59,6 +59,7 @@ public class BookingServiceImpl implements BookingService {
 
         List<Pet> pets = petRepository.findAllByIdIn(newBookingDto.getPetIds())
                 .orElseThrow(() -> new ConflictException("At least one pet should be in list"));
+        checkPetsInBooking(pets, newBookingDto.getPetIds());
         newBooking.setPets(pets);
 
         Booking addedBooking = bookingRepository.save(newBooking);
@@ -149,8 +150,10 @@ public class BookingServiceImpl implements BookingService {
         if (Objects.isNull(updateBookingDto.getPetIds())) {
             newBooking.setPets(oldBooking.getPets());
         } else {
-            newBooking.setPets(petRepository.findAllByIdIn(updateBookingDto.getPetIds())
-                    .orElseThrow(() -> new ConflictException("At least one pet should be in list")));
+            List<Pet> pets = petRepository.findAllByIdIn(updateBookingDto.getPetIds())
+                    .orElseThrow(() -> new ConflictException("At least one pet should be in list"));
+            checkPetsInBooking(pets, updateBookingDto.getPetIds());
+            newBooking.setPets(pets);
         }
 
         if (newBooking.getStatus().equals(StatusBooking.STATUS_INITIAL) & newBooking.getIsPrepaid()) {
@@ -216,6 +219,21 @@ public class BookingServiceImpl implements BookingService {
         if (type.equals(TypesBooking.TYPE_CLOSING)) {
             if (reason == null) {
                 throw new ConflictException("Reason of stop booking cannot be null when Type Booking is CLOSING");
+            }
+        }
+    }
+
+    private void checkPetsInBooking(List<Pet> pets, List<Long> petIds) {
+        for (Long id : petIds) {
+            boolean found = false;
+            for (Pet pet : pets) {
+                if (pet.getId() == id) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                throw new NotFoundException(String.format("Pet with id=%d is not found", id));
             }
         }
     }
