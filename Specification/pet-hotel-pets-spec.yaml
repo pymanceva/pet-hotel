@@ -363,6 +363,111 @@ paths:
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
+  /pets/search:
+    get:
+      tags:
+        - pet-controller
+      summary: Поиск питомца
+      description: >
+        Обратите внимание: 
+        - текстовый поиск (по кличке питомца) без учета регистра букв
+        - в случае, если по заданным фильтрам не найдено ни одного питомца, возвращается пустой список
+        - осуществлять поиск питомца может пользователь с ролью admin или boss
+      operationId: getPetsBySearch
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - name: text
+          description: Текст для поиска в кличках питомцев
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: size
+          description: Количество питомцев на странице
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 10
+        - name: page
+          description: Номер страницы
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 0
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePetDto'
+        '400':
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: >-
+                  Required request header X-PetHotel-User-Id for method
+                  parameter type Long is not present
+                timestamp: '2022-09-07 09:10:50'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Запрос составлен некорректно
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: User with role = %s, can not access for this action
+                timestamp: '2022-09-07 09:10:50'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Питомец или пользователь не найден
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: User with id=2 was not found
+                timestamp: '2022-09-07 09:10:50'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              example:
+                error: >-
+                  [
+                  "org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:256)",
+                  "org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:229)",
+                  "org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)",
+                  "org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)",
+                  "org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:242)"
+                  ....]
+                status: I_AM_A_TEAPOT
+                reason: Internal Server Error.
+                message: >-
+                  could not execute statement [ERROR: relation \"pets\" does not
+                  exist\n  Позиция: 13] [insert into pets
+                  (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet)
+                  values (?,?,?,?,?,?,?,?,?,?)]; SQL [insert into pets
+                  (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet)
+                  values (?,?,?,?,?,?,?,?,?,?)]
+                timestamp: '2022-09-07 09:10:50'
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   parameters:
     requesterHeader:
@@ -518,7 +623,7 @@ components:
           example: Спаниель
         birthDate:
           type: string
-          description: Дата рождения (в формате "dd.MM.yyyy"), должно быть в прошлом
+          description: Дата рождения (в формате "dd.MM.yyyy"), должна быть в прошлом
           example: 09.06.2023
         sex:
           type: string
@@ -545,7 +650,7 @@ components:
         vetVisitDate:
           type: string
           description: >-
-            Дата последнего посещения ветврача (в формате "dd.MM.yyyy"), должно
+            Дата последнего посещения ветврача (в формате "dd.MM.yyyy"), должна
             быть в прошлом
           example: 09.06.2023
         vetVisitReason:
@@ -614,7 +719,7 @@ components:
           type: string
           description: >-
             Предполагаемая дата очередной течки (для сук)(в формате
-            "dd.MM.yyyy"), должно быть в будущем
+            "dd.MM.yyyy"), должна быть в будущем
           example: 09.06.2023
         vetData:
           maxLength: 500
@@ -816,7 +921,7 @@ components:
           example: Спаниель
         birthDate:
           type: string
-          description: Дата рождения (в формате "dd.MM.yyyy"), должно быть в прошлом
+          description: Дата рождения (в формате "dd.MM.yyyy"), должна быть в прошлом
           example: 09.06.2023
         age:
           type: string
@@ -849,7 +954,7 @@ components:
         vetVisitDate:
           type: string
           description: >-
-            Дата последнего посещения ветврача (в формате "dd.MM.yyyy"), должно
+            Дата последнего посещения ветврача (в формате "dd.MM.yyyy"), должна
             быть в прошлом
           example: 09.06.2023
         vetVisitReason:
@@ -918,7 +1023,7 @@ components:
           type: string
           description: >-
             Предполагаемая дата очередной течки (для сук)(в формате
-            "dd.MM.yyyy"), должно быть в будущем
+            "dd.MM.yyyy"), должна быть в будущем
           example: 09.06.2023
         vetData:
           maxLength: 500
@@ -1090,7 +1195,7 @@ components:
           example: Любит, чтоб чесали животик
         registrationDate:
           type: string
-          description: Дата регистрации (в формате "dd.MM.yyyy"), должно быть в прошлом
+          description: Дата регистрации в ПО гостиницы (в формате "dd.MM.yyyy"), должна быть в прошлом
           example: 09.12.2023
     UpdatePetDto:
       description: Дто для изменения данных питомца
@@ -1118,7 +1223,7 @@ components:
           example: Спаниель
         birthDate:
           type: string
-          description: Дата рождения (в формате "dd.MM.yyyy"), должно быть в прошлом
+          description: Дата рождения (в формате "dd.MM.yyyy"), должна быть в прошлом
           example: 09.06.2023
         sex:
           type: string
@@ -1145,7 +1250,7 @@ components:
         vetVisitDate:
           type: string
           description: >-
-            Дата последнего посещения ветврача (в формате "dd.MM.yyyy"), должно
+            Дата последнего посещения ветврача (в формате "dd.MM.yyyy"), должна
             быть в прошлом
           example: 09.06.2023
         vetVisitReason:
@@ -1214,7 +1319,7 @@ components:
           type: string
           description: >-
             Предполагаемая дата очередной течки (для сук)(в формате
-            "dd.MM.yyyy"), должно быть в будущем
+            "dd.MM.yyyy"), должна быть в будущем
           example: 09.11.2023
         vetData:
           maxLength: 500
@@ -1399,3 +1504,62 @@ components:
           description: Рейтинг клиента (От 1 до 10)
           format: int32
           example: 7
+    PagePetDto:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PetDto'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        numberOfElements:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        sorted:
+          type: boolean
+        empty:
+          type: boolean
+        unsorted:
+          type: boolean

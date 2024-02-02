@@ -93,4 +93,8 @@ public class PetDto {
         return PET_COMPARATOR;
     }
 
+    public int compareTo(PetDto other) {
+        return this.name.compareTo(other.name);
+    }
+
 }

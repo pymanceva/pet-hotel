@@ -18,9 +18,12 @@ import ru.dogudacha.PetHotel.pet.repository.PetRepository;
 import ru.dogudacha.PetHotel.user.model.User;
 import ru.dogudacha.PetHotel.user.repository.UserRepository;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+import static java.util.Arrays.sort;
 import static java.util.stream.Collectors.toList;
 import static ru.dogudacha.PetHotel.pet.dto.PetDto.getComparator;
 
