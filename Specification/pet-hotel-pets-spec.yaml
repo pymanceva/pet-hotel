@@ -1510,56 +1510,84 @@ components:
         totalPages:
           type: integer
           format: int32
+          description: Общее количество доступных страниц
+          example: 3
         totalElements:
           type: integer
           format: int64
+          description: Общее количество доступных найденных питомцев
+          example: 25
         pageable:
           $ref: '#/components/schemas/PageableObject'
         first:
           type: boolean
+          description: Является ли эта страница первой?
+          example: true
         last:
           type: boolean
+          description: Является ли эта страница последней?
+          example: false
         size:
           type: integer
           format: int32
+          description: Количество питомцев на странице
+          example: 10
         content:
           type: array
+          description: Полученные питомцы
           items:
             $ref: '#/components/schemas/PetDto'
         number:
           type: integer
           format: int32
+          description: Номер страницы
+          example: 1
         sort:
           $ref: '#/components/schemas/SortObject'
         numberOfElements:
           type: integer
           format: int32
+          description: Количество питомцев на странице
+          example: 10
         empty:
           type: boolean
     PageableObject:
       type: object
+      description: Данные пагинации, которые были переданны
       properties:
         pageNumber:
           type: integer
           format: int32
+          description: Текущий номер страницы
+          example: 1
         pageSize:
           type: integer
           format: int32
+          description: Размер страницы/количество питомцев на странице
+          example: 10
         offset:
           type: integer
           format: int64
+          description: Номер страницы
+          example: 0
         sort:
           $ref: '#/components/schemas/SortObject'
         paged:
           type: boolean
+          example: true
         unpaged:
           type: boolean
+          example: false
     SortObject:
       type: object
+      description: Использование сортировки
       properties:
         sorted:
           type: boolean
+          example: true
         empty:
           type: boolean
+          example: false
         unsorted:
           type: boolean
+          example: false
