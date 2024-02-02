@@ -31,17 +31,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = UserController.class)
 class UserControllerIntegrationTest {
 
-    private final String requesterHeader = "X-PetHotel-User-Id";
-    long userId = 2L;
-    long requesterId = 1L;
-    UserDto userDto = new UserDto(userId, "userLastName", "userFirstName", "userMiddleName",
-            "user@mail.ru", "user_pwd", Roles.ROLE_ADMIN, true);
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
+
     @MockBean
     private UserService userService;
+
+    long userId = 2L;
+    long requesterId = 1L;
+    private final String requesterHeader = "X-PetHotel-User-Id";
+    UserDto userDto = new UserDto(userId, "userLastName", "userFirstName", "userMiddleName",
+            "user@mail.ru", "user_pwd", Roles.ROLE_ADMIN, true);
 
     @Test
     @SneakyThrows
@@ -145,20 +147,56 @@ class UserControllerIntegrationTest {
     @Test
     @SneakyThrows
     void getAllUsers() {
-        when(userService.getAllUsers(anyLong(), any())).thenReturn(List.of(userDto));
+        Boolean isActive1 = true;
+        Boolean isActive2 = false;
+        UserDto userDto1 = UserDto.builder()
+                .id(userDto.getId() + 1)
+                .lastName("1" + userDto.getLastName())
+                .firstName("1" + userDto.getFirstName())
+                .middleName("1" + userDto.getMiddleName())
+                .email("1" + userDto.getEmail())
+                .role(userDto.getRole())
+                .password("1" + userDto.getPassword())
+                .isActive(isActive1)
+                .build();
+        UserDto userDto2 = UserDto.builder()
+                .id(userDto.getId() + 2)
+                .lastName("2" + userDto.getLastName())
+                .firstName("2" + userDto.getFirstName())
+                .middleName("2" + userDto.getMiddleName())
+                .email("2" + userDto.getEmail())
+                .role(userDto.getRole())
+                .password("2" + userDto.getPassword())
+                .isActive(isActive2)
+                .build();
+
+        when(userService.getAllUsers(anyLong(), eq(isActive1))).thenReturn(List.of(userDto1));
 
         mockMvc.perform(get("/users")
                         .header(requesterHeader, requesterId)
+                        .param("isActive", String.valueOf(isActive1))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id", is(userDto.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].lastName", is(userDto.getLastName())))
-                .andExpect(jsonPath("$.[0].firstName", is(userDto.getFirstName())))
-                .andExpect(jsonPath("$.[0].middleName", is(userDto.getMiddleName())))
-                .andExpect(jsonPath("$.[0].email", is(userDto.getEmail())))
-                .andExpect(jsonPath("$.[0].password", is(userDto.getPassword())))
-                .andExpect(jsonPath("$.[0].role", is(userDto.getRole().toString())))
-                .andExpect(jsonPath("$.[0].isActive", is(userDto.getIsActive())));
+                .andExpect(jsonPath("$.[0]", is(userDto1), UserDto.class));
+
+        when(userService.getAllUsers(anyLong(), eq(isActive2))).thenReturn(List.of(userDto2));
+
+        mockMvc.perform(get("/users")
+                        .header(requesterHeader, requesterId)
+                        .param("isActive", String.valueOf(isActive2))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0]", is(userDto2), UserDto.class));
+
+        when(userService.getAllUsers(anyLong(), eq(null))).thenReturn(List.of(userDto1, userDto2));
+
+        mockMvc.perform(get("/users")
+                        .header(requesterHeader, requesterId)
+                        .param("isActive", (String) null)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0]", is(userDto1), UserDto.class))
+                .andExpect(jsonPath("$.[1]", is(userDto2), UserDto.class));
     }
 
     @Test
