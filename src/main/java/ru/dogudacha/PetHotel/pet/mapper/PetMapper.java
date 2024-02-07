@@ -11,6 +11,8 @@ import ru.dogudacha.PetHotel.user.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Collection;
+import java.util.Set;
 
 @Mapper(componentModel = "spring", uses = {UserRepository.class})
 public interface PetMapper {
@@ -45,5 +47,7 @@ public interface PetMapper {
 
     @Mapping(target = "id", ignore = true)
     Pet toPet(UpdatePetDto updatePetDto);
+
+    Set<Pet> toPet(Collection<PetDto> pets);
 }
 

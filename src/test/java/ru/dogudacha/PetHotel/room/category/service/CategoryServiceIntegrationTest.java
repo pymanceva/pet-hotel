@@ -33,6 +33,7 @@ public class CategoryServiceIntegrationTest {
             .email("admin@mail.ru")
             .firstName("admin")
             .role(Roles.ROLE_ADMIN)
+            .isActive(true)
             .build();
     final NewCategoryDto newCategoryDto = NewCategoryDto.builder()
             .name("Dog room")

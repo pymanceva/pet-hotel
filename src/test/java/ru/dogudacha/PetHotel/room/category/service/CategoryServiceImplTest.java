@@ -37,24 +37,28 @@ public class CategoryServiceImplTest {
             .id(1L)
             .firstName("boss")
             .role(Roles.ROLE_BOSS)
+            .isActive(true)
             .build();
     private final User admin = User.builder()
             .email("admin@pethotel.ru")
             .id(2L)
             .firstName("admin")
             .role(Roles.ROLE_ADMIN)
+            .isActive(true)
             .build();
     private final User user = User.builder()
             .email("user@pethotel.ru")
             .id(2L)
             .firstName("user")
             .role(Roles.ROLE_USER)
+            .isActive(true)
             .build();
     private final User financial = User.builder()
             .email("financial@pethotel.ru")
             .id(2L)
             .firstName("financial")
             .role(Roles.ROLE_FINANCIAL)
+            .isActive(true)
             .build();
     private final NewCategoryDto newCategoryDto = NewCategoryDto.builder()
             .name("Dog room")
