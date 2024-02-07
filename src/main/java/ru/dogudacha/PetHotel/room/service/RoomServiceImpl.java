@@ -7,8 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.dogudacha.PetHotel.exception.AccessDeniedException;
 import ru.dogudacha.PetHotel.exception.ConflictException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
-import ru.dogudacha.PetHotel.room.category.dto.CategoryDto;
-import ru.dogudacha.PetHotel.room.category.dto.mapper.CategoryMapper;
 import ru.dogudacha.PetHotel.room.category.model.Category;
 import ru.dogudacha.PetHotel.room.category.repository.CategoryRepository;
 import ru.dogudacha.PetHotel.room.dto.NewRoomDto;
@@ -20,7 +18,10 @@ import ru.dogudacha.PetHotel.room.repository.RoomRepository;
 import ru.dogudacha.PetHotel.user.model.User;
 import ru.dogudacha.PetHotel.user.repository.UserRepository;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -28,7 +29,6 @@ import java.util.*;
 public class RoomServiceImpl implements RoomService {
     final private RoomRepository roomRepository;
     final private RoomMapper roomMapper;
-    final private CategoryMapper categoryMapper;
     final private CategoryRepository categoryRepository;
     final private UserRepository userRepository;
 
@@ -41,11 +41,8 @@ public class RoomServiceImpl implements RoomService {
         Category category = findCategoryById(newRoomDto.getCategoryId());
         newRoom.setCategory(category);
         Room addedRoom = roomRepository.save(newRoom);
-        CategoryDto categoryDto = categoryMapper.toCategoryDto(category);
-        RoomDto addedRoomDto = roomMapper.toRoomDto(addedRoom);
-        addedRoomDto.setCategoryDto(categoryDto);
         log.info("RoomService: addRoom, userId={}, roomDto={}", userId, addedRoom);
-        return addedRoomDto;
+        return roomMapper.toRoomDto(addedRoom);
     }
 
     @Transactional(readOnly = true)
@@ -54,10 +51,8 @@ public class RoomServiceImpl implements RoomService {
         checkViewAccess(userId);
 
         Room room = findRoomById(roomId);
-        RoomDto roomDto = roomMapper.toRoomDto(room);
-        roomDto.setCategoryDto(categoryMapper.toCategoryDto(room.getCategory()));
         log.info("RoomService: getRoomById, userId={}, roomId={}", userId, roomId);
-        return roomDto;
+        return roomMapper.toRoomDto(room);
     }
 
     @Transactional
@@ -72,14 +67,9 @@ public class RoomServiceImpl implements RoomService {
         } else {
             category = oldRoom.getCategory();
         }
-        CategoryDto categoryDto = categoryMapper.toCategoryDto(category);
         newRoom.setId(roomId);
         newRoom.setCategory(category);
         newRoom.setIsVisible(oldRoom.getIsVisible());
-
-        if (Objects.isNull(newRoom.getCategory())) {
-            newRoom.setCategory(oldRoom.getCategory());
-        }
 
         if (Objects.isNull(newRoom.getArea())) {
             newRoom.setArea(oldRoom.getArea());
@@ -90,12 +80,9 @@ public class RoomServiceImpl implements RoomService {
         }
 
         Room updatedRoom = roomRepository.save(newRoom);
-        RoomDto updatedRoomDto = roomMapper.toRoomDto(updatedRoom);
-        updatedRoomDto.setCategoryDto(categoryDto);
-
         log.info("RoomService: updateRoom, userId={}, roomId={}, roomDto={}", userId, roomId, roomDto);
 
-        return updatedRoomDto;
+        return roomMapper.toRoomDto(updatedRoom);
     }
 
     @Transactional(readOnly = true)
@@ -104,15 +91,9 @@ public class RoomServiceImpl implements RoomService {
         checkViewAccess(userId);
 
         List<Room> allRooms = roomRepository.getAllRooms(isVisible).orElse(Collections.emptyList());
-        List<RoomDto> allRoomsDto = new ArrayList<>();
-        for (Room room : allRooms) {
-            RoomDto roomDto = roomMapper.toRoomDto(room);
-            roomDto.setCategoryDto(categoryMapper.toCategoryDto(room.getCategory()));
-            allRoomsDto.add(roomDto);
-        }
         log.info("RoomService: getAllRooms, userId={}, list size={}", userId, allRooms.size());
 
-        return allRoomsDto;
+        return roomMapper.toListRoomDto(allRooms);
     }
 
     @Transactional
@@ -126,10 +107,8 @@ public class RoomServiceImpl implements RoomService {
             room.setIsVisible(false);
             roomRepository.save(room);
             log.info("RoomService: hideRoomById, userId={}, roomId={}", userId, roomId);
-            RoomDto roomDto = roomMapper.toRoomDto(room);
-            CategoryDto categoryDto = categoryMapper.toCategoryDto(room.getCategory());
-            roomDto.setCategoryDto(categoryDto);
-            return roomDto;
+
+            return roomMapper.toRoomDto(room);
         } else {
             throw new ConflictException(String.format("room with id=%d has opened bookings", roomId));
         }
@@ -144,10 +123,8 @@ public class RoomServiceImpl implements RoomService {
         room.setIsVisible(true);
         roomRepository.save(room);
         log.info("RoomService: unhideRoomById, userId={}, roomId={}", userId, roomId);
-        RoomDto roomDto = roomMapper.toRoomDto(room);
-        CategoryDto categoryDto = categoryMapper.toCategoryDto(room.getCategory());
-        roomDto.setCategoryDto(categoryDto);
-        return roomDto;
+
+        return roomMapper.toRoomDto(room);
     }
 
     @Transactional

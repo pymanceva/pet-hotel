@@ -13,11 +13,11 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {CategoryMapper.class, CategoryServiceImpl.class})
 public interface RoomMapper {
-    @Mapping(target = "categoryDto", ignore = true)
+    @Mapping(target = "categoryDto", source = "category")
     RoomDto toRoomDto(Room room);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "category", source = "categoryDto")
     Room toRoom(RoomDto roomDto);
 
     @Mapping(target = "id", ignore = true)
