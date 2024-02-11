@@ -19,8 +19,6 @@ import java.util.Collection;
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
 public class UserController {
-    private static final String USER_ID = "X-PetHotel-User-Id";
-
     private final UserService userService;
 
     @PostMapping

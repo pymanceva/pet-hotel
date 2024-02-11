@@ -24,7 +24,7 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    final private UtilityService utilityService;
+    private final UtilityService utilityService;
 
     @Transactional(readOnly = true)
     @Override

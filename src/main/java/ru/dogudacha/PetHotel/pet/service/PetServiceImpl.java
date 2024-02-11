@@ -22,7 +22,7 @@ import java.util.Objects;
 public class PetServiceImpl implements PetService {
     private final PetRepository petRepository;
     private final PetMapper petMapper;
-    final private UtilityService utilityService;
+    private final UtilityService utilityService;
 
     @Override
     @Transactional

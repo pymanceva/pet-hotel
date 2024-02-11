@@ -3,7 +3,10 @@ package ru.dogudacha.PetHotel.utility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.dogudacha.PetHotel.booking.model.Booking;
+import ru.dogudacha.PetHotel.booking.repository.BookingRepository;
 import ru.dogudacha.PetHotel.exception.AccessDeniedException;
+import ru.dogudacha.PetHotel.exception.ConflictException;
 import ru.dogudacha.PetHotel.exception.NotFoundException;
 import ru.dogudacha.PetHotel.pet.model.Pet;
 import ru.dogudacha.PetHotel.pet.repository.PetRepository;
@@ -15,17 +18,20 @@ import ru.dogudacha.PetHotel.user.model.Roles;
 import ru.dogudacha.PetHotel.user.model.User;
 import ru.dogudacha.PetHotel.user.repository.UserRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UtilityService {
     public static final String REQUESTER_ID_HEADER = "X-PetHotel-User-Id";
-    final private UserRepository userRepository;
-    final private CategoryRepository categoryRepository;
-    final private RoomRepository roomRepository;
-    final private PetRepository petRepository;
+    private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
+    private final RoomRepository roomRepository;
+    private final PetRepository petRepository;
+    private final BookingRepository bookingRepository;
 
-    public User getUserIfExists(long userId) {
+    public User getUserIfExists(Long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("User with id=%d is not found", userId)));
     }
@@ -45,20 +51,24 @@ public class UtilityService {
                 new NotFoundException(String.format("Pet with id = %d not found", petId)));
     }
 
-    /* Раскомментить после мержа бронирований
-    public static Booking getBookingIfExists(Long id) {
-        return bookingRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("Booking with id=%d is not found", id)));
+    public Booking getBookingIfExists(Long bookingId) {
+        return bookingRepository.findById(bookingId).orElseThrow(() ->
+                new NotFoundException(String.format("Booking with id = %d not found", bookingId)));
     }
-    */
+
+    public List<Pet> getListOfPetsByIds(List<Long> petIds) {
+        return petRepository.findAllByIdIn(petIds)
+                .orElseThrow(() -> new ConflictException("At least one id should be in list"));
+    }
 
     //Проверка пользователя на роль BOSS или ADMIN, иначе AccessDeniedException
     public void checkBossAdminAccess(Long userId) {
         User user = getUserIfExists(userId);
-
         if (user.getRole().ordinal() >= 2) {
             throw new AccessDeniedException(String.format("User with role=%s, can't access for this action",
                     user.getRole()));
+        } else {
+            return;
         }
     }
 
