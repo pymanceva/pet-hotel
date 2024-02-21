@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.pet;
+package ru.modgy.pet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -8,17 +8,17 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.dogudacha.PetHotel.exception.AccessDeniedException;
-import ru.dogudacha.PetHotel.exception.NotFoundException;
-import ru.dogudacha.PetHotel.pet.controller.PetController;
-import ru.dogudacha.PetHotel.pet.dto.NewPetDto;
-import ru.dogudacha.PetHotel.pet.dto.PetDto;
-import ru.dogudacha.PetHotel.pet.dto.UpdatePetDto;
-import ru.dogudacha.PetHotel.pet.model.Sex;
-import ru.dogudacha.PetHotel.pet.model.TypeOfPet;
-import ru.dogudacha.PetHotel.pet.service.PetService;
-import ru.dogudacha.PetHotel.user.model.Roles;
-import ru.dogudacha.PetHotel.user.model.User;
+import ru.modgy.exception.AccessDeniedException;
+import ru.modgy.exception.NotFoundException;
+import ru.modgy.pet.controller.PetController;
+import ru.modgy.pet.dto.NewPetDto;
+import ru.modgy.pet.dto.PetDto;
+import ru.modgy.pet.dto.UpdatePetDto;
+import ru.modgy.pet.model.Sex;
+import ru.modgy.pet.model.TypeOfPet;
+import ru.modgy.pet.service.PetService;
+import ru.modgy.user.model.Roles;
+import ru.modgy.user.model.User;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

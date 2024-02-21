@@ -1,12 +1,12 @@
-package ru.dogudacha.PetHotel.pet.dto;
+package ru.modgy.pet.dto;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
-import ru.dogudacha.PetHotel.pet.model.Sex;
-import ru.dogudacha.PetHotel.pet.model.TypeOfPet;
+import ru.modgy.pet.model.Sex;
+import ru.modgy.pet.model.TypeOfPet;
 
 import java.time.LocalDate;
 

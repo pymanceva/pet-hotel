@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.pet.service;
+package ru.modgy.pet.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,19 +7,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import ru.dogudacha.PetHotel.exception.AccessDeniedException;
-import ru.dogudacha.PetHotel.exception.NotFoundException;
-import ru.dogudacha.PetHotel.pet.dto.NewPetDto;
-import ru.dogudacha.PetHotel.pet.dto.PetDto;
-import ru.dogudacha.PetHotel.pet.dto.UpdatePetDto;
-import ru.dogudacha.PetHotel.pet.mapper.PetMapper;
-import ru.dogudacha.PetHotel.pet.model.Pet;
-import ru.dogudacha.PetHotel.pet.model.Sex;
-import ru.dogudacha.PetHotel.pet.model.TypeOfPet;
-import ru.dogudacha.PetHotel.pet.repository.PetRepository;
-import ru.dogudacha.PetHotel.user.model.Roles;
-import ru.dogudacha.PetHotel.user.model.User;
-import ru.dogudacha.PetHotel.user.repository.UserRepository;
+import ru.modgy.exception.AccessDeniedException;
+import ru.modgy.exception.NotFoundException;
+import ru.modgy.pet.dto.NewPetDto;
+import ru.modgy.pet.dto.PetDto;
+import ru.modgy.pet.dto.UpdatePetDto;
+import ru.modgy.pet.mapper.PetMapper;
+import ru.modgy.pet.model.Pet;
+import ru.modgy.pet.model.Sex;
+import ru.modgy.pet.model.TypeOfPet;
+import ru.modgy.pet.repository.PetRepository;
+import ru.modgy.user.model.Roles;
+import ru.modgy.user.model.User;
+import ru.modgy.user.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.Optional;

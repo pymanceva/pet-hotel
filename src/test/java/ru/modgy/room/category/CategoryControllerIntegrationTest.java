@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.room.category;
+package ru.modgy.room.category;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -8,11 +8,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.dogudacha.PetHotel.exception.NotFoundException;
-import ru.dogudacha.PetHotel.room.category.dto.CategoryDto;
-import ru.dogudacha.PetHotel.room.category.dto.NewCategoryDto;
-import ru.dogudacha.PetHotel.room.category.dto.UpdateCategoryDto;
-import ru.dogudacha.PetHotel.room.category.service.CategoryService;
+import ru.modgy.exception.NotFoundException;
+import ru.modgy.room.category.dto.CategoryDto;
+import ru.modgy.room.category.dto.NewCategoryDto;
+import ru.modgy.room.category.dto.UpdateCategoryDto;
+import ru.modgy.room.category.service.CategoryService;
 
 import java.util.List;
 

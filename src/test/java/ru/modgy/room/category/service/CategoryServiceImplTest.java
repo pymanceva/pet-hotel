@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.room.category.service;
+package ru.modgy.room.category.service;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -8,17 +8,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import ru.dogudacha.PetHotel.exception.AccessDeniedException;
-import ru.dogudacha.PetHotel.exception.NotFoundException;
-import ru.dogudacha.PetHotel.room.category.dto.CategoryDto;
-import ru.dogudacha.PetHotel.room.category.dto.NewCategoryDto;
-import ru.dogudacha.PetHotel.room.category.dto.UpdateCategoryDto;
-import ru.dogudacha.PetHotel.room.category.dto.mapper.CategoryMapper;
-import ru.dogudacha.PetHotel.room.category.model.Category;
-import ru.dogudacha.PetHotel.room.category.repository.CategoryRepository;
-import ru.dogudacha.PetHotel.user.model.Roles;
-import ru.dogudacha.PetHotel.user.model.User;
-import ru.dogudacha.PetHotel.user.repository.UserRepository;
+import ru.modgy.exception.AccessDeniedException;
+import ru.modgy.exception.NotFoundException;
+import ru.modgy.room.category.dto.CategoryDto;
+import ru.modgy.room.category.dto.NewCategoryDto;
+import ru.modgy.room.category.dto.UpdateCategoryDto;
+import ru.modgy.room.category.dto.mapper.CategoryMapper;
+import ru.modgy.room.category.model.Category;
+import ru.modgy.room.category.repository.CategoryRepository;
+import ru.modgy.user.model.Roles;
+import ru.modgy.user.model.User;
+import ru.modgy.user.repository.UserRepository;
 
 import java.util.Collection;
 import java.util.List;

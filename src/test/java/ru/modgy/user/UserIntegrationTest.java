@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.user;
+package ru.modgy.user;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.MethodOrderer;
@@ -9,11 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-import ru.dogudacha.PetHotel.user.controller.UserController;
-import ru.dogudacha.PetHotel.user.dto.NewUserDto;
-import ru.dogudacha.PetHotel.user.dto.UpdateUserDto;
-import ru.dogudacha.PetHotel.user.dto.UserDto;
-import ru.dogudacha.PetHotel.user.model.Roles;
+import ru.modgy.user.controller.UserController;
+import ru.modgy.user.dto.NewUserDto;
+import ru.modgy.user.dto.UpdateUserDto;
+import ru.modgy.user.dto.UserDto;
+import ru.modgy.user.model.Roles;
 
 import java.util.Collection;
 

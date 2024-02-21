@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.room.service;
+package ru.modgy.room.service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -7,15 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import ru.dogudacha.PetHotel.exception.NotFoundException;
-import ru.dogudacha.PetHotel.room.category.dto.CategoryDto;
-import ru.dogudacha.PetHotel.room.category.model.Category;
-import ru.dogudacha.PetHotel.room.dto.NewRoomDto;
-import ru.dogudacha.PetHotel.room.dto.RoomDto;
-import ru.dogudacha.PetHotel.room.dto.UpdateRoomDto;
-import ru.dogudacha.PetHotel.room.model.Room;
-import ru.dogudacha.PetHotel.user.model.Roles;
-import ru.dogudacha.PetHotel.user.model.User;
+import ru.modgy.exception.NotFoundException;
+import ru.modgy.room.category.dto.CategoryDto;
+import ru.modgy.room.category.model.Category;
+import ru.modgy.room.dto.NewRoomDto;
+import ru.modgy.room.dto.RoomDto;
+import ru.modgy.room.dto.UpdateRoomDto;
+import ru.modgy.room.model.Room;
+import ru.modgy.user.model.Roles;
+import ru.modgy.user.model.User;
 
 import java.util.List;
 
