@@ -18,14 +18,11 @@ import ru.modgy.pet.repository.PetRepository;
 import ru.modgy.user.model.User;
 import ru.modgy.user.repository.UserRepository;
 
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-import static java.util.Arrays.sort;
 import static java.util.stream.Collectors.toList;
-import static ru.dogudacha.PetHotel.pet.dto.PetDto.getComparator;
+import static ru.modgy.pet.dto.PetDto.getComparator;
 
 @Service
 @RequiredArgsConstructor

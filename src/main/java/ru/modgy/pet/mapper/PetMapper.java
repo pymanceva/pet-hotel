@@ -3,8 +3,6 @@ package ru.modgy.pet.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import ru.modgyroom.dto.RoomDto;
-import ru.modgy.room.model.Room;
 import ru.modgy.pet.dto.NewPetDto;
 import ru.modgy.pet.dto.PetDto;
 import ru.modgy.pet.dto.UpdatePetDto;

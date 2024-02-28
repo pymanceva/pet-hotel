@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.pet.dto;
+package ru.modgy.pet.dto;
 
 import lombok.*;
 

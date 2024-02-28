@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.pet.model;
+package ru.modgy.pet.model;
 
 import jakarta.persistence.*;
 import lombok.*;

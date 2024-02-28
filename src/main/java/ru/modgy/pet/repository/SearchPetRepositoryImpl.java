@@ -1,9 +1,9 @@
-package ru.dogudacha.PetHotel.pet.repository;
+package ru.modgy.pet.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import ru.dogudacha.PetHotel.pet.dto.PetFilterParams;
-import ru.dogudacha.PetHotel.pet.model.Pet;
+import ru.modgy.pet.dto.PetFilterParams;
+import ru.modgy.pet.model.Pet;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;

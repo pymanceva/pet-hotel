@@ -1,7 +1,7 @@
-package ru.dogudacha.PetHotel.pet.repository;
+package ru.modgy.pet.repository;
 
-import ru.dogudacha.PetHotel.pet.dto.PetFilterParams;
-import ru.dogudacha.PetHotel.pet.model.Pet;
+import ru.modgy.pet.dto.PetFilterParams;
+import ru.modgy.pet.model.Pet;
 
 import java.util.List;
 

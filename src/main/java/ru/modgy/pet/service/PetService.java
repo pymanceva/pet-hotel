@@ -4,7 +4,6 @@ import ru.modgy.pet.dto.NewPetDto;
 import ru.modgy.pet.dto.PetDto;
 import ru.modgy.pet.dto.UpdatePetDto;
 
-import org.springframework.beans.support.PagedListHolder;
 import org.springframework.data.domain.Page;
 
 public interface PetService {

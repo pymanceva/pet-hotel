@@ -17,7 +17,7 @@ import java.util.Comparator;
 @ToString
 public class PetDto {
     private long id;
-//    private long ownerId;
+//todo    private long ownerId;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private TypeOfPet type; // вид животного
     private String name;
