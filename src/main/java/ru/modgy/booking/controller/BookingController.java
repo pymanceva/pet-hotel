@@ -3,12 +3,16 @@ package ru.modgy.booking.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.modgy.booking.dto.BookingDto;
 import ru.modgy.booking.dto.NewBookingDto;
 import ru.modgy.booking.dto.UpdateBookingDto;
 import ru.modgy.booking.service.BookingService;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @CrossOrigin
 @Slf4j
@@ -50,4 +54,14 @@ public class BookingController {
         log.info("BookingController: DELETE/deleteBookingById, requesterId={}, bookingId={}", requesterId, bookingId);
         bookingService.deleteBookingById(requesterId, bookingId);
     }
+
+    @GetMapping("/{roomId}/bookingsOfRoomInDates")
+    public List<BookingDto> findBookingsForRoomInDates(@RequestHeader(USER_ID) Long requesterId,
+                                                       @PathVariable("roomId") Long roomId,
+                                                       @Param("checkInDate") LocalDate checkInDate,
+                                                       @Param("checkOutDate") LocalDate checkOutDate) {
+        log.info("BookingController: GET/findBookingsForRoomInDates, requesterId={}, roomId={}", requesterId, roomId);
+        return bookingService.findBookingsForRoomInDates(requesterId, roomId, checkInDate, checkOutDate);
+    }
+
 }

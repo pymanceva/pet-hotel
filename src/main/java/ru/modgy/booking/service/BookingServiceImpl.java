@@ -24,6 +24,8 @@ import ru.modgy.user.model.User;
 import ru.modgy.user.repository.UserRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -182,6 +184,50 @@ public class BookingServiceImpl implements BookingService {
         }
 
         log.info("BookingService: deleteBookingById, userId={}, bookingId={}", userId, bookingId);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<BookingDto> findBookingsForRoomInDates(Long userId,
+                                                       Long roomId,
+                                                       LocalDate checkInDate,
+                                                       LocalDate checkOutDate) {
+        checkAdminAccess(userId);
+
+        List<Booking> foundBookings = bookingRepository.findBookingsForRoomInDates(
+                        roomId, checkInDate, checkOutDate)
+                .orElse(Collections.emptyList());
+        List<Booking> filteredBookings = new ArrayList<>();
+        if (!foundBookings.isEmpty()) {
+            checkRoomAvailabilityByDates(foundBookings, checkInDate, checkOutDate);
+            filteredBookings = findCrossingBookings(foundBookings, checkInDate, checkOutDate);
+        }
+        log.info("BookingService: findBookingsForRoomInDates, userId={}, roomId={}, checkInDate={}, checkOutDate={}",
+                userId, roomId, checkInDate, checkOutDate);
+        return bookingMapper.toBookingDto(filteredBookings);
+    }
+
+    private void checkRoomAvailabilityByDates(List<Booking> bookings,
+                                              LocalDate checkInDate,
+                                              LocalDate checkOutDate) {
+        for (Booking booking : bookings) {
+            if ((booking.getCheckInDate().isBefore(checkInDate)
+                    && booking.getCheckOutDate().isAfter(checkInDate))
+                || (booking.getCheckInDate().isAfter(checkInDate)
+                    && booking.getCheckInDate().isBefore(checkOutDate))
+                || (booking.getCheckInDate().isEqual(checkInDate)
+                    && booking.getCheckInDate().isBefore(checkOutDate))) {
+                throw new ConflictException(String.format("Room with id=%d is not available for current dates",
+                        booking.getRoom().getId()));
+            }
+        }
+    }
+
+    private List<Booking> findCrossingBookings(List<Booking> bookings, LocalDate checkInDate, LocalDate checkOutDate) {
+        return bookings.stream()
+                .filter(booking -> booking.getCheckInDate().equals(checkOutDate)
+                        || booking.getCheckOutDate().equals(checkInDate))
+                .toList();
     }
 
     private Booking findBookingById(Long id) {

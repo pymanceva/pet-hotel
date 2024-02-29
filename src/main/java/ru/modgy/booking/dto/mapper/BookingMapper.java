@@ -11,6 +11,7 @@ import ru.modgy.room.dto.mapper.RoomMapper;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {RoomMapper.class, PetMapper.class})
 public interface BookingMapper {
@@ -38,4 +39,6 @@ public interface BookingMapper {
     @Mapping(target = "room", ignore = true)
     @Mapping(target = "pets", ignore = true)
     Booking toBooking(UpdateBookingDto updateBookingDto);
+
+    List<BookingDto> toBookingDto(List<Booking> bookings);
 }
