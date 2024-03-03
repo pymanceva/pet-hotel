@@ -5,6 +5,9 @@ info:
 servers:
   - url: http://localhost:8080
     description: Generated server url
+  - url: http://212.109.192.9:8080
+    description: Удалённый backend сервер для тестирования и работы frontend.
+        По вопросам работы сервера обращаться к Руслану
 tags:
   - description: API для работы с питомцами
     name: pet-controller
@@ -363,6 +366,111 @@ paths:
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
+  /pets/search:
+    get:
+      tags:
+        - pet-controller
+      summary: Поиск питомца
+      description: >
+        Обратите внимание: 
+        - текстовый поиск (по кличке питомца) без учета регистра букв
+        - в случае, если по заданным фильтрам не найдено ни одного питомца, возвращается пустой список
+        - осуществлять поиск питомца может пользователь с ролью admin или boss
+      operationId: getPetsBySearch
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - name: text
+          description: Текст для поиска в кличках питомцев
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: size
+          description: Количество питомцев на странице
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 10
+        - name: page
+          description: Номер страницы
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 0
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePetDto'
+        '400':
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: >-
+                  Required request header X-PetHotel-User-Id for method
+                  parameter type Long is not present
+                timestamp: '2022-09-07 09:10:50'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Запрос составлен некорректно
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: User with role = %s, can not access for this action
+                timestamp: '2022-09-07 09:10:50'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Питомец или пользователь не найден
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: User with id=2 was not found
+                timestamp: '2022-09-07 09:10:50'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              example:
+                error: >-
+                  [
+                  "org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:256)",
+                  "org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:229)",
+                  "org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)",
+                  "org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)",
+                  "org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:242)"
+                  ....]
+                status: I_AM_A_TEAPOT
+                reason: Internal Server Error.
+                message: >-
+                  could not execute statement [ERROR: relation \"pets\" does not
+                  exist\n  Позиция: 13] [insert into pets
+                  (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet)
+                  values (?,?,?,?,?,?,?,?,?,?)]; SQL [insert into pets
+                  (age_pet,breed_pet,comments_pet,diet_pet,contact_pet,photographed_pet,medication_pet,sex_pet,type_pet,weight_pet)
+                  values (?,?,?,?,?,?,?,?,?,?)]
+                timestamp: '2022-09-07 09:10:50'
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   parameters:
     requesterHeader:
@@ -374,7 +482,7 @@ components:
         type: integer
         format: int64
     petId:
-      name: pet-Id
+      name: id
       description: ID питомца
       in: path
       required: true
@@ -518,7 +626,7 @@ components:
           example: Спаниель
         birthDate:
           type: string
-          description: Дата рождения (в формате "dd.MM.yyyy"), должно быть в прошлом
+          description: Дата рождения (в формате "dd.MM.yyyy"), должна быть в прошлом
           example: 09.06.2023
         sex:
           type: string
@@ -527,7 +635,7 @@ components:
             - MALE
             - HERMAPHRODITE
           description: Пол питомца
-          example: Женский
+          example: FEMALE
         color:
           maxLength: 30
           type: string
@@ -545,7 +653,7 @@ components:
         vetVisitDate:
           type: string
           description: >-
-            Дата последнего посещения ветврача (в формате "dd.MM.yyyy"), должно
+            Дата последнего посещения ветврача (в формате "dd.MM.yyyy"), должна
             быть в прошлом
           example: 09.06.2023
         vetVisitReason:
@@ -614,7 +722,7 @@ components:
           type: string
           description: >-
             Предполагаемая дата очередной течки (для сук)(в формате
-            "dd.MM.yyyy"), должно быть в будущем
+            "dd.MM.yyyy"), должна быть в будущем
           example: 09.06.2023
         vetData:
           maxLength: 500
@@ -816,7 +924,7 @@ components:
           example: Спаниель
         birthDate:
           type: string
-          description: Дата рождения (в формате "dd.MM.yyyy"), должно быть в прошлом
+          description: Дата рождения (в формате "dd.MM.yyyy"), должна быть в прошлом
           example: 09.06.2023
         age:
           type: string
@@ -831,7 +939,7 @@ components:
             - MALE
             - HERMAPHRODITE
           description: Пол питомца
-          example: Женский
+          example: FEMALE
         color:
           maxLength: 30
           type: string
@@ -849,7 +957,7 @@ components:
         vetVisitDate:
           type: string
           description: >-
-            Дата последнего посещения ветврача (в формате "dd.MM.yyyy"), должно
+            Дата последнего посещения ветврача (в формате "dd.MM.yyyy"), должна
             быть в прошлом
           example: 09.06.2023
         vetVisitReason:
@@ -918,7 +1026,7 @@ components:
           type: string
           description: >-
             Предполагаемая дата очередной течки (для сук)(в формате
-            "dd.MM.yyyy"), должно быть в будущем
+            "dd.MM.yyyy"), должна быть в будущем
           example: 09.06.2023
         vetData:
           maxLength: 500
@@ -1088,6 +1196,10 @@ components:
           type: string
           description: Дополнительные комментарии, особенности поведения
           example: Любит, чтоб чесали животик
+        registrationDate:
+          type: string
+          description: Дата регистрации в ПО гостиницы (в формате "dd.MM.yyyy"), должна быть в прошлом
+          example: 09.12.2023
     UpdatePetDto:
       description: Дто для изменения данных питомца
       type: object
@@ -1114,7 +1226,7 @@ components:
           example: Спаниель
         birthDate:
           type: string
-          description: Дата рождения (в формате "dd.MM.yyyy"), должно быть в прошлом
+          description: Дата рождения (в формате "dd.MM.yyyy"), должна быть в прошлом
           example: 09.06.2023
         sex:
           type: string
@@ -1123,7 +1235,7 @@ components:
             - MALE
             - HERMAPHRODITE
           description: Пол питомца
-          example: Женский
+          example: FEMALE
         color:
           maxLength: 30
           type: string
@@ -1141,7 +1253,7 @@ components:
         vetVisitDate:
           type: string
           description: >-
-            Дата последнего посещения ветврача (в формате "dd.MM.yyyy"), должно
+            Дата последнего посещения ветврача (в формате "dd.MM.yyyy"), должна
             быть в прошлом
           example: 09.06.2023
         vetVisitReason:
@@ -1210,7 +1322,7 @@ components:
           type: string
           description: >-
             Предполагаемая дата очередной течки (для сук)(в формате
-            "dd.MM.yyyy"), должно быть в будущем
+            "dd.MM.yyyy"), должна быть в будущем
           example: 09.11.2023
         vetData:
           maxLength: 500
@@ -1395,3 +1507,90 @@ components:
           description: Рейтинг клиента (От 1 до 10)
           format: int32
           example: 7
+    PagePetDto:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+          description: Общее количество доступных страниц
+          example: 3
+        totalElements:
+          type: integer
+          format: int64
+          description: Общее количество доступных найденных питомцев
+          example: 25
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        first:
+          type: boolean
+          description: Является ли эта страница первой?
+          example: true
+        last:
+          type: boolean
+          description: Является ли эта страница последней?
+          example: false
+        size:
+          type: integer
+          format: int32
+          description: Количество питомцев на странице
+          example: 10
+        content:
+          type: array
+          description: Полученные питомцы
+          items:
+            $ref: '#/components/schemas/PetDto'
+        number:
+          type: integer
+          format: int32
+          description: Номер страницы
+          example: 1
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        numberOfElements:
+          type: integer
+          format: int32
+          description: Количество питомцев на странице
+          example: 10
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      description: Данные пагинации, которые были переданны
+      properties:
+        pageNumber:
+          type: integer
+          format: int32
+          description: Текущий номер страницы
+          example: 1
+        pageSize:
+          type: integer
+          format: int32
+          description: Размер страницы/количество питомцев на странице
+          example: 10
+        offset:
+          type: integer
+          format: int64
+          description: Номер страницы
+          example: 0
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        paged:
+          type: boolean
+          example: true
+        unpaged:
+          type: boolean
+          example: false
+    SortObject:
+      type: object
+      description: Использование сортировки
+      properties:
+        sorted:
+          type: boolean
+          example: true
+        empty:
+          type: boolean
+          example: false
+        unsorted:
+          type: boolean
+          example: false

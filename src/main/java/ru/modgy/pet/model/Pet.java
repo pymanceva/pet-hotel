@@ -2,8 +2,10 @@ package ru.modgy.pet.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Builder
 @Getter
@@ -18,7 +20,7 @@ public class Pet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_pets")
     private long id;
-    //    @ManyToOne()
+//        @ManyToOne()
 //    @JoinColumn(name = "owner_id_pet", nullable = false)
 //    @Column(name = "owner_id_pet", nullable = false)
 //    private long owner;
@@ -134,6 +136,9 @@ public class Pet {
     private String medicineRegimen;
     @Column(name = "additional_data_pets", nullable = true, length = 1000)
     private String additionalData;
+    @CreationTimestamp
+    @Column(name = "registration_date_pets")
+    private LocalDateTime registrationDate;
 }
 
 
