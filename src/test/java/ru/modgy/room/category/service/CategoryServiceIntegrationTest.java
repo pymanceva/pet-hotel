@@ -106,7 +106,7 @@ public class CategoryServiceIntegrationTest {
 
         service.deleteCategoryById(requesterAdmin.getId(), category.getId());
 
-        String error = String.format("category with id=%d is not found", category.getId());
+        String error = String.format("Category with id=%d is not found", category.getId());
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
                 () -> service.getCategoryById(requesterAdmin.getId(), category.getId())

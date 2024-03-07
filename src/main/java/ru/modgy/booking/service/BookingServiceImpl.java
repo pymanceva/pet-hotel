@@ -13,15 +13,11 @@ import ru.modgy.booking.model.ReasonOfStopBooking;
 import ru.modgy.booking.model.StatusBooking;
 import ru.modgy.booking.model.TypesBooking;
 import ru.modgy.booking.repository.BookingRepository;
-import ru.modgy.exception.AccessDeniedException;
 import ru.modgy.exception.ConflictException;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.pet.model.Pet;
-import ru.modgy.pet.repository.PetRepository;
 import ru.modgy.room.model.Room;
-import ru.modgy.room.repository.RoomRepository;
-import ru.modgy.user.model.User;
-import ru.modgy.user.repository.UserRepository;
+import ru.modgy.utility.UtilityService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,20 +29,18 @@ import java.util.Objects;
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
-    private final RoomRepository roomRepository;
-    private final PetRepository petRepository;
-    private final UserRepository userRepository;
+    private final UtilityService utilityService;
 
     @Transactional
     @Override
     public BookingDto addBooking(Long userId, NewBookingDto newBookingDto) {
-        checkAdminAccess(userId);
+        utilityService.checkBossAdminAccess(userId);
         checkDates(newBookingDto.getCheckInDate(), newBookingDto.getCheckOutDate());
         checkReasonWhenTypeClosing(newBookingDto.getType(), newBookingDto.getReasonOfStop());
 
         Booking newBooking = bookingMapper.toBooking(newBookingDto);
 
-        Room room = findRoomById(newBookingDto.getRoomId());
+        Room room = utilityService.getRoomIfExists(newBookingDto.getRoomId());
         newBooking.setRoom(room);
 
         if (newBooking.getStatus() == null) {
@@ -57,13 +51,11 @@ public class BookingServiceImpl implements BookingService {
             }
         }
 
-        List<Pet> pets = petRepository.findAllByIdIn(newBookingDto.getPetIds())
-                .orElseThrow(() -> new ConflictException("At least one pet should be in list"));
+        List<Pet> pets = utilityService.getListOfPetsByIds(newBookingDto.getPetIds());
         checkPetsInBooking(pets, newBookingDto.getPetIds());
         newBooking.setPets(pets);
 
         Booking addedBooking = bookingRepository.save(newBooking);
-
         log.info("BookingService: addBooking, userId={}, bookingDto={}", userId, addedBooking);
 
         return bookingMapper.toBookingDto(addedBooking);
@@ -72,9 +64,9 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     @Override
     public BookingDto getBookingById(Long userId, Long bookingId) {
-        checkAdminAccess(userId);
+        utilityService.checkBossAdminAccess(userId);
 
-        Booking booking = findBookingById(bookingId);
+        Booking booking = utilityService.getBookingIfExists(bookingId);
         log.info("BookingService: getBookingById, userId={}, bookingId={}", userId, bookingId);
         return bookingMapper.toBookingDto(booking);
     }
@@ -82,9 +74,9 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public BookingDto updateBooking(Long userId, Long bookingId, UpdateBookingDto updateBookingDto) {
-        checkAdminAccess(userId);
+        utilityService.checkBossAdminAccess(userId);
 
-        Booking oldBooking = findBookingById(bookingId);
+        Booking oldBooking = utilityService.getBookingIfExists(bookingId);
         Booking newBooking = bookingMapper.toBooking(updateBookingDto);
         newBooking.setId(oldBooking.getId());
         newBooking.setType(oldBooking.getType());
@@ -142,7 +134,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (updateBookingDto.getRoomId() != null) {
-            newBooking.setRoom(findRoomById(updateBookingDto.getRoomId()));
+            newBooking.setRoom(utilityService.getRoomIfExists(updateBookingDto.getRoomId()));
         } else {
             newBooking.setRoom(oldBooking.getRoom());
         }
@@ -150,8 +142,7 @@ public class BookingServiceImpl implements BookingService {
         if (Objects.isNull(updateBookingDto.getPetIds())) {
             newBooking.setPets(oldBooking.getPets());
         } else {
-            List<Pet> pets = petRepository.findAllByIdIn(updateBookingDto.getPetIds())
-                    .orElseThrow(() -> new ConflictException("At least one pet should be in list"));
+            List<Pet> pets = utilityService.getListOfPetsByIds(updateBookingDto.getPetIds());
             checkPetsInBooking(pets, updateBookingDto.getPetIds());
             newBooking.setPets(pets);
         }
@@ -173,7 +164,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public void deleteBookingById(Long userId, Long bookingId) {
-        checkAdminAccess(userId);
+        utilityService.checkBossAdminAccess(userId);
 
         int result = bookingRepository.deleteBookingById(bookingId);
 
@@ -182,30 +173,6 @@ public class BookingServiceImpl implements BookingService {
         }
 
         log.info("BookingService: deleteBookingById, userId={}, bookingId={}", userId, bookingId);
-    }
-
-    private Booking findBookingById(Long id) {
-        return bookingRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("booking with id=%d is not found", id)));
-    }
-
-    private Room findRoomById(Long id) {
-        return roomRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("room with id=%d is not found", id)));
-    }
-
-    private User findUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("user with id=%d is not found", userId)));
-    }
-
-    private void checkAdminAccess(Long userId) {
-        User user = findUserById(userId);
-
-        if (user.getRole().ordinal() >= 2) {
-            throw new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                    user.getRole()));
-        }
     }
 
     private void checkDates(LocalDate checkInDate, LocalDate checkOutDate) {

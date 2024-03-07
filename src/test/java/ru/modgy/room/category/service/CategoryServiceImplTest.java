@@ -18,11 +18,10 @@ import ru.modgy.room.category.model.Category;
 import ru.modgy.room.category.repository.CategoryRepository;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
-import ru.modgy.user.repository.UserRepository;
+import ru.modgy.utility.UtilityService;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -80,13 +79,12 @@ public class CategoryServiceImplTest {
     @Mock
     private CategoryRepository categoryRepository;
     @Mock
-    private UserRepository userRepository;
+    private UtilityService utilityService;
     @Mock
     private CategoryMapper categoryMapper;
 
     @Test
     void addCategory_whenAddCategoryByBoss_thenCategoryAdded() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
         when(categoryRepository.save(any(Category.class))).thenReturn(category);
         when(categoryMapper.toCategory(any(NewCategoryDto.class))).thenReturn(category);
         when(categoryMapper.toCategoryDto(any(Category.class))).thenReturn(categoryDto);
@@ -104,7 +102,6 @@ public class CategoryServiceImplTest {
 
     @Test
     void addCategory_whenAddCategoryByAdmin_thenCategoryAdded() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
         when(categoryRepository.save(any(Category.class))).thenReturn(category);
         when(categoryMapper.toCategory(any(NewCategoryDto.class))).thenReturn(category);
         when(categoryMapper.toCategoryDto(any(Category.class))).thenReturn(categoryDto);
@@ -122,7 +119,8 @@ public class CategoryServiceImplTest {
 
     @Test
     void addCategory_whenAddCategoryByUser_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> categoryService.addCategory(user.getId(), newCategoryDto));
@@ -130,7 +128,8 @@ public class CategoryServiceImplTest {
 
     @Test
     void addCategory_whenAddCategoryByFinancial_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> categoryService.addCategory(financial.getId(), newCategoryDto));
@@ -138,8 +137,7 @@ public class CategoryServiceImplTest {
 
     @Test
     void getCategoryById_whenGetCategoryByBoss_thenReturnedCategory() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+        when(utilityService.getCategoryIfExists(anyLong())).thenReturn(category);
         when(categoryMapper.toCategory(any(CategoryDto.class))).thenReturn(category);
         when(categoryMapper.toCategoryDto(any(Category.class))).thenReturn(categoryDto);
 
@@ -150,14 +148,13 @@ public class CategoryServiceImplTest {
         Assertions.assertEquals(categoryDto.getName(), result.getName());
         Assertions.assertEquals(categoryDto.getDescription(), result.getDescription());
 
-        verify(categoryRepository, times(1)).findById(anyLong());
+        verify(utilityService, times(1)).getCategoryIfExists(anyLong());
         verifyNoMoreInteractions(categoryRepository);
     }
 
     @Test
     void getCategoryById_whenGetCategoryByAdmin_thenReturnedCategory() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+        when(utilityService.getCategoryIfExists(anyLong())).thenReturn(category);
         when(categoryMapper.toCategory(any(CategoryDto.class))).thenReturn(category);
         when(categoryMapper.toCategoryDto(any(Category.class))).thenReturn(categoryDto);
 
@@ -168,13 +165,15 @@ public class CategoryServiceImplTest {
         Assertions.assertEquals(categoryDto.getName(), result.getName());
         Assertions.assertEquals(categoryDto.getDescription(), result.getDescription());
 
-        verify(categoryRepository, times(1)).findById(anyLong());
+        verify(utilityService, times(1)).getCategoryIfExists(anyLong());
         verifyNoMoreInteractions(categoryRepository);
     }
 
     @Test
     void getCategoryById_whenGetCategoryByIdByUser_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
+
 
         assertThrows(AccessDeniedException.class,
                 () -> categoryService.getCategoryById(user.getId(), category.getId()));
@@ -182,7 +181,8 @@ public class CategoryServiceImplTest {
 
     @Test
     void getCategoryById_whenGetCategoryByIdByFinancial_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> categoryService.getCategoryById(financial.getId(), category.getId()));
@@ -190,7 +190,8 @@ public class CategoryServiceImplTest {
 
     @Test
     void getCategoryById_whenRequesterNotFound_thenNotFoundException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        doThrow(new NotFoundException(String.format("User with id=%d is not found", user.getId())))
+                .when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> categoryService.getCategoryById(boss.getId(), category.getId()));
@@ -215,8 +216,7 @@ public class CategoryServiceImplTest {
                 .description("new description")
                 .build();
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+        when(utilityService.getCategoryIfExists(anyLong())).thenReturn(category);
         when(categoryRepository.save(any(Category.class))).thenReturn(newCategory);
         when(categoryMapper.toCategory(any(UpdateCategoryDto.class))).thenReturn(newCategory);
         when(categoryMapper.toCategoryDto(any(Category.class))).thenReturn(updatedCategoryDto);
@@ -250,8 +250,7 @@ public class CategoryServiceImplTest {
                 .description("new description")
                 .build();
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+        when(utilityService.getCategoryIfExists(anyLong())).thenReturn(category);
         when(categoryRepository.save(any(Category.class))).thenReturn(newCategory);
         when(categoryMapper.toCategory(any(UpdateCategoryDto.class))).thenReturn(newCategory);
         when(categoryMapper.toCategoryDto(any(Category.class))).thenReturn(updatedCategoryDto);
@@ -268,7 +267,8 @@ public class CategoryServiceImplTest {
 
     @Test
     void updateCategory_whenRequesterNotFound_thenNotFoundException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        doThrow(new NotFoundException(String.format("User with id=%d is not found", user.getId())))
+                .when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> categoryService.updateCategoryById(boss.getId(), category.getId(), new UpdateCategoryDto()));
@@ -276,8 +276,8 @@ public class CategoryServiceImplTest {
 
     @Test
     void updateCategory_whenRequesterFoundAndRoomNotFound_thenNotFoundException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.empty());
+        doThrow(new NotFoundException(String.format("Category with id=%d is not found", category.getId())))
+                .when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> categoryService.updateCategoryById(boss.getId(), category.getId(), new UpdateCategoryDto()));
@@ -285,7 +285,8 @@ public class CategoryServiceImplTest {
 
     @Test
     void updateCategory_whenUpdateCategoryByUser_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> categoryService.updateCategoryById(user.getId(), category.getId(), new UpdateCategoryDto()));
@@ -293,7 +294,8 @@ public class CategoryServiceImplTest {
 
     @Test
     void updateCategory_whenUpdateCategoryByFinancial_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                financial.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> categoryService.updateCategoryById(financial.getId(), category.getId(), new UpdateCategoryDto()));
@@ -301,7 +303,6 @@ public class CategoryServiceImplTest {
 
     @Test
     void getAllCategories_whenGetAllCategoriesByBoss_thenReturnAllCategories() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
         when(categoryRepository.findAll()).thenReturn(List.of(category));
         when(categoryMapper.toCategoryDto(anyList())).thenReturn(List.of(categoryDto));
 
@@ -320,7 +321,6 @@ public class CategoryServiceImplTest {
 
     @Test
     void getAllCategories_whenGetAllCategoriesByAdmin_thenReturnAllCategories() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
         when(categoryRepository.findAll()).thenReturn(List.of(category));
         when(categoryMapper.toCategoryDto(anyList())).thenReturn(List.of(categoryDto));
 
@@ -339,7 +339,8 @@ public class CategoryServiceImplTest {
 
     @Test
     void getAllCategories_whenGetAllCategoriesByUser_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> categoryService.getAllCategories(user.getId()));
@@ -347,7 +348,8 @@ public class CategoryServiceImplTest {
 
     @Test
     void getAllCategories_whenGetAllCategoriesByFinancial_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                financial.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> categoryService.getAllCategories(financial.getId()));
@@ -355,7 +357,6 @@ public class CategoryServiceImplTest {
 
     @Test
     void deleteCategoryId_whenRequesterBossAndCategoryFound_thenCategoryDeleted() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
         when(categoryRepository.deleteCategoryById(anyLong())).thenReturn(1);
 
         categoryService.deleteCategoryById(boss.getId(), category.getId());
@@ -366,7 +367,6 @@ public class CategoryServiceImplTest {
 
     @Test
     void deleteCategoryId_whenRequesterAdminAndCategoryFound_thenCategoryDeleted() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
         when(categoryRepository.deleteCategoryById(anyLong())).thenReturn(1);
 
         categoryService.deleteCategoryById(admin.getId(), category.getId());
@@ -377,7 +377,8 @@ public class CategoryServiceImplTest {
 
     @Test
     void deleteCategoryId_whenRequesterNotFound_thenNotFoundException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        doThrow(new NotFoundException(String.format("User with id=%d is not found", user.getId())))
+                .when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> categoryService.deleteCategoryById(boss.getId(), category.getId()));
@@ -385,8 +386,8 @@ public class CategoryServiceImplTest {
 
     @Test
     void deleteCategoryId_whenCategoryNotFound_thenNotFoundException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
-        when(categoryRepository.deleteCategoryById(anyLong())).thenReturn(0);
+        doThrow(new NotFoundException(String.format("Category with id=%d is not found", category.getId())))
+                .when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> categoryService.deleteCategoryById(boss.getId(), category.getId()));
@@ -394,7 +395,8 @@ public class CategoryServiceImplTest {
 
     @Test
     void deleteCategoryId_whenRequesterUserAndCategoryFound_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> categoryService.deleteCategoryById(user.getId(), category.getId()));
@@ -402,7 +404,8 @@ public class CategoryServiceImplTest {
 
     @Test
     void deleteCategoryId_whenRequesterFinancialAndCategoryFound_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                financial.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> categoryService.deleteCategoryById(financial.getId(), category.getId()));

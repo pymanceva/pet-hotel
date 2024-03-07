@@ -4,21 +4,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.modgy.exception.AccessDeniedException;
 import ru.modgy.exception.ConflictException;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.room.category.dto.CategoryDto;
 import ru.modgy.room.category.dto.mapper.CategoryMapper;
 import ru.modgy.room.category.model.Category;
-import ru.modgy.room.category.repository.CategoryRepository;
 import ru.modgy.room.dto.NewRoomDto;
 import ru.modgy.room.dto.RoomDto;
 import ru.modgy.room.dto.UpdateRoomDto;
 import ru.modgy.room.dto.mapper.RoomMapper;
 import ru.modgy.room.model.Room;
 import ru.modgy.room.repository.RoomRepository;
-import ru.modgy.user.model.User;
-import ru.modgy.user.repository.UserRepository;
+import ru.modgy.utility.UtilityService;
 
 import java.util.*;
 
@@ -29,16 +26,15 @@ public class RoomServiceImpl implements RoomService {
     final private RoomRepository roomRepository;
     final private RoomMapper roomMapper;
     final private CategoryMapper categoryMapper;
-    final private CategoryRepository categoryRepository;
-    final private UserRepository userRepository;
+    final private UtilityService utilityService;
 
     @Transactional
     @Override
     public RoomDto addRoom(Long userId, NewRoomDto newRoomDto) {
-        checkAdminAccess(userId);
+        utilityService.checkBossAdminAccess(userId);
 
         Room newRoom = roomMapper.toRoom(newRoomDto);
-        Category category = findCategoryById(newRoomDto.getCategoryId());
+        Category category = utilityService.getCategoryIfExists(newRoomDto.getCategoryId());
         newRoom.setCategory(category);
         Room addedRoom = roomRepository.save(newRoom);
         CategoryDto categoryDto = categoryMapper.toCategoryDto(category);
@@ -51,9 +47,9 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(readOnly = true)
     @Override
     public RoomDto getRoomById(Long userId, Long roomId) {
-        checkViewAccess(userId);
+        utilityService.checkBossAdminFinancialAccess(userId);
 
-        Room room = findRoomById(roomId);
+        Room room = utilityService.getRoomIfExists(roomId);
         RoomDto roomDto = roomMapper.toRoomDto(room);
         roomDto.setCategoryDto(categoryMapper.toCategoryDto(room.getCategory()));
         log.info("RoomService: getRoomById, userId={}, roomId={}", userId, roomId);
@@ -63,12 +59,12 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     @Override
     public RoomDto updateRoom(Long userId, Long roomId, UpdateRoomDto roomDto) {
-        checkAdminAccess(userId);
-        Room oldRoom = findRoomById(roomId);
+        utilityService.checkBossAdminAccess(userId);
+        Room oldRoom = utilityService.getRoomIfExists(roomId);
         Room newRoom = roomMapper.toRoom(roomDto);
         Category category;
         if (roomDto.getCategoryId() != null) {
-            category = findCategoryById(roomDto.getCategoryId());
+            category = utilityService.getCategoryIfExists(roomDto.getCategoryId());
         } else {
             category = oldRoom.getCategory();
         }
@@ -101,7 +97,7 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(readOnly = true)
     @Override
     public Collection<RoomDto> getAllRooms(Long userId, Boolean isVisible) {
-        checkViewAccess(userId);
+        utilityService.checkBossAdminFinancialAccess(userId);
 
         List<Room> allRooms = roomRepository.getAllRooms(isVisible).orElse(Collections.emptyList());
         List<RoomDto> allRoomsDto = new ArrayList<>();
@@ -118,8 +114,8 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     @Override
     public RoomDto hideRoomById(Long userId, Long roomId) {
-        checkAdminAccess(userId);
-        Room room = findRoomById(roomId);
+        utilityService.checkBossAdminAccess(userId);
+        Room room = utilityService.getRoomIfExists(roomId);
 
         //пока уловие всегда true, в дальнейшем здесь буду проверять наличие активных бронирований у номера
         if (true) {
@@ -138,8 +134,8 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     @Override
     public RoomDto unhideRoomById(Long userId, Long roomId) {
-        checkAdminAccess(userId);
-        Room room = findRoomById(roomId);
+        utilityService.checkBossAdminAccess(userId);
+        Room room = utilityService.getRoomIfExists(roomId);
 
         room.setIsVisible(true);
         roomRepository.save(room);
@@ -153,7 +149,7 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     @Override
     public void permanentlyDeleteRoomById(Long userId, Long roomId) {
-        checkAdminAccess(userId);
+        utilityService.checkBossAdminAccess(userId);
 
         int result = roomRepository.deleteRoomById(roomId);
 
@@ -162,38 +158,5 @@ public class RoomServiceImpl implements RoomService {
         }
 
         log.info("RoomService: permanentlyDeleteRoomById, userId={}, roomId={}", userId, roomId);
-    }
-
-    private Room findRoomById(Long id) {
-        return roomRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("room with id=%d is not found", id)));
-    }
-
-    private User findUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("user with id=%d is not found", userId)));
-    }
-
-    private void checkAdminAccess(Long userId) {
-        User user = findUserById(userId);
-
-        if (user.getRole().ordinal() >= 2) {
-            throw new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                    user.getRole()));
-        }
-    }
-
-    private void checkViewAccess(Long userId) {
-        User user = findUserById(userId);
-
-        if (user.getRole().ordinal() == 2) {
-            throw new AccessDeniedException(String.format("User with role=%s, can't access for this information",
-                    user.getRole()));
-        }
-    }
-
-    private Category findCategoryById(Long id) {
-        return categoryRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("category with id=%d is not found", id)));
     }
 }

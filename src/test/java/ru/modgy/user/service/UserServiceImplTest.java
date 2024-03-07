@@ -18,15 +18,15 @@ import ru.modgy.user.dto.mapper.UserMapper;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
 import ru.modgy.user.repository.UserRepository;
+import ru.modgy.utility.UtilityService;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -40,6 +40,9 @@ class UserServiceImplTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private UtilityService utilityService;
 
     final long requesterId = 1L;
     final User requester = User.builder()
@@ -74,7 +77,6 @@ class UserServiceImplTest {
                 userRole, true);
         UserDto userDto = new UserDto(userId, userLastName, userFirstName, userMiddleName, email, userPassword,
                 userRole, true);
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
         when(userMapper.toUser(newUserDto)).thenReturn(newUserInput);
         when(userRepository.save(newUserInput)).thenReturn(newUser);
         when(userMapper.toUserDto(newUser)).thenReturn(userDto);
@@ -98,8 +100,9 @@ class UserServiceImplTest {
                 userRole, true);
         User newUserInput = new User(null, userLastName, userFirstName, userMiddleName, email, userPassword,
                 userRole, true);
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userMapper.toUser(newUserDto)).thenReturn(newUserInput);
+        when(userMapper.toUser(any(NewUserDto.class))).thenReturn(newUserInput);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                userRole))).when(utilityService).checkHigherOrdinalRoleAccess(anyLong(), eq(userRole));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.addUser(requesterId, newUserDto));
@@ -118,7 +121,6 @@ class UserServiceImplTest {
                 userRole, true);
         UserDto userDto = new UserDto(userId, userLastName, userFirstName, userMiddleName, email, userPassword,
                 userRole, true);
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
         when(userMapper.toUser(newUserDto)).thenReturn(newUserInput);
         when(userRepository.save(newUserInput)).thenReturn(newUser);
         when(userMapper.toUserDto(newUser)).thenReturn(userDto);
@@ -142,8 +144,9 @@ class UserServiceImplTest {
                 userRole, true);
         User newUserInput = new User(null, userLastName, userFirstName, userMiddleName, email, userPassword,
                 userRole, true);
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userMapper.toUser(newUserDto)).thenReturn(newUserInput);
+        when(userMapper.toUser(any(NewUserDto.class))).thenReturn(newUserInput);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                userRole))).when(utilityService).checkHigherOrdinalRoleAccess(anyLong(), eq(userRole));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.addUser(requesterId, newUserDto));
@@ -185,16 +188,16 @@ class UserServiceImplTest {
         User expectedUser = new User();
         expectedUser.setRole(userRole);
         UserDto expectedUserDto = new UserDto();
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(expectedUser);
         when(userMapper.toUserDto(expectedUser)).thenReturn(expectedUserDto);
 
         UserDto returnedUserDto = userService.getUserById(requesterId, userId);
 
         assertAll(
                 () -> assertEquals(expectedUserDto, returnedUserDto),
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userMapper).toUserDto(expectedUser)
         );
     }
@@ -207,16 +210,16 @@ class UserServiceImplTest {
         User expectedUser = new User();
         expectedUser.setRole(userRole);
         UserDto expectedUserDto = new UserDto();
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(expectedUser);
         when(userMapper.toUserDto(expectedUser)).thenReturn(expectedUserDto);
 
         UserDto returnedUserDto = userService.getUserById(requesterId, userId);
 
         assertAll(
                 () -> assertEquals(expectedUserDto, returnedUserDto),
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userMapper).toUserDto(expectedUser)
         );
     }
@@ -229,16 +232,16 @@ class UserServiceImplTest {
         User expectedUser = new User();
         expectedUser.setRole(userRole);
         UserDto expectedUserDto = new UserDto();
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(expectedUser);
         when(userMapper.toUserDto(expectedUser)).thenReturn(expectedUserDto);
 
         UserDto returnedUserDto = userService.getUserById(requesterId, userId);
 
         assertAll(
                 () -> assertEquals(expectedUserDto, returnedUserDto),
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userMapper).toUserDto(expectedUser)
         );
     }
@@ -251,16 +254,16 @@ class UserServiceImplTest {
         User expectedUser = new User();
         expectedUser.setRole(userRole);
         UserDto expectedUserDto = new UserDto();
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(expectedUser);
         when(userMapper.toUserDto(expectedUser)).thenReturn(expectedUserDto);
 
         UserDto returnedUserDto = userService.getUserById(requesterId, userId);
 
         assertAll(
                 () -> assertEquals(expectedUserDto, returnedUserDto),
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userMapper).toUserDto(expectedUser)
         );
     }
@@ -272,23 +275,24 @@ class UserServiceImplTest {
         userId = requesterId;
         User expectedUser = requester;
         UserDto expectedUserDto = new UserDto();
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(expectedUser);
         when(userMapper.toUserDto(expectedUser)).thenReturn(expectedUserDto);
 
         UserDto returnedUserDto = userService.getUserById(requesterId, userId);
 
         assertAll(
                 () -> assertEquals(expectedUserDto, returnedUserDto),
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userMapper).toUserDto(expectedUser)
         );
     }
 
     @Test
     void getUserById_whenRequesterNotFound_thenNotFoundException() {
-        when(userRepository.findById(requesterId)).thenReturn(Optional.empty());
+        doThrow(new NotFoundException(String.format("User with id=%d is not found", requesterId)))
+                .when(utilityService).getUserIfExists(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> userService.getUserById(requesterId, userId));
@@ -296,8 +300,8 @@ class UserServiceImplTest {
 
     @Test
     void getUserById_whenUserNotFound_thenNotFoundException() {
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        doThrow(new NotFoundException(String.format("User with id=%d is not found", userId)))
+                .when(utilityService).getUserIfExists(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> userService.getUserById(requesterId, userId));
@@ -309,8 +313,10 @@ class UserServiceImplTest {
         Roles userRole = Roles.ROLE_BOSS;
         requester.setRole(requesterRole);
         User expectedUser = User.builder().role(userRole).build();
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(expectedUser);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                userRole))).when(utilityService).checkHigherOrEqualOrdinalRoleAccess(anyLong(), eq(userRole));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.getUserById(requesterId, userId));
@@ -322,8 +328,10 @@ class UserServiceImplTest {
         Roles userRole = Roles.ROLE_ADMIN;
         requester.setRole(requesterRole);
         User expectedUser = User.builder().role(userRole).build();
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(expectedUser);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                userRole))).when(utilityService).checkHigherOrEqualOrdinalRoleAccess(anyLong(), eq(userRole));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.getUserById(requesterId, userId));
@@ -388,8 +396,8 @@ class UserServiceImplTest {
                 .isActive(userAfter.getIsActive())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(oldUser));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(oldUser);
         when(userMapper.toUser(newUserDto)).thenReturn(newUser);
         when(userRepository.save(newUser)).thenReturn(userAfter);
         when(userMapper.toUserDto(userAfter)).thenReturn(userDtoAfter);
@@ -418,8 +426,8 @@ class UserServiceImplTest {
                         "role field test failed"),
 
 
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userMapper).toUser(newUserDto),
                 () -> verify(userRepository).save(newUser),
                 () -> verify(userMapper).toUserDto(userAfter)
@@ -479,8 +487,8 @@ class UserServiceImplTest {
                 .isActive(userAfter.getIsActive())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(oldUser));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(oldUser);
         when(userMapper.toUser(newUserDto)).thenReturn(newUser);
         when(userRepository.save(newUser)).thenReturn(userAfter);
         when(userMapper.toUserDto(userAfter)).thenReturn(userDtoAfter);
@@ -505,8 +513,8 @@ class UserServiceImplTest {
                 () -> assertEquals(oldUser.getRole(), userForSave.getRole(),
                         "role field test failed"),
 
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userMapper).toUser(newUserDto),
                 () -> verify(userRepository).save(newUser),
                 () -> verify(userMapper).toUserDto(userAfter)
@@ -572,8 +580,8 @@ class UserServiceImplTest {
                 .isActive(userAfter.getIsActive())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(oldUser));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(oldUser);
         when(userMapper.toUser(newUserDto)).thenReturn(newUser);
         when(userRepository.save(newUser)).thenReturn(userAfter);
         when(userMapper.toUserDto(userAfter)).thenReturn(userDtoAfter);
@@ -602,8 +610,8 @@ class UserServiceImplTest {
                         "role field test failed"),
 
 
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userMapper).toUser(newUserDto),
                 () -> verify(userRepository).save(newUser),
                 () -> verify(userMapper).toUserDto(userAfter)
@@ -663,8 +671,8 @@ class UserServiceImplTest {
                 .isActive(userAfter.getIsActive())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(oldUser));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(oldUser);
         when(userMapper.toUser(newUserDto)).thenReturn(newUser);
         when(userRepository.save(newUser)).thenReturn(userAfter);
         when(userMapper.toUserDto(userAfter)).thenReturn(userDtoAfter);
@@ -689,8 +697,8 @@ class UserServiceImplTest {
                 () -> assertEquals(oldUser.getRole(), userForSave.getRole(),
                         "role field test failed"),
 
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userMapper).toUser(newUserDto),
                 () -> verify(userRepository).save(newUser),
                 () -> verify(userMapper).toUserDto(userAfter)
@@ -746,8 +754,8 @@ class UserServiceImplTest {
                 .isActive(userAfter.getIsActive())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(oldUser));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(oldUser);
         when(userMapper.toUser(newUserDto)).thenReturn(newUser);
         when(userRepository.save(newUser)).thenReturn(userAfter);
         when(userMapper.toUserDto(userAfter)).thenReturn(userDtoAfter);
@@ -776,8 +784,8 @@ class UserServiceImplTest {
                         "role field test failed"),
 
 
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userMapper).toUser(newUserDto),
                 () -> verify(userRepository).save(newUser),
                 () -> verify(userMapper).toUserDto(userAfter)
@@ -786,7 +794,8 @@ class UserServiceImplTest {
 
     @Test
     void updateUser_whenRequesterNotFound_thenNotFoundException() {
-        when(userRepository.findById(requesterId)).thenReturn(Optional.empty());
+        doThrow(new NotFoundException(String.format("User with id=%d is not found", requesterId)))
+                .when(utilityService).getUserIfExists(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> userService.updateUser(requesterId, userId, new UpdateUserDto()));
@@ -796,9 +805,9 @@ class UserServiceImplTest {
     void updateUser_whenUserNotFound_thenNotFoundException() {
         Roles requesterRole = Roles.ROLE_ADMIN;
         requester.setRole(requesterRole);
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
         when(userMapper.toUser(any(UpdateUserDto.class))).thenReturn(new User());
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        doThrow(new NotFoundException(String.format("User with id=%d is not found", requesterId)))
+                .when(utilityService).getUserIfExists(userId);
 
         assertThrows(NotFoundException.class,
                 () -> userService.updateUser(requesterId, userId, new UpdateUserDto()));
@@ -830,9 +839,11 @@ class UserServiceImplTest {
                 .role(oldUser.getRole())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(oldUser));
-        when(userMapper.toUser(newUserDto)).thenReturn(newUser);
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(oldUser);
+        when(userMapper.toUser(any(UpdateUserDto.class))).thenReturn(newUser);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccess(any(User.class), any(User.class));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.updateUser(requesterId, userId, newUserDto));
@@ -866,9 +877,11 @@ class UserServiceImplTest {
                 .role(newUserDto.getRole())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(oldUser));
-        when(userMapper.toUser(newUserDto)).thenReturn(newUser);
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(oldUser);
+        when(userMapper.toUser(any(UpdateUserDto.class))).thenReturn(newUser);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccess(any(User.class), any(User.class));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.updateUser(requesterId, userId, newUserDto));
@@ -900,9 +913,11 @@ class UserServiceImplTest {
                 .role(oldUser.getRole())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(oldUser));
-        when(userMapper.toUser(newUserDto)).thenReturn(newUser);
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(oldUser);
+        when(userMapper.toUser(any(UpdateUserDto.class))).thenReturn(newUser);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccess(any(User.class), any(User.class));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.updateUser(requesterId, userId, newUserDto));
@@ -934,9 +949,11 @@ class UserServiceImplTest {
                 .role(oldUser.getRole())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(oldUser));
-        when(userMapper.toUser(newUserDto)).thenReturn(newUser);
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(oldUser);
+        when(userMapper.toUser(any(UpdateUserDto.class))).thenReturn(newUser);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccess(any(User.class), any(User.class));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.updateUser(requesterId, userId, newUserDto));
@@ -946,7 +963,6 @@ class UserServiceImplTest {
     void updateUser_whenUserUpdateFinancial_thenNotAccessDeniedException() {
         Roles requesterRole = Roles.ROLE_USER;
         Roles oldUserRole = Roles.ROLE_FINANCIAL;
-        Roles newUserRole = null;
 
         requester.setRole(requesterRole);
 
@@ -969,9 +985,11 @@ class UserServiceImplTest {
                 .role(oldUser.getRole())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(oldUser));
-        when(userMapper.toUser(newUserDto)).thenReturn(newUser);
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(oldUser);
+        when(userMapper.toUser(any(UpdateUserDto.class))).thenReturn(newUser);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccess(any(User.class), any(User.class));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.updateUser(requesterId, userId, newUserDto));
@@ -1017,7 +1035,7 @@ class UserServiceImplTest {
 
         List<UserDto> userDtoList = List.of(userDto1, userDto2, userDto3);
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
         when(userRepository.findAllByRoleIn(roles)).thenReturn(Optional.of(userList));
         when(userMapper.map(userList)).thenReturn(userDtoList);
 
@@ -1034,20 +1052,15 @@ class UserServiceImplTest {
     void getAllUsers_whenBossGetAllActiveUsers_returnAllActiveUsers() {
         Roles requesterRole = Roles.ROLE_BOSS;
         Roles userRole1 = Roles.ROLE_USER;
-        Roles userRole2 = Roles.ROLE_ADMIN;
         Roles userRole3 = Roles.ROLE_FINANCIAL;
         Boolean isActive = true;
         boolean isActive1 = true;
-        boolean isActive2 = false;
         boolean isActive3 = true;
         List<Roles> roles = Arrays.stream(Roles.values()).toList();
         requester.setRole(requesterRole);
 
         User user1 = User.builder()
                 .id(userId + 1).firstName("1" + userFirstName).email("1" + email).role(userRole1).isActive(isActive1)
-                .build();
-        User user2 = User.builder()
-                .id(userId + 2).firstName("2" + userFirstName).email("2" + email).role(userRole2).isActive(isActive2)
                 .build();
         User user3 = User.builder()
                 .id(userId + 3).firstName("3" + userFirstName).email("3" + email).role(userRole3).isActive(isActive3)
@@ -1059,10 +1072,6 @@ class UserServiceImplTest {
                 .id(user1.getId()).firstName(user1.getFirstName()).email(user1.getEmail()).role(user1.getRole())
                 .isActive(user1.getIsActive())
                 .build();
-        UserDto userDto2 = UserDto.builder()
-                .id(user2.getId()).firstName(user2.getFirstName()).email(user2.getEmail()).role(user2.getRole())
-                .isActive(user2.getIsActive())
-                .build();
         UserDto userDto3 = UserDto.builder()
                 .id(user3.getId()).firstName(user3.getFirstName()).email(user3.getEmail()).role(user3.getRole())
                 .isActive(user3.getIsActive())
@@ -1070,7 +1079,7 @@ class UserServiceImplTest {
 
         List<UserDto> userDtoList = List.of(userDto1, userDto3);
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
         when(userRepository.findAllByRoleInAndIsActive(roles, isActive)).thenReturn(Optional.of(userList));
         when(userMapper.map(userList)).thenReturn(userDtoList);
 
@@ -1086,44 +1095,26 @@ class UserServiceImplTest {
     @Test
     void getAllUsers_whenBossGetAllNotActiveUsers_returnAllNotActiveUsers() {
         Roles requesterRole = Roles.ROLE_BOSS;
-        Roles userRole1 = Roles.ROLE_USER;
         Roles userRole2 = Roles.ROLE_ADMIN;
-        Roles userRole3 = Roles.ROLE_FINANCIAL;
         Boolean isActive = false;
-        boolean isActive1 = true;
         boolean isActive2 = false;
-        boolean isActive3 = true;
         List<Roles> roles = Arrays.stream(Roles.values()).toList();
         requester.setRole(requesterRole);
 
-        User user1 = User.builder()
-                .id(userId + 1).firstName("1" + userFirstName).email("1" + email).role(userRole1).isActive(isActive1)
-                .build();
         User user2 = User.builder()
                 .id(userId + 2).firstName("2" + userFirstName).email("2" + email).role(userRole2).isActive(isActive2)
-                .build();
-        User user3 = User.builder()
-                .id(userId + 3).firstName("3" + userFirstName).email("3" + email).role(userRole3).isActive(isActive3)
                 .build();
 
         List<User> userList = List.of(user2);
 
-        UserDto userDto1 = UserDto.builder()
-                .id(user1.getId()).firstName(user1.getFirstName()).email(user1.getEmail()).role(user1.getRole())
-                .isActive(user1.getIsActive())
-                .build();
         UserDto userDto2 = UserDto.builder()
                 .id(user2.getId()).firstName(user2.getFirstName()).email(user2.getEmail()).role(user2.getRole())
                 .isActive(user2.getIsActive())
                 .build();
-        UserDto userDto3 = UserDto.builder()
-                .id(user3.getId()).firstName(user3.getFirstName()).email(user3.getEmail()).role(user3.getRole())
-                .isActive(user3.getIsActive())
-                .build();
 
         List<UserDto> userDtoList = List.of(userDto2);
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
         when(userRepository.findAllByRoleInAndIsActive(roles, isActive)).thenReturn(Optional.of(userList));
         when(userMapper.map(userList)).thenReturn(userDtoList);
 
@@ -1140,19 +1131,14 @@ class UserServiceImplTest {
     void getAllUsers_whenAdminGetAllUsers_returnAllUsersThanBoss() {
         Roles requesterRole = Roles.ROLE_ADMIN;
         Roles userRole1 = Roles.ROLE_ADMIN;
-        Roles userRole2 = Roles.ROLE_BOSS;
         Roles userRole3 = Roles.ROLE_FINANCIAL;
         Boolean isActive = null;
         boolean isActive1 = true;
-        boolean isActive2 = false;
         boolean isActive3 = true;
         List<Roles> roles = Arrays.asList(Roles.values()).subList(requesterRole.ordinal(), Roles.values().length);
         requester.setRole(requesterRole);
         User user1 = User.builder()
                 .id(userId + 1).firstName("1" + userFirstName).email("1" + email).role(userRole1).isActive(isActive1)
-                .build();
-        User user2 = User.builder()
-                .id(userId + 2).firstName("2" + userFirstName).email("2" + email).role(userRole2).isActive(isActive2)
                 .build();
         User user3 = User.builder()
                 .id(userId + 3).firstName("3" + userFirstName).email("3" + email).role(userRole3).isActive(isActive3)
@@ -1164,10 +1150,6 @@ class UserServiceImplTest {
                 .id(user1.getId()).firstName(user1.getFirstName()).email(user1.getEmail()).role(user1.getRole())
                 .isActive(user1.getIsActive())
                 .build();
-        UserDto userDto2 = UserDto.builder()
-                .id(user2.getId()).firstName(user2.getFirstName()).email(user2.getEmail()).role(user2.getRole())
-                .isActive(user2.getIsActive())
-                .build();
         UserDto userDto3 = UserDto.builder()
                 .id(user3.getId()).firstName(user3.getFirstName()).email(user3.getEmail()).role(user3.getRole())
                 .isActive(user3.getIsActive())
@@ -1175,7 +1157,7 @@ class UserServiceImplTest {
 
         List<UserDto> userDtoList = List.of(userDto1, userDto3);
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
         when(userRepository.findAllByRoleIn(roles)).thenReturn(Optional.of(userList));
         when(userMapper.map(userList)).thenReturn(userDtoList);
 
@@ -1192,22 +1174,12 @@ class UserServiceImplTest {
     void getAllUsers_whenAdminGetAllActiveUsers_returnAllActiveUsersThanBoss() {
         Roles requesterRole = Roles.ROLE_ADMIN;
         Roles userRole1 = Roles.ROLE_ADMIN;
-        Roles userRole2 = Roles.ROLE_FINANCIAL;
-        Roles userRole3 = Roles.ROLE_BOSS;
         Boolean isActive = true;
         boolean isActive1 = true;
-        boolean isActive2 = false;
-        boolean isActive3 = true;
         List<Roles> roles = Arrays.asList(Roles.values()).subList(requesterRole.ordinal(), Roles.values().length);
         requester.setRole(requesterRole);
         User user1 = User.builder()
                 .id(userId + 1).firstName("1" + userFirstName).email("1" + email).role(userRole1).isActive(isActive1)
-                .build();
-        User user2 = User.builder()
-                .id(userId + 2).firstName("2" + userFirstName).email("2" + email).role(userRole2).isActive(isActive2)
-                .build();
-        User user3 = User.builder()
-                .id(userId + 3).firstName("3" + userFirstName).email("3" + email).role(userRole3).isActive(isActive3)
                 .build();
 
         List<User> userList = List.of(user1);
@@ -1216,18 +1188,10 @@ class UserServiceImplTest {
                 .id(user1.getId()).firstName(user1.getFirstName()).email(user1.getEmail()).role(user1.getRole())
                 .isActive(user1.getIsActive())
                 .build();
-        UserDto userDto2 = UserDto.builder()
-                .id(user2.getId()).firstName(user2.getFirstName()).email(user2.getEmail()).role(user2.getRole())
-                .isActive(user2.getIsActive())
-                .build();
-        UserDto userDto3 = UserDto.builder()
-                .id(user3.getId()).firstName(user3.getFirstName()).email(user3.getEmail()).role(user3.getRole())
-                .isActive(user3.getIsActive())
-                .build();
 
         List<UserDto> userDtoList = List.of(userDto1);
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
         when(userRepository.findAllByRoleInAndIsActive(roles, isActive)).thenReturn(Optional.of(userList));
         when(userMapper.map(userList)).thenReturn(userDtoList);
 
@@ -1243,43 +1207,25 @@ class UserServiceImplTest {
     @Test
     void getAllUsers_whenAdminGetAllNotActiveUsers_returnAllNotActiveUsersThanBoss() {
         Roles requesterRole = Roles.ROLE_ADMIN;
-        Roles userRole1 = Roles.ROLE_ADMIN;
         Roles userRole2 = Roles.ROLE_FINANCIAL;
-        Roles userRole3 = Roles.ROLE_BOSS;
         Boolean isActive = true;
-        boolean isActive1 = true;
         boolean isActive2 = false;
-        boolean isActive3 = true;
         List<Roles> roles = Arrays.asList(Roles.values()).subList(requesterRole.ordinal(), Roles.values().length);
         requester.setRole(requesterRole);
-        User user1 = User.builder()
-                .id(userId + 1).firstName("1" + userFirstName).email("1" + email).role(userRole1).isActive(isActive1)
-                .build();
         User user2 = User.builder()
                 .id(userId + 2).firstName("2" + userFirstName).email("2" + email).role(userRole2).isActive(isActive2)
-                .build();
-        User user3 = User.builder()
-                .id(userId + 3).firstName("3" + userFirstName).email("3" + email).role(userRole3).isActive(isActive3)
                 .build();
 
         List<User> userList = List.of(user2);
 
-        UserDto userDto1 = UserDto.builder()
-                .id(user1.getId()).firstName(user1.getFirstName()).email(user1.getEmail()).role(user1.getRole())
-                .isActive(user1.getIsActive())
-                .build();
         UserDto userDto2 = UserDto.builder()
                 .id(user2.getId()).firstName(user2.getFirstName()).email(user2.getEmail()).role(user2.getRole())
                 .isActive(user2.getIsActive())
                 .build();
-        UserDto userDto3 = UserDto.builder()
-                .id(user3.getId()).firstName(user3.getFirstName()).email(user3.getEmail()).role(user3.getRole())
-                .isActive(user3.getIsActive())
-                .build();
 
         List<UserDto> userDtoList = List.of(userDto2);
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
         when(userRepository.findAllByRoleInAndIsActive(roles, isActive)).thenReturn(Optional.of(userList));
         when(userMapper.map(userList)).thenReturn(userDtoList);
 
@@ -1296,7 +1242,9 @@ class UserServiceImplTest {
     void getAllUsers_whenUserGetAllUsers_ThenAccessDeniedException() {
         Roles requesterRole = Roles.ROLE_USER;
         requester.setRole(requesterRole);
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                requesterRole))).when(utilityService).checkHigherOrEqualOrdinalRoleAccess(any(User.class), eq(Roles.ROLE_ADMIN));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.getAllUsers(requesterId, isActive));
@@ -1306,7 +1254,9 @@ class UserServiceImplTest {
     void getAllUsers_whenFinancialGetAllUsers_ThenAccessDeniedException() {
         Roles requesterRole = Roles.ROLE_FINANCIAL;
         requester.setRole(requesterRole);
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                requesterRole))).when(utilityService).checkHigherOrEqualOrdinalRoleAccess(any(User.class), eq(Roles.ROLE_ADMIN));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.getAllUsers(requesterId, isActive));
@@ -1314,7 +1264,8 @@ class UserServiceImplTest {
 
     @Test
     void getAllUsers_whenRequesterNotFound_thenNotFoundException() {
-        when(userRepository.findById(requesterId)).thenReturn(Optional.empty());
+        doThrow(new NotFoundException(String.format("User with id=%d is not found", requesterId)))
+                .when(utilityService).getUserIfExists(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> userService.getAllUsers(requesterId, isActive));
@@ -1333,8 +1284,8 @@ class UserServiceImplTest {
                 .role(userRole)
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(user);
         when(userRepository.deleteUserById(user.getId())).thenReturn(1);
 
         userService.deleteUserById(requesterId, userId);
@@ -1357,8 +1308,8 @@ class UserServiceImplTest {
                 .role(userRole)
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(user);
         when(userRepository.deleteUserById(user.getId())).thenReturn(1);
 
         userService.deleteUserById(requesterId, userId);
@@ -1381,8 +1332,10 @@ class UserServiceImplTest {
                 .role(userRole)
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(user);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkHigherOrdinalRoleAccess(any(User.class), any(User.class));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.deleteUserById(requesterId, userId));
@@ -1401,8 +1354,10 @@ class UserServiceImplTest {
                 .role(userRole)
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(user);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkHigherOrdinalRoleAccess(any(User.class), any(User.class));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.deleteUserById(requesterId, userId));
@@ -1410,7 +1365,8 @@ class UserServiceImplTest {
 
     @Test
     void deleteUserById_whenRequesterNotFound_thenNotFoundException() {
-        when(userRepository.findById(requesterId)).thenReturn(Optional.empty());
+        doThrow(new NotFoundException(String.format("User with id=%d is not found", userId)))
+                .when(utilityService).getUserIfExists(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> userService.deleteUserById(requesterId, userId));
@@ -1453,8 +1409,8 @@ class UserServiceImplTest {
                 .isActive(userAfter.getIsActive())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(userAfter);
         when(userMapper.toUserDto(userAfter)).thenReturn(userAfterDto);
 
@@ -1464,8 +1420,8 @@ class UserServiceImplTest {
         User userForSave = userArgumentCaptor.getValue();
 
         assertAll(
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userRepository).save(user),
                 () -> verify(userMapper).toUserDto(userAfter),
                 () -> assertEquals(newActive, userForSave.getIsActive()),
@@ -1510,8 +1466,8 @@ class UserServiceImplTest {
                 .isActive(userAfter.getIsActive())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(userAfter);
         when(userMapper.toUserDto(userAfter)).thenReturn(userAfterDto);
 
@@ -1521,8 +1477,8 @@ class UserServiceImplTest {
         User userForSave = userArgumentCaptor.getValue();
 
         assertAll(
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userRepository).save(user),
                 () -> verify(userMapper).toUserDto(userAfter),
                 () -> assertEquals(newActive, userForSave.getIsActive()),
@@ -1567,8 +1523,8 @@ class UserServiceImplTest {
                 .isActive(userAfter.getIsActive())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(userAfter);
         when(userMapper.toUserDto(userAfter)).thenReturn(userAfterDto);
 
@@ -1578,8 +1534,8 @@ class UserServiceImplTest {
         User userForSave = userArgumentCaptor.getValue();
 
         assertAll(
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userRepository).save(user),
                 () -> verify(userMapper).toUserDto(userAfter),
                 () -> assertEquals(newActive, userForSave.getIsActive()),
@@ -1624,8 +1580,8 @@ class UserServiceImplTest {
                 .isActive(userAfter.getIsActive())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(userAfter);
         when(userMapper.toUserDto(userAfter)).thenReturn(userAfterDto);
 
@@ -1635,8 +1591,8 @@ class UserServiceImplTest {
         User userForSave = userArgumentCaptor.getValue();
 
         assertAll(
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userRepository).save(user),
                 () -> verify(userMapper).toUserDto(userAfter),
                 () -> assertEquals(newActive, userForSave.getIsActive()),
@@ -1681,8 +1637,8 @@ class UserServiceImplTest {
                 .isActive(userAfter.getIsActive())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(userAfter);
         when(userMapper.toUserDto(userAfter)).thenReturn(userAfterDto);
 
@@ -1692,8 +1648,8 @@ class UserServiceImplTest {
         User userForSave = userArgumentCaptor.getValue();
 
         assertAll(
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userRepository).save(user),
                 () -> verify(userMapper).toUserDto(userAfter),
                 () -> assertEquals(newActive, userForSave.getIsActive()),
@@ -1738,8 +1694,8 @@ class UserServiceImplTest {
                 .isActive(userAfter.getIsActive())
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(userAfter);
         when(userMapper.toUserDto(userAfter)).thenReturn(userAfterDto);
 
@@ -1749,8 +1705,8 @@ class UserServiceImplTest {
         User userForSave = userArgumentCaptor.getValue();
 
         assertAll(
-                () -> verify(userRepository).findById(requesterId),
-                () -> verify(userRepository).findById(userId),
+                () -> verify(utilityService).getUserIfExists(requesterId),
+                () -> verify(utilityService).getUserIfExists(userId),
                 () -> verify(userRepository).save(user),
                 () -> verify(userMapper).toUserDto(userAfter),
                 () -> assertEquals(newActive, userForSave.getIsActive()),
@@ -1771,8 +1727,10 @@ class UserServiceImplTest {
                 .role(userRole)
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(user);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccess(any(User.class), any(User.class));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.setUserState(requesterId, userId, true));
@@ -1791,8 +1749,10 @@ class UserServiceImplTest {
                 .role(userRole)
                 .build();
 
-        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requester));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(utilityService.getUserIfExists(requesterId)).thenReturn(requester);
+        when(utilityService.getUserIfExists(userId)).thenReturn(user);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccess(any(User.class), any(User.class));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.setUserState(requesterId, userId, true));
@@ -1800,7 +1760,8 @@ class UserServiceImplTest {
 
     @Test
     void setUserState_whenRequesterNotFound_thenNotFoundException() {
-        when(userRepository.findById(requesterId)).thenReturn(Optional.empty());
+        doThrow(new NotFoundException(String.format("User with id=%d is not found", requesterId)))
+                .when(utilityService).getUserIfExists(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> userService.setUserState(requesterId, userId, true));

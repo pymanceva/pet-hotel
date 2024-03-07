@@ -479,7 +479,7 @@ public class PetServiceIntegrationTest {
 
         service.deletePetById(requesterAdmin.getId(), pet.getId());
 
-        String error = String.format("Pet with id = %d not found", pet.getId());
+        String error = String.format("Pet with id=%d is not found", pet.getId());
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
                 () -> service.getPetById(requesterAdmin.getId(), pet.getId())

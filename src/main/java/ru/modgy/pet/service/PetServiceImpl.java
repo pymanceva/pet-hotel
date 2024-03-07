@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.modgy.exception.AccessDeniedException;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.pet.dto.NewPetDto;
 import ru.modgy.pet.dto.PetDto;
@@ -12,8 +11,7 @@ import ru.modgy.pet.dto.UpdatePetDto;
 import ru.modgy.pet.mapper.PetMapper;
 import ru.modgy.pet.model.Pet;
 import ru.modgy.pet.repository.PetRepository;
-import ru.modgy.user.model.User;
-import ru.modgy.user.repository.UserRepository;
+import ru.modgy.utility.UtilityService;
 
 import java.util.Objects;
 
@@ -22,16 +20,15 @@ import java.util.Objects;
 @Slf4j
 public class PetServiceImpl implements PetService {
     private final PetRepository petRepository;
-    private final UserRepository userRepository;
     private final PetMapper petMapper;
+    private final UtilityService utilityService;
 
     @Override
     @Transactional
     public PetDto addPet(Long requesterId, NewPetDto newPetDto) {
-        User requester = findUserById(requesterId);
         //метод проверки наличия хозяина питомца, будет дописан после добавления сущности оунеров
         //findOwnerById(newPetDto.getOwnerId());
-        checkAccess(requester);
+        utilityService.checkBossAdminAccess(requesterId);
         //метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
 //        checkPet(newPetDto);
         Pet newPet = petMapper.toPet(newPetDto);
@@ -43,8 +40,8 @@ public class PetServiceImpl implements PetService {
     @Override
     @Transactional(readOnly = true)
     public PetDto getPetById(Long requesterId, Long petId) {
-        findUserById(requesterId);
-        Pet pet = getPetIfExists(petId);
+        utilityService.getUserIfExists(requesterId);
+        Pet pet = utilityService.getPetIfExists(petId);
         log.info("PetService: getPetById, requesterId={}, petId={}", requesterId, petId);
         return petMapper.toPetDto(pet);
     }
@@ -52,9 +49,8 @@ public class PetServiceImpl implements PetService {
     @Override
     @Transactional
     public PetDto updatePet(Long requesterId, Long petId, UpdatePetDto updatePetDto) {
-        User requester = findUserById(requesterId);
-        checkAccess(requester);
-        Pet oldPet = getPetIfExists(petId);
+        utilityService.checkBossAdminAccess(requesterId);
+        Pet oldPet = utilityService.getPetIfExists(petId);
         Pet newPet = petMapper.toPet(updatePetDto);
         newPet.setId(oldPet.getId());
         //метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
@@ -236,8 +232,7 @@ public class PetServiceImpl implements PetService {
     @Override
     @Transactional
     public void deletePetById(Long requesterId, Long petId) {
-        User requester = findUserById(requesterId);
-        checkAccess(requester);
+        utilityService.checkBossAdminAccess(requesterId);
 
         int result = petRepository.deletePetById(petId);
 
@@ -247,27 +242,12 @@ public class PetServiceImpl implements PetService {
         log.info("PetService: deletePetById, requesterId={}, petId={}", requesterId, petId);
     }
 
-    private User findUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("User with id = %d not found", userId)));
-    }
     //метод проверки наличия хозяина питомца, будет дописан после добавления сущности оунеров
 //    private User findOwnerById(long userId) {
 //        return ownerRepository.findById(userId).orElseThrow(() ->
 //                new NotFoundException(String.format("Owner with id = %d not found", userId)));
 //    }
 
-    private void checkAccess(User requester) {
-        if (requester.getRole().ordinal() >= 2) {
-            throw new AccessDeniedException(String.format("User with role = %s, can't access for this action",
-                    requester.getRole()));
-        }
-    }
-
-    private Pet getPetIfExists(Long petId) {
-        return petRepository.findById(petId).orElseThrow(() ->
-                new NotFoundException(String.format("Pet with id = %d not found", petId)));
-    }
     //метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
 //    private void checkPet(NewPetDto newPetDto) {
 //        try {
