@@ -9,6 +9,7 @@ import ru.modgy.booking.dto.BookingDto;
 import ru.modgy.booking.dto.NewBookingDto;
 import ru.modgy.booking.dto.UpdateBookingDto;
 import ru.modgy.booking.service.BookingService;
+import ru.modgy.utility.UtilityService;
 
 @CrossOrigin
 @Slf4j

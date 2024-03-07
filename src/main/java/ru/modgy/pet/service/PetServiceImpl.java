@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.modgy.exception.AccessDeniedException;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.pet.dto.NewPetDto;
 import ru.modgy.pet.dto.PetDto;
@@ -12,8 +11,7 @@ import ru.modgy.pet.dto.UpdatePetDto;
 import ru.modgy.pet.mapper.PetMapper;
 import ru.modgy.pet.model.Pet;
 import ru.modgy.pet.repository.PetRepository;
-import ru.modgy.user.model.User;
-import ru.modgy.user.repository.UserRepository;
+import ru.modgy.utility.UtilityService;
 
 import java.util.Objects;
 
@@ -28,10 +26,9 @@ public class PetServiceImpl implements PetService {
     @Override
     @Transactional
     public PetDto addPet(Long requesterId, NewPetDto newPetDto) {
-        User requester = utilityService.getUserIfExists(requesterId);
         //метод проверки наличия хозяина питомца, будет дописан после добавления сущности оунеров
         //findOwnerById(newPetDto.getOwnerId());
-        utilityService.checkBossAdminAccess(requester);
+        utilityService.checkBossAdminAccess(requesterId);
         //метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
 //        checkPet(newPetDto);
         Pet newPet = petMapper.toPet(newPetDto);
@@ -52,8 +49,7 @@ public class PetServiceImpl implements PetService {
     @Override
     @Transactional
     public PetDto updatePet(Long requesterId, Long petId, UpdatePetDto updatePetDto) {
-        User requester = utilityService.getUserIfExists(requesterId);
-        utilityService.checkBossAdminAccess(requester);
+        utilityService.checkBossAdminAccess(requesterId);
         Pet oldPet = utilityService.getPetIfExists(petId);
         Pet newPet = petMapper.toPet(updatePetDto);
         newPet.setId(oldPet.getId());
@@ -236,8 +232,7 @@ public class PetServiceImpl implements PetService {
     @Override
     @Transactional
     public void deletePetById(Long requesterId, Long petId) {
-        User requester = utilityService.getUserIfExists(requesterId);
-        utilityService.checkBossAdminAccess(requester);
+        utilityService.checkBossAdminAccess(requesterId);
 
         int result = petRepository.deletePetById(petId);
 

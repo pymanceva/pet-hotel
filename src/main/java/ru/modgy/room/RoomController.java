@@ -10,6 +10,7 @@ import ru.modgy.room.dto.NewRoomDto;
 import ru.modgy.room.dto.RoomDto;
 import ru.modgy.room.dto.UpdateRoomDto;
 import ru.modgy.room.service.RoomService;
+import ru.modgy.utility.UtilityService;
 
 import java.util.Collection;
 

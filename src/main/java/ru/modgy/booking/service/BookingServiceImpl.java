@@ -13,15 +13,11 @@ import ru.modgy.booking.model.ReasonOfStopBooking;
 import ru.modgy.booking.model.StatusBooking;
 import ru.modgy.booking.model.TypesBooking;
 import ru.modgy.booking.repository.BookingRepository;
-import ru.modgy.exception.AccessDeniedException;
 import ru.modgy.exception.ConflictException;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.pet.model.Pet;
-import ru.modgy.pet.repository.PetRepository;
 import ru.modgy.room.model.Room;
-import ru.modgy.room.repository.RoomRepository;
-import ru.modgy.user.model.User;
-import ru.modgy.user.repository.UserRepository;
+import ru.modgy.utility.UtilityService;
 
 import java.time.LocalDate;
 import java.util.List;

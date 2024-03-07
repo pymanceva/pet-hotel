@@ -9,6 +9,7 @@ import ru.modgy.pet.dto.NewPetDto;
 import ru.modgy.pet.dto.PetDto;
 import ru.modgy.pet.dto.UpdatePetDto;
 import ru.modgy.pet.service.PetService;
+import ru.modgy.utility.UtilityService;
 
 
 @CrossOrigin

@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import ru.modgy.utility.UtilityService;
 import ru.modgy.booking.dto.BookingDto;
 import ru.modgy.booking.dto.NewBookingDto;
 import ru.modgy.booking.dto.UpdateBookingDto;
@@ -22,19 +23,15 @@ import ru.modgy.pet.dto.PetDto;
 import ru.modgy.pet.model.Pet;
 import ru.modgy.pet.model.Sex;
 import ru.modgy.pet.model.TypeOfPet;
-import ru.modgy.pet.repository.PetRepository;
 import ru.modgy.room.category.dto.CategoryDto;
 import ru.modgy.room.category.model.Category;
 import ru.modgy.room.dto.RoomDto;
 import ru.modgy.room.model.Room;
-import ru.modgy.room.repository.RoomRepository;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
-import ru.modgy.user.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -181,8 +178,6 @@ public class BookingServiceImplTest {
     @Mock
     private BookingRepository bookingRepository;
     @Mock
-    private UserRepository userRepository;
-    @Mock
     private UtilityService utilityService;
     @Mock
     private BookingMapper bookingMapper;
@@ -247,7 +242,8 @@ public class BookingServiceImplTest {
 
     @Test
     void addBooking_whenAddBookingByUser_thenAccessDeniedException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(user);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> bookingService.addBooking(user.getId(), newBookingDto));
@@ -255,7 +251,8 @@ public class BookingServiceImplTest {
 
     @Test
     void addBooking_whenAddBookingByFinancial_thenAccessDeniedException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(financial);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> bookingService.addBooking(user.getId(), newBookingDto));
@@ -263,7 +260,8 @@ public class BookingServiceImplTest {
 
     @Test
     void addBooking_whenAddBookingAndRequesterNotFound_thenNotFoundException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(null);
+        doThrow(new NotFoundException(String.format("User with id=%d is not found", user.getId())))
+                .when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.addBooking(user.getId(), newBookingDto));
@@ -271,8 +269,8 @@ public class BookingServiceImplTest {
 
     @Test
     void addBooking_whenAddBookingAndRoomNotFound_thenNotFoundException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(boss);
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(null);
+        doThrow(new NotFoundException(String.format("Room with id=%d is not found", user.getId())))
+                .when(utilityService).getRoomIfExists(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.addBooking(user.getId(), newBookingDto));
@@ -326,7 +324,8 @@ public class BookingServiceImplTest {
 
     @Test
     void getBookingById_whenGetBookingByUser_thenAccessDeniedException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(user);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> bookingService.getBookingById(user.getId(), bookingId));
@@ -334,7 +333,8 @@ public class BookingServiceImplTest {
 
     @Test
     void getBookingById_whenGetBookingByFinancial_thenAccessDeniedException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(financial);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> bookingService.getBookingById(financial.getId(), bookingId));
@@ -342,7 +342,8 @@ public class BookingServiceImplTest {
 
     @Test
     void getBookingById_whenGetBookingByIdAndRequesterNotFound_thenNotFoundException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(null);
+        doThrow(new NotFoundException(String.format("User with id=%d is not found", user.getId())))
+                .when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.getBookingById(user.getId(), bookingId));
@@ -351,7 +352,8 @@ public class BookingServiceImplTest {
     @Test
     void getBookingById_whenGetBookingByIdAndBookingNotFound_thenNotFoundException() {
         when(utilityService.getUserIfExists(anyLong())).thenReturn(boss);
-        when(utilityService.getBookingIfExists(anyLong())).thenReturn(null);
+        doThrow(new NotFoundException(String.format("Booking with id=%d is not found", user.getId())))
+                .when(utilityService).getBookingIfExists(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.getBookingById(user.getId(), bookingId));
@@ -419,7 +421,8 @@ public class BookingServiceImplTest {
 
     @Test
     void updateBookingById_whenRequesterUser_thenAccessDeniedException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(user);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> bookingService.updateBooking(user.getId(), bookingId, new UpdateBookingDto()));
@@ -427,7 +430,8 @@ public class BookingServiceImplTest {
 
     @Test
     void updateBookingById_whenRequesterFinancial_thenAccessDeniedException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(financial);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> bookingService.updateBooking(financial.getId(), bookingId, new UpdateBookingDto()));
@@ -435,7 +439,9 @@ public class BookingServiceImplTest {
 
     @Test
     void updateBookingById_whenRequesterNotFound_thenNotFoundException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(null);
+        when(utilityService.getUserIfExists(anyLong())).thenReturn(boss);
+        doThrow(new NotFoundException(String.format("User with id=%d is not found", user.getId())))
+                .when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.updateBooking(boss.getId(), bookingId, new UpdateBookingDto()));
@@ -444,7 +450,9 @@ public class BookingServiceImplTest {
     @Test
     void updateBookingById_whenRequesterFoundAndBookingNotFound_thenNotFoundException() {
         when(utilityService.getUserIfExists(anyLong())).thenReturn(boss);
-        when(utilityService.getBookingIfExists(anyLong())).thenReturn(null);
+        when(utilityService.getUserIfExists(anyLong())).thenReturn(boss);
+        doThrow(new NotFoundException(String.format("Booking with id=%d is not found", user.getId())))
+                .when(utilityService).getBookingIfExists(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.updateBooking(boss.getId(), bookingId, new UpdateBookingDto()));
@@ -474,7 +482,8 @@ public class BookingServiceImplTest {
 
     @Test
     void deleteBookingId_whenRequesterUser_thenAccessDeniedException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(user);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> bookingService.deleteBookingById(user.getId(), bookingId));
@@ -482,7 +491,8 @@ public class BookingServiceImplTest {
 
     @Test
     void deleteBookingId_whenRequesterFinancial_thenAccessDeniedException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(financial);
+        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
 
         assertThrows(AccessDeniedException.class,
                 () -> bookingService.deleteBookingById(financial.getId(), bookingId));

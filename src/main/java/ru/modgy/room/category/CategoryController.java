@@ -9,6 +9,7 @@ import ru.modgy.room.category.dto.CategoryDto;
 import ru.modgy.room.category.dto.NewCategoryDto;
 import ru.modgy.room.category.dto.UpdateCategoryDto;
 import ru.modgy.room.category.service.CategoryService;
+import ru.modgy.utility.UtilityService;
 
 import java.util.Collection;
 

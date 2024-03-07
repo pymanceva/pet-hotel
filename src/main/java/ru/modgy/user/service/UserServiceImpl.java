@@ -13,8 +13,12 @@ import ru.modgy.user.dto.mapper.UserMapper;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
 import ru.modgy.user.repository.UserRepository;
+import ru.modgy.utility.UtilityService;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 
 @Slf4j
@@ -49,10 +53,9 @@ public class UserServiceImpl implements UserService {
     @Transactional()
     @Override
     public UserDto addUser(Long requesterId, NewUserDto newUserDto) {
-        User requester = utilityService.getUserIfExists(requesterId);
         User newUser = userMapper.toUser(newUserDto);
 
-        utilityService.checkHigherOrdinalRoleAccess(requester, newUser);
+        utilityService.checkHigherOrdinalRoleAccess(requesterId, newUser.getRole());
 
         User addedUser = userRepository.save(newUser);
         log.info("userService: addUser, requesterId={}, newUserDto={},  newUser={}",
@@ -69,7 +72,7 @@ public class UserServiceImpl implements UserService {
             return userMapper.toUserDto(requester);
         }
         User user = utilityService.getUserIfExists(userId);
-        utilityService.checkHigherOrEqualOrdinalRoleAccess(requester, user);
+        utilityService.checkHigherOrEqualOrdinalRoleAccess(requesterId, user.getRole());
 
         log.info("UserService: getUserById, requesterId ={}, by userId={}", requesterId, userId);
         return userMapper.toUserDto(user);

@@ -9,6 +9,7 @@ import ru.modgy.user.dto.NewUserDto;
 import ru.modgy.user.dto.UpdateUserDto;
 import ru.modgy.user.dto.UserDto;
 import ru.modgy.user.service.UserService;
+import ru.modgy.utility.UtilityService;
 
 import java.util.Collection;
 
