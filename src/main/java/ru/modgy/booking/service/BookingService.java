@@ -16,5 +16,7 @@ public interface BookingService {
 
     void deleteBookingById(Long userId, Long bookingId);
 
-    List<BookingDto> findBookingsForRoomInDates(Long userId, Long roomId, LocalDate checkInDate, LocalDate checkOutDate);
+    List<BookingDto> findCrossingBookingsForRoomInDates(Long userId, Long roomId, LocalDate checkInDate, LocalDate checkOutDate);
+
+    void checkRoomAvailableInDates(Long userId, Long roomId, LocalDate checkInDate, LocalDate checkOutDate);
 }

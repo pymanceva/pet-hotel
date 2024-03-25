@@ -4,7 +4,9 @@ import ru.modgy.room.dto.NewRoomDto;
 import ru.modgy.room.dto.RoomDto;
 import ru.modgy.room.dto.UpdateRoomDto;
 
+import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 
 public interface RoomService {
     RoomDto addRoom(Long userId, NewRoomDto newRoomDto);
@@ -20,4 +22,6 @@ public interface RoomService {
     RoomDto unhideRoomById(Long userId, Long roomId);
 
     void permanentlyDeleteRoomById(Long userId, Long roomId);
+
+    List<RoomDto> getAvailableRoomsByCategoryInDates(Long userId, Long catId, LocalDate checkInDate, LocalDate checkOutDate);
 }

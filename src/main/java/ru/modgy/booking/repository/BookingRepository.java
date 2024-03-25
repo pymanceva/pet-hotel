@@ -13,7 +13,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Integer deleteBookingById(Long id);
 
     @Query("SELECT b FROM Booking b WHERE b.room.id = :roomId " +
-            "AND b.status <> 'STATUS_CANCELLED' "+
+            "AND b.status <> 'STATUS_CANCELLED' " +
             "AND ((b.checkInDate < :checkInDate AND b.checkOutDate > :checkInDate) OR " +
             "(b.checkInDate >= :checkInDate AND b.checkInDate < :checkOutDate) OR " +
             "(b.checkInDate = :checkInDate AND b.checkInDate = :checkOutDate) OR " +
@@ -23,4 +23,19 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Optional<List<Booking>> findBookingsForRoomInDates(@Param("roomId") Long roomId,
                                                        @Param("checkInDate") LocalDate checkInDate,
                                                        @Param("checkOutDate") LocalDate checkOutDate);
+
+    @Query("SELECT b FROM Booking b WHERE b.room.id = :roomId " +
+            "AND b.status <> 'STATUS_CANCELLED' "+
+            "AND b.checkInDate = :checkOutDate OR " +
+            "b.checkOutDate = :checkInDate")
+    Optional<List<Booking>> findCrossingBookingsForRoomInDates(@Param("roomId") Long roomId,
+                                                       @Param("checkInDate") LocalDate checkInDate,
+                                                       @Param("checkOutDate") LocalDate checkOutDate);
+
+    @Query("SELECT b FROM Booking b WHERE b.room.id = :roomId " +
+            "AND b.status <> 'STATUS_CANCELLED' " +
+            "AND b.type = 'TYPE_BOOKING'" +
+            "AND b.checkOutDate >= :today")
+    Optional<List<Booking>> findFutureBookingsForRoom(@Param("roomId") Long roomId,
+                                                      @Param("today") LocalDate today);
 }

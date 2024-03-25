@@ -3,7 +3,6 @@ package ru.modgy.room.dto.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.modgy.room.category.dto.mapper.CategoryMapper;
-import ru.modgy.room.category.service.CategoryServiceImpl;
 import ru.modgy.room.dto.NewRoomDto;
 import ru.modgy.room.dto.RoomDto;
 import ru.modgy.room.dto.UpdateRoomDto;
@@ -11,13 +10,13 @@ import ru.modgy.room.model.Room;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {CategoryMapper.class, CategoryServiceImpl.class})
+@Mapper(componentModel = "spring", uses = {CategoryMapper.class})
 public interface RoomMapper {
-    @Mapping(target = "categoryDto", ignore = true)
+    @Mapping(source = "room.category", target = "categoryDto")
     RoomDto toRoomDto(Room room);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "category", ignore = true)
+    @Mapping(source = "roomDto.categoryDto", target = "category")
     Room toRoom(RoomDto roomDto);
 
     @Mapping(target = "id", ignore = true)

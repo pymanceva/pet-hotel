@@ -24,7 +24,6 @@ import ru.modgy.user.model.User;
 import ru.modgy.user.repository.UserRepository;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -45,10 +44,15 @@ public class BookingServiceImpl implements BookingService {
         checkAdminAccess(userId);
         checkDates(newBookingDto.getCheckInDate(), newBookingDto.getCheckOutDate());
         checkReasonWhenTypeClosing(newBookingDto.getType(), newBookingDto.getReasonOfStop());
+        checkRoomAvailabilityByDates(
+                newBookingDto.getRoomId(),
+                newBookingDto.getCheckInDate(),
+                newBookingDto.getCheckOutDate());
 
         Booking newBooking = bookingMapper.toBooking(newBookingDto);
 
         Room room = findRoomById(newBookingDto.getRoomId());
+        checkRoom(room);
         newBooking.setRoom(room);
 
         if (newBooking.getStatus() == null) {
@@ -93,10 +97,20 @@ public class BookingServiceImpl implements BookingService {
 
         if (Objects.isNull(newBooking.getCheckInDate())) {
             newBooking.setCheckInDate(oldBooking.getCheckInDate());
+        } else {
+            checkRoomAvailabilityByDates(
+                    updateBookingDto.getRoomId(),
+                    updateBookingDto.getCheckInDate(),
+                    updateBookingDto.getCheckOutDate());
         }
 
         if (Objects.isNull(newBooking.getCheckOutDate())) {
             newBooking.setCheckOutDate(oldBooking.getCheckOutDate());
+        } else {
+            checkRoomAvailabilityByDates(
+                    updateBookingDto.getRoomId(),
+                    updateBookingDto.getCheckInDate(),
+                    updateBookingDto.getCheckOutDate());
         }
 
         if (Objects.isNull(newBooking.getCheckInTime())) {
@@ -144,7 +158,9 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (updateBookingDto.getRoomId() != null) {
-            newBooking.setRoom(findRoomById(updateBookingDto.getRoomId()));
+            Room room = findRoomById(updateBookingDto.getRoomId());
+            checkRoom(room);
+            newBooking.setRoom(room);
         } else {
             newBooking.setRoom(oldBooking.getRoom());
         }
@@ -188,46 +204,45 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<BookingDto> findBookingsForRoomInDates(Long userId,
+    public List<BookingDto> findCrossingBookingsForRoomInDates(Long userId,
                                                        Long roomId,
                                                        LocalDate checkInDate,
                                                        LocalDate checkOutDate) {
         checkAdminAccess(userId);
 
-        List<Booking> foundBookings = bookingRepository.findBookingsForRoomInDates(
-                        roomId, checkInDate, checkOutDate)
-                .orElse(Collections.emptyList());
-        List<Booking> filteredBookings = new ArrayList<>();
-        if (!foundBookings.isEmpty()) {
-            checkRoomAvailabilityByDates(foundBookings, checkInDate, checkOutDate);
-            filteredBookings = findCrossingBookings(foundBookings, checkInDate, checkOutDate);
-        }
+        List<Booking> foundBookings = bookingRepository.findCrossingBookingsForRoomInDates(
+                        roomId, checkInDate, checkOutDate).orElse(Collections.emptyList());
+
         log.info("BookingService: findBookingsForRoomInDates, userId={}, roomId={}, checkInDate={}, checkOutDate={}",
                 userId, roomId, checkInDate, checkOutDate);
-        return bookingMapper.toBookingDto(filteredBookings);
+        return bookingMapper.toBookingDto(foundBookings);
     }
 
-    private void checkRoomAvailabilityByDates(List<Booking> bookings,
+    @Transactional(readOnly = true)
+    @Override
+    public void checkRoomAvailableInDates(Long userId,
+                                          Long roomId,
+                                          LocalDate checkInDate,
+                                          LocalDate checkOutDate) {
+        checkAdminAccess(userId);
+        log.info("BookingService: checkRoomAvailableInDates, userId={}, roomId={}, checkInDate={}, checkOutDate={}",
+                userId, roomId, checkInDate, checkOutDate);
+        checkRoomAvailabilityByDates(roomId, checkInDate, checkOutDate);
+    }
+
+    private List<Booking> findBookingsForRoomInDates(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
+        return bookingRepository.findBookingsForRoomInDates(
+                        roomId, checkInDate, checkOutDate)
+                .orElse(Collections.emptyList());
+    }
+
+    private void checkRoomAvailabilityByDates(Long roomId,
                                               LocalDate checkInDate,
                                               LocalDate checkOutDate) {
-        for (Booking booking : bookings) {
-            if ((booking.getCheckInDate().isBefore(checkInDate)
-                    && booking.getCheckOutDate().isAfter(checkInDate))
-                || (booking.getCheckInDate().isAfter(checkInDate)
-                    && booking.getCheckInDate().isBefore(checkOutDate))
-                || (booking.getCheckInDate().isEqual(checkInDate)
-                    && booking.getCheckInDate().isBefore(checkOutDate))) {
-                throw new ConflictException(String.format("Room with id=%d is not available for current dates",
-                        booking.getRoom().getId()));
-            }
+        List<Booking> blockingBookings = findBookingsForRoomInDates(roomId, checkInDate, checkOutDate);
+        if(!blockingBookings.isEmpty()) {
+            throw new ConflictException(String.format("Room with id=%d is not available for current dates", roomId));
         }
-    }
-
-    private List<Booking> findCrossingBookings(List<Booking> bookings, LocalDate checkInDate, LocalDate checkOutDate) {
-        return bookings.stream()
-                .filter(booking -> booking.getCheckInDate().equals(checkOutDate)
-                        || booking.getCheckOutDate().equals(checkInDate))
-                .toList();
     }
 
     private Booking findBookingById(Long id) {
@@ -281,6 +296,12 @@ public class BookingServiceImpl implements BookingService {
             if (!found) {
                 throw new NotFoundException(String.format("Pet with id=%d is not found", id));
             }
+        }
+    }
+
+    private void checkRoom(Room room) {
+        if (!room.getIsVisible()) {
+            throw new ConflictException("Can't add booking for hidden room");
         }
     }
 }

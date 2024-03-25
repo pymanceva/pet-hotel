@@ -15,9 +15,11 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     Optional<List<Room>> getAllRooms(@Param("isVisible") Boolean isVisible);
 
     @Query("SELECT r FROM Room r WHERE r.category.id = :categoryId AND " +
+            "r.isVisible = true AND " +
             "r.id NOT IN (SELECT b.room.id FROM Booking b WHERE b.room.category.id = :categoryId AND " +
-            "((b.checkInDate <= :checkInDate AND b.checkOutDate >= :checkInDate) OR " +
-            "(b.checkInDate <= :checkOutDate AND b.checkOutDate >= :checkOutDate) OR " +
+            "b.status <> 'STATUS_CANCELLED' AND "+
+            "((b.checkInDate <= :checkInDate AND b.checkOutDate > :checkInDate) OR " +
+            "(b.checkInDate < :checkOutDate AND b.checkOutDate >= :checkOutDate) OR " +
             "(b.checkInDate >= :checkInDate AND b.checkOutDate <= :checkOutDate)))")
     Optional<List<Room>> findAvailableRoomsByCategoryInDates(@Param("categoryId") Long categoryId,
                                                     @Param("checkInDate") LocalDate checkInDate,

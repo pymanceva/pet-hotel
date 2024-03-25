@@ -11,7 +11,9 @@ import ru.modgy.room.dto.RoomDto;
 import ru.modgy.room.dto.UpdateRoomDto;
 import ru.modgy.room.service.RoomService;
 
+import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 
 @CrossOrigin
 @Slf4j
@@ -75,5 +77,16 @@ public class RoomController {
                                @PathVariable("id") Long roomId) {
         log.info("RoomController: DELETE/deleteRoomById, requesterId={}, roomId={}", requesterId, roomId);
         roomService.permanentlyDeleteRoomById(requesterId, roomId);
+    }
+
+    @GetMapping("/{catId}/getAvailableRooms")
+    public List<RoomDto> getAvailableRoomsByCategoryInDates(@RequestHeader(USER_ID) Long requesterId,
+                                                            @PathVariable("catId") Long catId,
+                                                            @Param("checkInDate") LocalDate checkInDate,
+                                                            @Param("checkOutDate") LocalDate checkOutDate) {
+        log.info("RoomController: GET/getAvailableRoomsByCategoryInDates, " +
+                "requesterId={}, catId={}, checkInDate={}, checkOutDate={}",
+                requesterId, catId, checkInDate, checkOutDate);
+        return roomService.getAvailableRoomsByCategoryInDates(requesterId, catId, checkInDate, checkOutDate);
     }
 }

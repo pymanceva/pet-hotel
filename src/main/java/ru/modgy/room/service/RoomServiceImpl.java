@@ -4,10 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.modgy.booking.model.Booking;
+import ru.modgy.booking.repository.BookingRepository;
 import ru.modgy.exception.AccessDeniedException;
 import ru.modgy.exception.ConflictException;
 import ru.modgy.exception.NotFoundException;
-import ru.modgy.room.category.dto.CategoryDto;
 import ru.modgy.room.category.dto.mapper.CategoryMapper;
 import ru.modgy.room.category.model.Category;
 import ru.modgy.room.category.repository.CategoryRepository;
@@ -20,6 +21,7 @@ import ru.modgy.room.repository.RoomRepository;
 import ru.modgy.user.model.User;
 import ru.modgy.user.repository.UserRepository;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
@@ -28,9 +30,9 @@ import java.util.*;
 public class RoomServiceImpl implements RoomService {
     final private RoomRepository roomRepository;
     final private RoomMapper roomMapper;
-    final private CategoryMapper categoryMapper;
     final private CategoryRepository categoryRepository;
     final private UserRepository userRepository;
+    final private BookingRepository bookingRepository;
 
     @Transactional
     @Override
@@ -41,9 +43,7 @@ public class RoomServiceImpl implements RoomService {
         Category category = findCategoryById(newRoomDto.getCategoryId());
         newRoom.setCategory(category);
         Room addedRoom = roomRepository.save(newRoom);
-        CategoryDto categoryDto = categoryMapper.toCategoryDto(category);
         RoomDto addedRoomDto = roomMapper.toRoomDto(addedRoom);
-        addedRoomDto.setCategoryDto(categoryDto);
         log.info("RoomService: addRoom, userId={}, roomDto={}", userId, addedRoom);
         return addedRoomDto;
     }
@@ -55,7 +55,6 @@ public class RoomServiceImpl implements RoomService {
 
         Room room = findRoomById(roomId);
         RoomDto roomDto = roomMapper.toRoomDto(room);
-        roomDto.setCategoryDto(categoryMapper.toCategoryDto(room.getCategory()));
         log.info("RoomService: getRoomById, userId={}, roomId={}", userId, roomId);
         return roomDto;
     }
@@ -72,7 +71,6 @@ public class RoomServiceImpl implements RoomService {
         } else {
             category = oldRoom.getCategory();
         }
-        CategoryDto categoryDto = categoryMapper.toCategoryDto(category);
         newRoom.setId(roomId);
         newRoom.setCategory(category);
         newRoom.setIsVisible(oldRoom.getIsVisible());
@@ -91,7 +89,6 @@ public class RoomServiceImpl implements RoomService {
 
         Room updatedRoom = roomRepository.save(newRoom);
         RoomDto updatedRoomDto = roomMapper.toRoomDto(updatedRoom);
-        updatedRoomDto.setCategoryDto(categoryDto);
 
         log.info("RoomService: updateRoom, userId={}, roomId={}, roomDto={}", userId, roomId, roomDto);
 
@@ -107,7 +104,6 @@ public class RoomServiceImpl implements RoomService {
         List<RoomDto> allRoomsDto = new ArrayList<>();
         for (Room room : allRooms) {
             RoomDto roomDto = roomMapper.toRoomDto(room);
-            roomDto.setCategoryDto(categoryMapper.toCategoryDto(room.getCategory()));
             allRoomsDto.add(roomDto);
         }
         log.info("RoomService: getAllRooms, userId={}, list size={}", userId, allRooms.size());
@@ -121,15 +117,13 @@ public class RoomServiceImpl implements RoomService {
         checkAdminAccess(userId);
         Room room = findRoomById(roomId);
 
-        //пока уловие всегда true, в дальнейшем здесь буду проверять наличие активных бронирований у номера
-        if (true) {
+        List<Booking> futureBookings = bookingRepository.findFutureBookingsForRoom(roomId, LocalDate.now())
+                .orElse(Collections.emptyList());
+        if (futureBookings.isEmpty()) {
             room.setIsVisible(false);
             roomRepository.save(room);
             log.info("RoomService: hideRoomById, userId={}, roomId={}", userId, roomId);
-            RoomDto roomDto = roomMapper.toRoomDto(room);
-            CategoryDto categoryDto = categoryMapper.toCategoryDto(room.getCategory());
-            roomDto.setCategoryDto(categoryDto);
-            return roomDto;
+            return roomMapper.toRoomDto(room);
         } else {
             throw new ConflictException(String.format("room with id=%d has opened bookings", roomId));
         }
@@ -144,10 +138,7 @@ public class RoomServiceImpl implements RoomService {
         room.setIsVisible(true);
         roomRepository.save(room);
         log.info("RoomService: unhideRoomById, userId={}, roomId={}", userId, roomId);
-        RoomDto roomDto = roomMapper.toRoomDto(room);
-        CategoryDto categoryDto = categoryMapper.toCategoryDto(room.getCategory());
-        roomDto.setCategoryDto(categoryDto);
-        return roomDto;
+        return roomMapper.toRoomDto(room);
     }
 
     @Transactional
@@ -162,6 +153,28 @@ public class RoomServiceImpl implements RoomService {
         }
 
         log.info("RoomService: permanentlyDeleteRoomById, userId={}, roomId={}", userId, roomId);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<RoomDto> getAvailableRoomsByCategoryInDates(
+            Long userId,
+            Long catId,
+            LocalDate checkInDate,
+            LocalDate checkOutDate) {
+        checkAdminAccess(userId);
+        List<Room> foundRooms = findAvailableRoomsByCategoryInDates(catId, checkInDate, checkOutDate);
+        log.info("RoomService: findAvailableRoomsByCategoryInDates, " +
+                "userId={}, catId={}, checkInDate={}, checkOutDate={}",
+                userId, catId, checkInDate, checkOutDate);
+        return roomMapper.toListRoomDto(foundRooms);
+    }
+
+    private List<Room> findAvailableRoomsByCategoryInDates(Long catId,
+                                                           LocalDate checkInDate,
+                                                           LocalDate checkOutDate) {
+        return roomRepository.findAvailableRoomsByCategoryInDates(catId, checkInDate, checkOutDate)
+                .orElse(Collections.emptyList());
     }
 
     private Room findRoomById(Long id) {

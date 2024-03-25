@@ -56,12 +56,20 @@ public class BookingController {
     }
 
     @GetMapping("/{roomId}/bookingsOfRoomInDates")
-    public List<BookingDto> findBookingsForRoomInDates(@RequestHeader(USER_ID) Long requesterId,
+    public List<BookingDto> findCrossingBookingsForRoomInDates(@RequestHeader(USER_ID) Long requesterId,
                                                        @PathVariable("roomId") Long roomId,
                                                        @Param("checkInDate") LocalDate checkInDate,
                                                        @Param("checkOutDate") LocalDate checkOutDate) {
         log.info("BookingController: GET/findBookingsForRoomInDates, requesterId={}, roomId={}", requesterId, roomId);
-        return bookingService.findBookingsForRoomInDates(requesterId, roomId, checkInDate, checkOutDate);
+        return bookingService.findCrossingBookingsForRoomInDates(requesterId, roomId, checkInDate, checkOutDate);
     }
 
+    @GetMapping("/{roomId}/checkRoomAvailable")
+    public void checkRoomAvailableInDates(@RequestHeader(USER_ID) Long requesterId,
+                                          @PathVariable("roomId") Long roomId,
+                                          @Param("checkInDate") LocalDate checkInDate,
+                                          @Param("checkOutDate") LocalDate checkOutDate) {
+        log.info("BookingController: GET/checkRoomAvailableInDates, requesterId={}, roomId={}", requesterId, roomId);
+        bookingService.checkRoomAvailableInDates(requesterId, roomId, checkInDate, checkOutDate);
+    }
 }
