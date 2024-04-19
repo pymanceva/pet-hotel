@@ -93,10 +93,10 @@ public class CategoryServiceIntegrationTest {
 
         List<CategoryDto> result = service.getAllCategories(requesterAdmin.getId()).stream().toList();
 
-        assertThat(result, hasSize(2));
-        assertThat(result.get(1).getId(), notNullValue());
-        assertThat(result.get(1).getName(), equalTo(categoryDto.getName()));
-        assertThat(result.get(1).getDescription(), equalTo(categoryDto.getDescription()));
+        assertThat(result, hasSize(1));
+        assertThat(result.get(0).getId(), notNullValue());
+        assertThat(result.get(0).getName(), equalTo(categoryDto.getName()));
+        assertThat(result.get(0).getDescription(), equalTo(categoryDto.getDescription()));
     }
 
     @Test

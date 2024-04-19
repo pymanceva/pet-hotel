@@ -41,5 +41,5 @@ API: *<https://github.com/pymanceva/pet-hotel/blob/add-bookings/Specification/pe
 Отредактирован RoomServiceImpl для работы с исправленным маппером.
 Карточка задачи: *<https://nkiblyk.kaiten.ru/space/167883/card/27548948?filter=eyJrZXkiOiJhbmQiLCJ2YWx1ZSI6W3sia2V5IjoiYW5kIiwidmFsdWUiOlt7ImNvbXBhcmlzb24iOiJlcSIsImtleSI6InRhZyIsInZhbHVlIjo0OTA5MDF9XX1dfQ>*
 
-**0.0.10: Добавлен UtiдityService для получения сущностей всех типов и проверки прав доступа.
+**0.0.10: Добавлен UtilityService для получения сущностей всех типов и проверки прав доступа.**
 Карточка задачи: *<https://nkiblyk.kaiten.ru/space/167883/card/27549007?filter=eyJrZXkiOiJhbmQiLCJ2YWx1ZSI6W3sia2V5IjoiYW5kIiwidmFsdWUiOlt7ImNvbXBhcmlzb24iOiJlcSIsImtleSI6InRhZyIsInZhbHVlIjo0OTA5MDF9XX1dfQ>*
