@@ -133,13 +133,13 @@ public class RoomServiceIntegrationTest {
 
         List<RoomDto> result = service.getAllRooms(requesterAdmin.getId(), room.getIsVisible()).stream().toList();
 
-        assertThat(result, hasSize(1));
-        assertThat(result.get(0).getId(), notNullValue());
-        assertThat(result.get(0).getNumber(), equalTo(roomDto.getNumber()));
-        assertThat(result.get(0).getArea(), equalTo(roomDto.getArea()));
-        assertThat(result.get(0).getCategoryDto().getName(), equalTo(roomDto.getCategoryDto().getName()));
-        assertThat(result.get(0).getDescription(), equalTo(roomDto.getDescription()));
-        assertTrue(result.get(0).getIsVisible());
+        assertThat(result, hasSize(2));
+        assertThat(result.get(1).getId(), notNullValue());
+        assertThat(result.get(1).getNumber(), equalTo(roomDto.getNumber()));
+        assertThat(result.get(1).getArea(), equalTo(roomDto.getArea()));
+        assertThat(result.get(1).getCategoryDto().getName(), equalTo(roomDto.getCategoryDto().getName()));
+        assertThat(result.get(1).getDescription(), equalTo(roomDto.getDescription()));
+        assertTrue(result.get(1).getIsVisible());
     }
 
     @Test

@@ -19,11 +19,13 @@ import ru.modgy.utility.UtilityService;
 @Slf4j
 public class PetController {
     private final PetService petService;
+    private final UtilityService utilityService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PetDto addPet(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                          @RequestBody @Valid NewPetDto newPetDto) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("PetController: POST/addPet, requesterId={}", requesterId);
         return petService.addPet(requesterId, newPetDto);
     }
@@ -39,6 +41,7 @@ public class PetController {
     public PetDto updatePet(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                             @RequestBody @Valid UpdatePetDto updatePetDto,
                             @PathVariable(value = "id") Long petId) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("PetController: PATCH/updatePet, requesterId={}, petId={}", requesterId, petId);
         return petService.updatePet(requesterId, petId, updatePetDto);
     }
@@ -47,6 +50,7 @@ public class PetController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePetById(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                               @PathVariable(value = "id") Long petId) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("PetController: DELETE/deletePetById, requesterId= {}, petId={}", requesterId, petId);
         petService.deletePetById(requesterId, petId);
     }

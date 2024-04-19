@@ -20,11 +20,13 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
+    private final UtilityService utilityService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto addCategory(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                    @RequestBody @Valid NewCategoryDto newCategoryDto) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("CategoryController: POST/addCategory, requesterId={}, Category={}", requesterId, newCategoryDto);
         return categoryService.addCategory(requesterId, newCategoryDto);
     }
@@ -32,6 +34,7 @@ public class CategoryController {
     @GetMapping("/{id}")
     public CategoryDto getCategoryById(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                        @PathVariable("id") Long catId) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("CategoryController: GET/getCategoryById, requesterId={}, catId={}", requesterId, catId);
         return categoryService.getCategoryById(requesterId, catId);
     }
@@ -40,6 +43,7 @@ public class CategoryController {
     public CategoryDto updateCategoryById(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                           @RequestBody @Valid UpdateCategoryDto updateCategoryDto,
                                           @PathVariable("id") Long catId) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("CategoryController: PATCH/updateCategoryById, requesterId={}, catId={}, requestBody={}",
                 requesterId, catId, updateCategoryDto);
         return categoryService.updateCategoryById(requesterId, catId, updateCategoryDto);
@@ -47,6 +51,7 @@ public class CategoryController {
 
     @GetMapping
     public Collection<CategoryDto> getAllCategories(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("CategoryController: GET/getAllCategories, requesterId={}", requesterId);
         return categoryService.getAllCategories(requesterId);
     }
@@ -55,6 +60,7 @@ public class CategoryController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategoryById(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                    @PathVariable("id") Long catId) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("CategoryController: DELETE/deleteCategoryById, requesterId={}, catId={}", requesterId, catId);
         categoryService.deleteCategoryById(requesterId, catId);
     }

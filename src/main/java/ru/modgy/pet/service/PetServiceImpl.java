@@ -11,7 +11,7 @@ import ru.modgy.pet.dto.UpdatePetDto;
 import ru.modgy.pet.mapper.PetMapper;
 import ru.modgy.pet.model.Pet;
 import ru.modgy.pet.repository.PetRepository;
-import ru.modgy.utility.UtilityService;
+import ru.modgy.utility.EntityService;
 
 import java.util.Objects;
 
@@ -21,14 +21,13 @@ import java.util.Objects;
 public class PetServiceImpl implements PetService {
     private final PetRepository petRepository;
     private final PetMapper petMapper;
-    private final UtilityService utilityService;
+    private final EntityService entityService;
 
     @Override
     @Transactional
     public PetDto addPet(Long requesterId, NewPetDto newPetDto) {
         //метод проверки наличия хозяина питомца, будет дописан после добавления сущности оунеров
-        //findOwnerById(newPetDto.getOwnerId());
-        utilityService.checkBossAdminAccess(requesterId);
+        //findOwnerById(newPetDto.getOwnerId())
         //метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
 //        checkPet(newPetDto);
         Pet newPet = petMapper.toPet(newPetDto);
@@ -40,8 +39,8 @@ public class PetServiceImpl implements PetService {
     @Override
     @Transactional(readOnly = true)
     public PetDto getPetById(Long requesterId, Long petId) {
-        utilityService.getUserIfExists(requesterId);
-        Pet pet = utilityService.getPetIfExists(petId);
+        entityService.getUserIfExists(requesterId);
+        Pet pet = entityService.getPetIfExists(petId);
         log.info("PetService: getPetById, requesterId={}, petId={}", requesterId, petId);
         return petMapper.toPetDto(pet);
     }
@@ -49,8 +48,7 @@ public class PetServiceImpl implements PetService {
     @Override
     @Transactional
     public PetDto updatePet(Long requesterId, Long petId, UpdatePetDto updatePetDto) {
-        utilityService.checkBossAdminAccess(requesterId);
-        Pet oldPet = utilityService.getPetIfExists(petId);
+        Pet oldPet = entityService.getPetIfExists(petId);
         Pet newPet = petMapper.toPet(updatePetDto);
         newPet.setId(oldPet.getId());
         //метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
@@ -232,8 +230,6 @@ public class PetServiceImpl implements PetService {
     @Override
     @Transactional
     public void deletePetById(Long requesterId, Long petId) {
-        utilityService.checkBossAdminAccess(requesterId);
-
         int result = petRepository.deletePetById(petId);
 
         if (result == 0) {

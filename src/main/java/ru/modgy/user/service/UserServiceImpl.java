@@ -13,6 +13,7 @@ import ru.modgy.user.dto.mapper.UserMapper;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
 import ru.modgy.user.repository.UserRepository;
+import ru.modgy.utility.EntityService;
 import ru.modgy.utility.UtilityService;
 
 import java.util.Arrays;
@@ -27,14 +28,13 @@ import java.util.Objects;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final EntityService entityService;
     private final UtilityService utilityService;
 
     @Transactional(readOnly = true)
     @Override
     public List<UserDto> getAllUsers(Long requesterId, Boolean isActive) {
-        User requester = utilityService.getUserIfExists(requesterId);
-
-        utilityService.checkHigherOrEqualOrdinalRoleAccess(requester, Roles.ROLE_ADMIN);
+        User requester = entityService.getUserIfExists(requesterId);
 
         List<Roles> roles =
                 Arrays.asList(Roles.values()).subList(requester.getRole().ordinal(), Roles.values().length);
@@ -54,9 +54,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto addUser(Long requesterId, NewUserDto newUserDto) {
         User newUser = userMapper.toUser(newUserDto);
-
-        utilityService.checkHigherOrdinalRoleAccess(requesterId, newUser.getRole());
-
         User addedUser = userRepository.save(newUser);
         log.info("userService: addUser, requesterId={}, newUserDto={},  newUser={}",
                 requesterId, newUserDto, addedUser);
@@ -66,14 +63,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public UserDto getUserById(Long requesterId, Long userId) {
-        User requester = utilityService.getUserIfExists(requesterId);
-        if (userId.equals(requesterId)) {
-            log.info("UserService: getUserById, requesterId ={}, by userId={}", requesterId, userId);
-            return userMapper.toUserDto(requester);
-        }
-        User user = utilityService.getUserIfExists(userId);
-        utilityService.checkHigherOrEqualOrdinalRoleAccess(requesterId, user.getRole());
-
+        User user = entityService.getUserIfExists(userId);
         log.info("UserService: getUserById, requesterId ={}, by userId={}", requesterId, userId);
         return userMapper.toUserDto(user);
     }
@@ -81,14 +71,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void deleteUserById(Long requesterId, Long userId) {
-        User requester = utilityService.getUserIfExists(requesterId);
-        User user = utilityService.getUserIfExists(userId);
+        User user = entityService.getUserIfExists(userId);
 
         if (user.getRole().equals(Roles.ROLE_BOSS)) {
             throw new AccessDeniedException("User with role=ROLE_BOSS can't delete");
         }
-
-        utilityService.checkHigherOrdinalRoleAccess(requester, user);
 
         Integer result = userRepository.deleteUserById(userId);
         if (result == 0) {
@@ -100,8 +87,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public UserDto updateUser(Long requesterId, Long userId, UpdateUserDto updateUserDto) {
-        boolean updateBySelf = requesterId.equals(userId);
-        User requester = utilityService.getUserIfExists(requesterId);
+        boolean updateBySelf = utilityService.checkRequesterRequestsHimself(requesterId, userId);
+        User requester = entityService.getUserIfExists(requesterId);
 
         User newUser = userMapper.toUser(updateUserDto);
         newUser.setId(userId);
@@ -111,8 +98,7 @@ public class UserServiceImpl implements UserService {
             oldUser = requester;
         } else {
             utilityService.checkHigherOrdinalRoleAccess(requester, newUser);
-            oldUser = utilityService.getUserIfExists(userId);
-            utilityService.checkHigherOrdinalRoleAccess(requester, oldUser);
+            oldUser = entityService.getUserIfExists(userId);
         }
 
         if (Objects.isNull(newUser.getLastName())) {
@@ -145,9 +131,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto setUserState(Long requesterId, Long userId, Boolean isActive) {
-        User requester = utilityService.getUserIfExists(requesterId);
-        User user = utilityService.getUserIfExists(userId);
-        utilityService.checkHigherOrdinalRoleAccess(requester, user);
+        User user = entityService.getUserIfExists(userId);
 
         user.setIsActive(isActive);
 

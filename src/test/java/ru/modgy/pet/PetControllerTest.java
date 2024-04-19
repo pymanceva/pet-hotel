@@ -19,6 +19,7 @@ import ru.modgy.pet.model.TypeOfPet;
 import ru.modgy.pet.service.PetService;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
+import ru.modgy.utility.UtilityService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -46,6 +47,9 @@ public class PetControllerTest {
 
     @MockBean
     private PetService petService;
+
+    @MockBean
+    private UtilityService utilityService;
 
     private final String requesterHeader = "X-PetHotel-User-Id";
     private static final LocalDate BIRTH_DATE = LocalDate.now().minusYears(1);

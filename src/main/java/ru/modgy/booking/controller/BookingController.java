@@ -18,11 +18,13 @@ import ru.modgy.utility.UtilityService;
 @RequiredArgsConstructor
 public class BookingController {
     private final BookingService bookingService;
+    private final UtilityService utilityService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public BookingDto addBooking(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                  @RequestBody @Valid NewBookingDto newBookingDto) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("BookingController: POST/addBooking, requesterId={}, booking={}", requesterId, newBookingDto);
         return bookingService.addBooking(requesterId, newBookingDto);
     }
@@ -30,6 +32,7 @@ public class BookingController {
     @GetMapping("/{id}")
     public BookingDto getBookingById(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                      @PathVariable("id") Long bookingId) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("BookingController: GET/getBookingById, requesterId={}, bookingId={}", requesterId, bookingId);
         return bookingService.getBookingById(requesterId, bookingId);
     }
@@ -38,6 +41,7 @@ public class BookingController {
     public BookingDto updateBooking(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                     @RequestBody @Valid UpdateBookingDto updateBookingDto,
                                     @PathVariable("id") Long bookingId) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("BookingController: PATCH/updateBooking, requesterId={}, bookingId={}, requestBody={}",
                 requesterId, bookingId, updateBookingDto);
         return bookingService.updateBooking(requesterId, bookingId, updateBookingDto);
@@ -47,6 +51,7 @@ public class BookingController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBookingById(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                   @PathVariable("id") Long bookingId) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("BookingController: DELETE/deleteBookingById, requesterId={}, bookingId={}", requesterId, bookingId);
         bookingService.deleteBookingById(requesterId, bookingId);
     }

@@ -11,7 +11,7 @@ import ru.modgy.room.category.dto.UpdateCategoryDto;
 import ru.modgy.room.category.dto.mapper.CategoryMapper;
 import ru.modgy.room.category.model.Category;
 import ru.modgy.room.category.repository.CategoryRepository;
-import ru.modgy.utility.UtilityService;
+import ru.modgy.utility.EntityService;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,15 +21,13 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
-    final private CategoryRepository categoryRepository;
-    final private CategoryMapper categoryMapper;
-    final private UtilityService utilityService;
+    private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
+    private final EntityService entityService;
 
     @Transactional
     @Override
     public CategoryDto addCategory(Long userId, NewCategoryDto newCategoryDto) {
-        utilityService.checkBossAdminAccess(userId);
-
         Category newCategory = categoryMapper.toCategory(newCategoryDto);
         Category addedCategory = categoryRepository.save(newCategory);
         log.info("CategoryService: addCategory, userId={}, newCategoryDto={}", userId, newCategoryDto);
@@ -39,9 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     @Override
     public CategoryDto updateCategoryById(Long userId, Long catId, UpdateCategoryDto updateCategoryDto) {
-        utilityService.checkBossAdminAccess(userId);
-
-        Category oldCategory = utilityService.getCategoryIfExists(catId);
+        Category oldCategory = entityService.getCategoryIfExists(catId);
         Category newCategory = categoryMapper.toCategory(updateCategoryDto);
         newCategory.setId(oldCategory.getId());
 
@@ -63,9 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     @Override
     public CategoryDto getCategoryById(Long userId, Long catId) {
-        utilityService.checkBossAdminAccess(userId);
-
-        Category category = utilityService.getCategoryIfExists(catId);
+        Category category = entityService.getCategoryIfExists(catId);
         log.info("CategoryService: getCategoryById, userId={}, catId={}", userId, catId);
         return categoryMapper.toCategoryDto(category);
     }
@@ -73,8 +67,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     @Override
     public Collection<CategoryDto> getAllCategories(Long userId) {
-        utilityService.checkBossAdminAccess(userId);
-
         List<Category> allCategories = categoryRepository.findAll();
         log.info("CategoryService: getAllCategories, userId={}, list size={}", userId, allCategories.size());
         return categoryMapper.toCategoryDto(allCategories);
@@ -83,9 +75,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     @Override
     public void deleteCategoryById(Long userId, Long catId) {
-        utilityService.checkBossAdminAccess(userId);
-
-        int result = categoryRepository.deleteCategoryById(catId);
+         int result = categoryRepository.deleteCategoryById(catId);
 
         if (result == 0) {
             throw new NotFoundException(String.format("category with id=%d not found", catId));

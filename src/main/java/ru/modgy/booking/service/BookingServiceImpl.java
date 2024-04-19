@@ -17,7 +17,7 @@ import ru.modgy.exception.ConflictException;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.pet.model.Pet;
 import ru.modgy.room.model.Room;
-import ru.modgy.utility.UtilityService;
+import ru.modgy.utility.EntityService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,18 +29,17 @@ import java.util.Objects;
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
-    private final UtilityService utilityService;
+    private final EntityService entityService;
 
     @Transactional
     @Override
     public BookingDto addBooking(Long userId, NewBookingDto newBookingDto) {
-        utilityService.checkBossAdminAccess(userId);
         checkDates(newBookingDto.getCheckInDate(), newBookingDto.getCheckOutDate());
         checkReasonWhenTypeClosing(newBookingDto.getType(), newBookingDto.getReasonOfStop());
 
         Booking newBooking = bookingMapper.toBooking(newBookingDto);
 
-        Room room = utilityService.getRoomIfExists(newBookingDto.getRoomId());
+        Room room = entityService.getRoomIfExists(newBookingDto.getRoomId());
         newBooking.setRoom(room);
 
         if (newBooking.getStatus() == null) {
@@ -51,7 +50,7 @@ public class BookingServiceImpl implements BookingService {
             }
         }
 
-        List<Pet> pets = utilityService.getListOfPetsByIds(newBookingDto.getPetIds());
+        List<Pet> pets = entityService.getListOfPetsByIds(newBookingDto.getPetIds());
         checkPetsInBooking(pets, newBookingDto.getPetIds());
         newBooking.setPets(pets);
 
@@ -64,9 +63,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     @Override
     public BookingDto getBookingById(Long userId, Long bookingId) {
-        utilityService.checkBossAdminAccess(userId);
-
-        Booking booking = utilityService.getBookingIfExists(bookingId);
+        Booking booking = entityService.getBookingIfExists(bookingId);
         log.info("BookingService: getBookingById, userId={}, bookingId={}", userId, bookingId);
         return bookingMapper.toBookingDto(booking);
     }
@@ -74,9 +71,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public BookingDto updateBooking(Long userId, Long bookingId, UpdateBookingDto updateBookingDto) {
-        utilityService.checkBossAdminAccess(userId);
-
-        Booking oldBooking = utilityService.getBookingIfExists(bookingId);
+        Booking oldBooking = entityService.getBookingIfExists(bookingId);
         Booking newBooking = bookingMapper.toBooking(updateBookingDto);
         newBooking.setId(oldBooking.getId());
         newBooking.setType(oldBooking.getType());
@@ -134,7 +129,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (updateBookingDto.getRoomId() != null) {
-            newBooking.setRoom(utilityService.getRoomIfExists(updateBookingDto.getRoomId()));
+            newBooking.setRoom(entityService.getRoomIfExists(updateBookingDto.getRoomId()));
         } else {
             newBooking.setRoom(oldBooking.getRoom());
         }
@@ -142,7 +137,7 @@ public class BookingServiceImpl implements BookingService {
         if (Objects.isNull(updateBookingDto.getPetIds())) {
             newBooking.setPets(oldBooking.getPets());
         } else {
-            List<Pet> pets = utilityService.getListOfPetsByIds(updateBookingDto.getPetIds());
+            List<Pet> pets = entityService.getListOfPetsByIds(updateBookingDto.getPetIds());
             checkPetsInBooking(pets, updateBookingDto.getPetIds());
             newBooking.setPets(pets);
         }
@@ -164,8 +159,6 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public void deleteBookingById(Long userId, Long bookingId) {
-        utilityService.checkBossAdminAccess(userId);
-
         int result = bookingRepository.deleteBookingById(bookingId);
 
         if (result == 0) {

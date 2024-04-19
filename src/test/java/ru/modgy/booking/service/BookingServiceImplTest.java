@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import ru.modgy.utility.UtilityService;
+import ru.modgy.utility.EntityService;
 import ru.modgy.booking.dto.BookingDto;
 import ru.modgy.booking.dto.NewBookingDto;
 import ru.modgy.booking.dto.UpdateBookingDto;
@@ -17,7 +17,6 @@ import ru.modgy.booking.model.Booking;
 import ru.modgy.booking.model.StatusBooking;
 import ru.modgy.booking.model.TypesBooking;
 import ru.modgy.booking.repository.BookingRepository;
-import ru.modgy.exception.AccessDeniedException;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.pet.dto.PetDto;
 import ru.modgy.pet.model.Pet;
@@ -76,13 +75,6 @@ public class BookingServiceImplTest {
             .id(2L)
             .firstName("user")
             .role(Roles.ROLE_USER)
-            .isActive(true)
-            .build();
-    private final User financial = User.builder()
-            .email("financial@pethotel.ru")
-            .id(2L)
-            .firstName("financial")
-            .role(Roles.ROLE_FINANCIAL)
             .isActive(true)
             .build();
     private final Room room = Room.builder()
@@ -178,16 +170,16 @@ public class BookingServiceImplTest {
     @Mock
     private BookingRepository bookingRepository;
     @Mock
-    private UtilityService utilityService;
+    private EntityService entityService;
     @Mock
     private BookingMapper bookingMapper;
 
     @Test
     void addBooking_whenAddBookingByBoss_thenBookingAdded() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(boss);
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
         when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(room);
-        when(utilityService.getListOfPetsByIds(any())).thenReturn(List.of(pet));
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getListOfPetsByIds(any())).thenReturn(List.of(pet));
         when(bookingMapper.toBooking(any(NewBookingDto.class))).thenReturn(booking);
         when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(bookingDto);
 
@@ -213,10 +205,10 @@ public class BookingServiceImplTest {
 
     @Test
     void addBooking_whenAddBookingByAdmin_thenBookingAdded() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(admin);
+        when(entityService.getUserIfExists(anyLong())).thenReturn(admin);
         when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(room);
-        when(utilityService.getListOfPetsByIds(any())).thenReturn(List.of(pet));
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getListOfPetsByIds(any())).thenReturn(List.of(pet));
         when(bookingMapper.toBooking(any(NewBookingDto.class))).thenReturn(booking);
         when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(bookingDto);
 
@@ -241,36 +233,9 @@ public class BookingServiceImplTest {
     }
 
     @Test
-    void addBooking_whenAddBookingByUser_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.addBooking(user.getId(), newBookingDto));
-    }
-
-    @Test
-    void addBooking_whenAddBookingByFinancial_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.addBooking(user.getId(), newBookingDto));
-    }
-
-    @Test
-    void addBooking_whenAddBookingAndRequesterNotFound_thenNotFoundException() {
-        doThrow(new NotFoundException(String.format("User with id=%d is not found", user.getId())))
-                .when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(NotFoundException.class,
-                () -> bookingService.addBooking(user.getId(), newBookingDto));
-    }
-
-    @Test
     void addBooking_whenAddBookingAndRoomNotFound_thenNotFoundException() {
         doThrow(new NotFoundException(String.format("Room with id=%d is not found", user.getId())))
-                .when(utilityService).getRoomIfExists(anyLong());
+                .when(entityService).getRoomIfExists(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.addBooking(user.getId(), newBookingDto));
@@ -278,8 +243,8 @@ public class BookingServiceImplTest {
 
     @Test
     void getBookingById_whenGetBookingByBoss_thenReturnedBooking() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(boss);
-        when(utilityService.getBookingIfExists(anyLong())).thenReturn(booking);
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
+        when(entityService.getBookingIfExists(anyLong())).thenReturn(booking);
         when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(bookingDto);
 
         BookingDto result = bookingService.getBookingById(boss.getId(), bookingId);
@@ -301,8 +266,8 @@ public class BookingServiceImplTest {
 
     @Test
     void getBookingById_whenGetBookingByAdmin_thenReturnedBooking() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(admin);
-        when(utilityService.getBookingIfExists(anyLong())).thenReturn(booking);
+        when(entityService.getUserIfExists(anyLong())).thenReturn(admin);
+        when(entityService.getBookingIfExists(anyLong())).thenReturn(booking);
         when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(bookingDto);
 
         BookingDto result = bookingService.getBookingById(admin.getId(), bookingId);
@@ -323,37 +288,10 @@ public class BookingServiceImplTest {
     }
 
     @Test
-    void getBookingById_whenGetBookingByUser_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.getBookingById(user.getId(), bookingId));
-    }
-
-    @Test
-    void getBookingById_whenGetBookingByFinancial_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.getBookingById(financial.getId(), bookingId));
-    }
-
-    @Test
-    void getBookingById_whenGetBookingByIdAndRequesterNotFound_thenNotFoundException() {
-        doThrow(new NotFoundException(String.format("User with id=%d is not found", user.getId())))
-                .when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(NotFoundException.class,
-                () -> bookingService.getBookingById(user.getId(), bookingId));
-    }
-
-    @Test
     void getBookingById_whenGetBookingByIdAndBookingNotFound_thenNotFoundException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(boss);
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
         doThrow(new NotFoundException(String.format("Booking with id=%d is not found", user.getId())))
-                .when(utilityService).getBookingIfExists(anyLong());
+                .when(entityService).getBookingIfExists(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.getBookingById(user.getId(), bookingId));
@@ -361,11 +299,11 @@ public class BookingServiceImplTest {
 
     @Test
     void updateBookingById_whenRequesterBossAndBookingFound_thenUpdateAllFields() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(boss);
-        when(utilityService.getBookingIfExists(anyLong())).thenReturn(booking);
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
+        when(entityService.getBookingIfExists(anyLong())).thenReturn(booking);
         when(bookingMapper.toBooking(any(UpdateBookingDto.class))).thenReturn(newBooking);
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(room);
-        when(utilityService.getPetIfExists(anyLong())).thenReturn(pet);
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getPetIfExists(anyLong())).thenReturn(pet);
         when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(updatedBookingDto);
         when(bookingRepository.save(any(Booking.class))).thenReturn(updatedBooking);
 
@@ -391,11 +329,11 @@ public class BookingServiceImplTest {
 
     @Test
     void updateBookingById_whenRequesterAdminAndBookingFound_thenUpdateAllFields() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(admin);
-        when(utilityService.getBookingIfExists(anyLong())).thenReturn(booking);
+        when(entityService.getUserIfExists(anyLong())).thenReturn(admin);
+        when(entityService.getBookingIfExists(anyLong())).thenReturn(booking);
         when(bookingMapper.toBooking(any(UpdateBookingDto.class))).thenReturn(newBooking);
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(room);
-        when(utilityService.getPetIfExists(anyLong())).thenReturn(pet);
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getPetIfExists(anyLong())).thenReturn(pet);
         when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(updatedBookingDto);
         when(bookingRepository.save(any(Booking.class))).thenReturn(updatedBooking);
 
@@ -420,39 +358,11 @@ public class BookingServiceImplTest {
     }
 
     @Test
-    void updateBookingById_whenRequesterUser_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.updateBooking(user.getId(), bookingId, new UpdateBookingDto()));
-    }
-
-    @Test
-    void updateBookingById_whenRequesterFinancial_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.updateBooking(financial.getId(), bookingId, new UpdateBookingDto()));
-    }
-
-    @Test
-    void updateBookingById_whenRequesterNotFound_thenNotFoundException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(boss);
-        doThrow(new NotFoundException(String.format("User with id=%d is not found", user.getId())))
-                .when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(NotFoundException.class,
-                () -> bookingService.updateBooking(boss.getId(), bookingId, new UpdateBookingDto()));
-    }
-
-    @Test
     void updateBookingById_whenRequesterFoundAndBookingNotFound_thenNotFoundException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(boss);
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(boss);
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
         doThrow(new NotFoundException(String.format("Booking with id=%d is not found", user.getId())))
-                .when(utilityService).getBookingIfExists(anyLong());
+                .when(entityService).getBookingIfExists(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.updateBooking(boss.getId(), bookingId, new UpdateBookingDto()));
@@ -460,7 +370,7 @@ public class BookingServiceImplTest {
 
     @Test
     void deleteBookingId_whenRequesterBossAndBookingFound_thenBookingDeleted() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(boss);
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
         when(bookingRepository.deleteBookingById(anyLong())).thenReturn(1);
 
         bookingService.deleteBookingById(boss.getId(), bookingId);
@@ -471,7 +381,7 @@ public class BookingServiceImplTest {
 
     @Test
     void deleteBookingId_whenRequesterAdminAndBookingFound_thenBookingDeleted() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(admin);
+        when(entityService.getUserIfExists(anyLong())).thenReturn(admin);
         when(bookingRepository.deleteBookingById(anyLong())).thenReturn(1);
 
         bookingService.deleteBookingById(boss.getId(), bookingId);
@@ -481,26 +391,8 @@ public class BookingServiceImplTest {
     }
 
     @Test
-    void deleteBookingId_whenRequesterUser_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.deleteBookingById(user.getId(), bookingId));
-    }
-
-    @Test
-    void deleteBookingId_whenRequesterFinancial_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.deleteBookingById(financial.getId(), bookingId));
-    }
-
-    @Test
     void deleteBookingById_whenRequesterNotFound_thenNotFoundException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(null);
+        when(entityService.getUserIfExists(anyLong())).thenReturn(null);
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.deleteBookingById(boss.getId(), bookingId));
@@ -508,8 +400,8 @@ public class BookingServiceImplTest {
 
     @Test
     void deleteBookingById_whenRequesterFoundAndBookingNotFound_thenNotFoundException() {
-        when(utilityService.getUserIfExists(anyLong())).thenReturn(boss);
-        when(utilityService.getBookingIfExists(anyLong())).thenReturn(null);
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
+        when(entityService.getBookingIfExists(anyLong())).thenReturn(null);
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.deleteBookingById(boss.getId(), bookingId));

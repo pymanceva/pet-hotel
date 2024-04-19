@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import ru.modgy.exception.AccessDeniedException;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.room.category.dto.CategoryDto;
 import ru.modgy.room.category.dto.mapper.CategoryMapper;
@@ -21,6 +20,7 @@ import ru.modgy.room.model.Room;
 import ru.modgy.room.repository.RoomRepository;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
+import ru.modgy.utility.EntityService;
 import ru.modgy.utility.UtilityService;
 
 import java.util.Collection;
@@ -122,11 +122,12 @@ public class RoomServiceImplTest {
     private RoomMapper roomMapper;
     @Mock
     private CategoryMapper categoryMapper;
-
+    @Mock
+    private EntityService entityService;
 
     @Test
     void addRoom_whenAddRoomByBoss_thenRoomAdded() {
-        when(utilityService.getCategoryIfExists(anyLong())).thenReturn(category);
+        when(entityService.getCategoryIfExists(anyLong())).thenReturn(category);
         when(roomRepository.save(any(Room.class))).thenReturn(room);
         when(roomMapper.toRoom(any(NewRoomDto.class))).thenReturn(room);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
@@ -146,7 +147,7 @@ public class RoomServiceImplTest {
 
     @Test
     void addRoom_whenAddRoomByAdmin_thenRoomAdded() {
-        when(utilityService.getCategoryIfExists(anyLong())).thenReturn(category);
+        when(entityService.getCategoryIfExists(anyLong())).thenReturn(category);
         when(roomRepository.save(any(Room.class))).thenReturn(room);
         when(roomMapper.toRoom(any(NewRoomDto.class))).thenReturn(room);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
@@ -165,26 +166,8 @@ public class RoomServiceImplTest {
     }
 
     @Test
-    void addRoom_whenAddRoomByUser_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> roomService.addRoom(user.getId(), newRoomDto));
-    }
-
-    @Test
-    void addRoom_whenAddRoomByFinancial_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                financial.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> roomService.addRoom(financial.getId(), newRoomDto));
-    }
-
-    @Test
     void getRoomById_whenGetRoomByBoss_thenReturnedRoom() {
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
 
         RoomDto result = roomService.getRoomById(boss.getId(), room.getId());
@@ -196,13 +179,13 @@ public class RoomServiceImplTest {
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
 
-        verify(utilityService, times(1)).getRoomIfExists(anyLong());
+        verify(entityService, times(1)).getRoomIfExists(anyLong());
         verifyNoMoreInteractions(roomRepository);
     }
 
     @Test
     void getRoomById_whenGetRoomByAdmin_thenReturnedRoom() {
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
 
         RoomDto result = roomService.getRoomById(admin.getId(), room.getId());
@@ -214,13 +197,13 @@ public class RoomServiceImplTest {
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
 
-        verify(utilityService, times(1)).getRoomIfExists(anyLong());
+        verify(entityService, times(1)).getRoomIfExists(anyLong());
         verifyNoMoreInteractions(roomRepository);
     }
 
     @Test
     void getRoomById_whenGetRoomByFinancial_thenReturnedRoom() {
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
 
         RoomDto result = roomService.getRoomById(financial.getId(), room.getId());
@@ -232,26 +215,8 @@ public class RoomServiceImplTest {
         Assertions.assertTrue(result.getIsVisible());
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
 
-        verify(utilityService, times(1)).getRoomIfExists(anyLong());
+        verify(entityService, times(1)).getRoomIfExists(anyLong());
         verifyNoMoreInteractions(roomRepository);
-    }
-
-    @Test
-    void getRoomById_whenGetRoomByUser_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                user.getRole()))).when(utilityService).checkBossAdminFinancialAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> roomService.getRoomById(user.getId(), room.getId()));
-    }
-
-    @Test
-    void getRoomById_whenRequesterNotFound_thenNotFoundException() {
-        doThrow(new NotFoundException(String.format("User with id=%d is not found", user.getId())))
-                .when(utilityService).checkBossAdminFinancialAccess(anyLong());
-
-        assertThrows(NotFoundException.class,
-                () -> roomService.getRoomById(boss.getId(), room.getId()));
     }
 
     @Test
@@ -277,8 +242,8 @@ public class RoomServiceImplTest {
                 .isVisible(false)
                 .build();
 
-        when(utilityService.getCategoryIfExists(anyLong())).thenReturn(category);
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getCategoryIfExists(anyLong())).thenReturn(category);
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
         when(roomRepository.save(any(Room.class))).thenReturn(newRoom);
         when(roomMapper.toRoom(any(UpdateRoomDto.class))).thenReturn(room);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(updatedRoomDto);
@@ -319,9 +284,9 @@ public class RoomServiceImplTest {
                 .isVisible(true)
                 .build();
 
-        when(utilityService.getCategoryIfExists(anyLong())).thenReturn(category);
+        when(entityService.getCategoryIfExists(anyLong())).thenReturn(category);
         when(categoryMapper.toCategoryDto(any(Category.class))).thenReturn(categoryDto);
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
         when(roomRepository.save(any(Room.class))).thenReturn(newRoom);
         when(roomMapper.toRoom(any(UpdateRoomDto.class))).thenReturn(updatedRoom);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(updatedRoomDto);
@@ -363,8 +328,8 @@ public class RoomServiceImplTest {
                 .isVisible(false)
                 .build();
 
-        when(utilityService.getCategoryIfExists(anyLong())).thenReturn(category);
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getCategoryIfExists(anyLong())).thenReturn(category);
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
         when(roomRepository.save(any(Room.class))).thenReturn(newRoom);
         when(roomMapper.toRoom(any(UpdateRoomDto.class))).thenReturn(updatedRoom);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(updatedRoomDto);
@@ -404,8 +369,8 @@ public class RoomServiceImplTest {
                 .isVisible(false)
                 .build();
 
-        when(utilityService.getCategoryIfExists(anyLong())).thenReturn(category);
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getCategoryIfExists(anyLong())).thenReturn(category);
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
         when(roomRepository.save(any(Room.class))).thenReturn((newRoom));
         when(roomMapper.toRoom(any(UpdateRoomDto.class))).thenReturn(room);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(updatedRoomDto);
@@ -420,42 +385,6 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(updatedRoomDto.getNumber(), result.getNumber());
 
         verify(roomRepository, times(1)).save(any(Room.class));
-    }
-
-    @Test
-    void updateRoom_whenRequesterNotFound_thenNotFoundException() {
-        doThrow(new NotFoundException(String.format("User with id=%d is not found", user.getId())))
-                .when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(NotFoundException.class,
-                () -> roomService.updateRoom(boss.getId(), room.getId(), new UpdateRoomDto()));
-    }
-
-    @Test
-    void updateRoom_whenRequesterFoundAndRoomNotFound_thenNotFoundException() {
-        doThrow(new NotFoundException(String.format("Room with id=%d is not found", room.getId())))
-                .when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(NotFoundException.class,
-                () -> roomService.updateRoom(boss.getId(), room.getId(), new UpdateRoomDto()));
-    }
-
-    @Test
-    void updateRoom_whenUpdateRoomByUser_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> roomService.updateRoom(user.getId(), room.getId(), new UpdateRoomDto()));
-    }
-
-    @Test
-    void updateRoom_whenUpdateRoomByFinancial_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                financial.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> roomService.updateRoom(financial.getId(), room.getId(), new UpdateRoomDto()));
     }
 
     @Test
@@ -519,17 +448,8 @@ public class RoomServiceImplTest {
     }
 
     @Test
-    void getAllRooms_whenGetAllRoomsByUser_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                user.getRole()))).when(utilityService).checkBossAdminFinancialAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> roomService.getAllRooms(user.getId(), room.getIsVisible()));
-    }
-
-    @Test
     void hideRoomById_whenHideRoomByIdByBoss_thenRoomHidden() {
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
         when(roomRepository.save(any(Room.class))).thenReturn(hiddenRoom);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(hiddenRoomDto);
 
@@ -547,7 +467,7 @@ public class RoomServiceImplTest {
 
     @Test
     void hideRoomById_whenHideRoomByIdByAdmin_thenRoomHidden() {
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
         when(roomRepository.save(any(Room.class))).thenReturn(hiddenRoom);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(hiddenRoomDto);
 
@@ -564,44 +484,8 @@ public class RoomServiceImplTest {
     }
 
     @Test
-    void hideRoomById_whenHideRoomByIdByUser_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> roomService.hideRoomById(user.getId(), room.getId()));
-    }
-
-    @Test
-    void hideRoomById_whenHideRoomByIdByFinancial_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                financial.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> roomService.hideRoomById(financial.getId(), room.getId()));
-    }
-
-    @Test
-    void hideRoomById_whenRequesterIsNotFound_thenNotFoundException() {
-        doThrow(new NotFoundException(String.format("User with id=%d is not found", user.getId())))
-                .when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(NotFoundException.class,
-                () -> roomService.hideRoomById(boss.getId(), room.getId()));
-    }
-
-    @Test
-    void hideRoomById_whenRequesterFoundAndRoomIsNotFound_thenNotFoundException() {
-        doThrow(new NotFoundException(String.format("Room with id=%d is not found", room.getId())))
-                .when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(NotFoundException.class,
-                () -> roomService.hideRoomById(boss.getId(), room.getId()));
-    }
-
-    @Test
     void unhideRoomById_whenUnhideRoomByIdByBoss_thenRoomUnhidden() {
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(hiddenRoom);
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(hiddenRoom);
         when(roomRepository.save(any(Room.class))).thenReturn(room);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
 
@@ -619,7 +503,7 @@ public class RoomServiceImplTest {
 
     @Test
     void unhideRoomById_whenUnhideRoomByIdByAdmin_thenRoomUnhidden() {
-        when(utilityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
         when(roomRepository.save(any(Room.class))).thenReturn(room);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
 
@@ -633,43 +517,6 @@ public class RoomServiceImplTest {
         Assertions.assertEquals(roomDto.getNumber(), result.getNumber());
 
         verify(roomRepository, times(1)).save(any(Room.class));
-    }
-
-    @Test
-    void unhideRoomById_whenUnhideRoomByIdByUser_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                user.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> roomService.unhideRoomById(user.getId(), room.getId()));
-    }
-
-    @Test
-    void unhideRoomById_whenUnhideRoomByIdByFinancial_thenAccessDeniedException() {
-        doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                financial.getRole()))).when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(AccessDeniedException.class,
-                () -> roomService.unhideRoomById(financial.getId(), room.getId()));
-    }
-
-    @Test
-    void unhideRoomById_whenRequesterIsNotFound_thenNotFoundException() {
-        doThrow(new NotFoundException(String.format("User with id=%d is not found", user.getId())))
-                .when(utilityService).checkBossAdminAccess(anyLong());
-
-        assertThrows(NotFoundException.class,
-                () -> roomService.unhideRoomById(boss.getId(), room.getId()));
-    }
-
-    @Test
-    void unhideRoomById_whenRequesterFoundAndRoomIsNotFound_thenNotFoundException() {
-        doThrow(new NotFoundException(String.format("Room with id=%d is not found", room.getId())))
-                .when(utilityService).checkBossAdminAccess(anyLong());
-
-
-        assertThrows(NotFoundException.class,
-                () -> roomService.unhideRoomById(boss.getId(), room.getId()));
     }
 
     @Test

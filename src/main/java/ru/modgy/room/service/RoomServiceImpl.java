@@ -15,7 +15,7 @@ import ru.modgy.room.dto.UpdateRoomDto;
 import ru.modgy.room.dto.mapper.RoomMapper;
 import ru.modgy.room.model.Room;
 import ru.modgy.room.repository.RoomRepository;
-import ru.modgy.utility.UtilityService;
+import ru.modgy.utility.EntityService;
 
 import java.util.*;
 
@@ -23,18 +23,16 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService {
-    final private RoomRepository roomRepository;
-    final private RoomMapper roomMapper;
-    final private CategoryMapper categoryMapper;
-    final private UtilityService utilityService;
+    private final RoomRepository roomRepository;
+    private final RoomMapper roomMapper;
+    private final CategoryMapper categoryMapper;
+    private final EntityService entityService;
 
     @Transactional
     @Override
     public RoomDto addRoom(Long userId, NewRoomDto newRoomDto) {
-        utilityService.checkBossAdminAccess(userId);
-
         Room newRoom = roomMapper.toRoom(newRoomDto);
-        Category category = utilityService.getCategoryIfExists(newRoomDto.getCategoryId());
+        Category category = entityService.getCategoryIfExists(newRoomDto.getCategoryId());
         newRoom.setCategory(category);
         Room addedRoom = roomRepository.save(newRoom);
         CategoryDto categoryDto = categoryMapper.toCategoryDto(category);
@@ -47,9 +45,7 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(readOnly = true)
     @Override
     public RoomDto getRoomById(Long userId, Long roomId) {
-        utilityService.checkBossAdminFinancialAccess(userId);
-
-        Room room = utilityService.getRoomIfExists(roomId);
+        Room room = entityService.getRoomIfExists(roomId);
         RoomDto roomDto = roomMapper.toRoomDto(room);
         roomDto.setCategoryDto(categoryMapper.toCategoryDto(room.getCategory()));
         log.info("RoomService: getRoomById, userId={}, roomId={}", userId, roomId);
@@ -59,12 +55,11 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     @Override
     public RoomDto updateRoom(Long userId, Long roomId, UpdateRoomDto roomDto) {
-        utilityService.checkBossAdminAccess(userId);
-        Room oldRoom = utilityService.getRoomIfExists(roomId);
+        Room oldRoom = entityService.getRoomIfExists(roomId);
         Room newRoom = roomMapper.toRoom(roomDto);
         Category category;
         if (roomDto.getCategoryId() != null) {
-            category = utilityService.getCategoryIfExists(roomDto.getCategoryId());
+            category = entityService.getCategoryIfExists(roomDto.getCategoryId());
         } else {
             category = oldRoom.getCategory();
         }
@@ -97,8 +92,6 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(readOnly = true)
     @Override
     public Collection<RoomDto> getAllRooms(Long userId, Boolean isVisible) {
-        utilityService.checkBossAdminFinancialAccess(userId);
-
         List<Room> allRooms = roomRepository.getAllRooms(isVisible).orElse(Collections.emptyList());
         List<RoomDto> allRoomsDto = new ArrayList<>();
         for (Room room : allRooms) {
@@ -114,8 +107,7 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     @Override
     public RoomDto hideRoomById(Long userId, Long roomId) {
-        utilityService.checkBossAdminAccess(userId);
-        Room room = utilityService.getRoomIfExists(roomId);
+        Room room = entityService.getRoomIfExists(roomId);
 
         //пока уловие всегда true, в дальнейшем здесь буду проверять наличие активных бронирований у номера
         if (true) {
@@ -134,8 +126,7 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     @Override
     public RoomDto unhideRoomById(Long userId, Long roomId) {
-        utilityService.checkBossAdminAccess(userId);
-        Room room = utilityService.getRoomIfExists(roomId);
+        Room room = entityService.getRoomIfExists(roomId);
 
         room.setIsVisible(true);
         roomRepository.save(room);
@@ -149,8 +140,6 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     @Override
     public void permanentlyDeleteRoomById(Long userId, Long roomId) {
-        utilityService.checkBossAdminAccess(userId);
-
         int result = roomRepository.deleteRoomById(roomId);
 
         if (result == 0) {
