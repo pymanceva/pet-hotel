@@ -33,10 +33,9 @@ public class PetServiceImpl implements PetService {
     @Override
     @Transactional
     public PetDto addPet(Long requesterId, NewPetDto newPetDto) {
-        User requester = findUserById(requesterId);
+        entityService.getUserIfExists(requesterId);
         //todo метод проверки наличия хозяина питомца, будет дописан после добавления сущности оунеров
         //findOwnerById(newPetDto.getOwnerId());
-        checkAccess(requester);
         //todo метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
         //checkPet(newPetDto);
         Pet newPet = petMapper.toPet(newPetDto);
@@ -252,8 +251,7 @@ public class PetServiceImpl implements PetService {
     @Override
     @Transactional(readOnly = true)
     public Page<PetDto> getPetsBySearch(Long requesterId, String text, Integer page, Integer size) {
-        User requester = findUserById(requesterId);
-        checkAccess(requester);
+        entityService.getUserIfExists(requesterId);
 
         Pageable pageable = PageRequest.of(page, size);
 
@@ -287,11 +285,6 @@ public class PetServiceImpl implements PetService {
             return new PageImpl<>(pagedListHolder.getPageList(), pageable, pets.size());
         }
 
-    }
-
-    private User findUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("User with id = %d not found", userId)));
     }
     //todo метод проверки наличия хозяина питомца, будет дописан после добавления сущности оунеров
 //    private User findOwnerById(long userId) {

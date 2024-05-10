@@ -42,12 +42,13 @@ public class PetController {
 
     @GetMapping("/search")
     public Page<PetDto> getPetsBySearch(
-            @RequestHeader(USER_ID) Long requesterId,
+            @RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
             @RequestParam(required = false) String text,
             @PositiveOrZero
             @RequestParam(defaultValue = "0") Integer page,
             @Positive
             @RequestParam(defaultValue = "10") Integer size) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("PetController: GET/getPetsBySearch, requesterId={}, text={}, page={}, size={}", requesterId,
                 text, page, size);
         return petService.getPetsBySearch(

@@ -6,10 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.modgy.exception.AccessDeniedException;
@@ -28,10 +24,8 @@ import ru.modgy.utility.UtilityService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -58,7 +52,7 @@ public class PetControllerTest {
     @MockBean
     private UtilityService utilityService;
 
-    private final String requesterHeader = "X-PetHotel-User-Id";
+    private final String requesterHeader = UtilityService.REQUESTER_ID_HEADER;
     private static final LocalDate BIRTH_DATE = LocalDate.now().minusYears(1);
     private static final LocalDate VET_VISIT_DATE = LocalDate.now().minusMonths(1);
     private static final LocalDate HEAT_DATE = LocalDate.now().plusMonths(1);
