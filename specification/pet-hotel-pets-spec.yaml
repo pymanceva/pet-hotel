@@ -59,7 +59,7 @@ paths:
                 error: '[]'
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
-                message: User with role = %s, can not access for this action
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -71,7 +71,7 @@ paths:
                 error: '[]'
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: User with id=2 was not found
+                message: "User with id=1 is not found"
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -83,7 +83,7 @@ paths:
                 error: '[]'
                 status: CONFLICT
                 reason: For the requested operation the conditions are not met.
-                message: The client with id = 1 already has a pet with name = Бобик.
+                message: "The client with id = 1 already has a pet with name = Бобик."
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -150,7 +150,7 @@ paths:
                 error: '[]'
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
-                message: User with role = %s, can not access for this action
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -162,7 +162,7 @@ paths:
                 error: '[]'
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: User with id=2 was not found
+                message: "User with id=1 is not found"
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -225,7 +225,7 @@ paths:
                 error: '[]'
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
-                message: User with role = %s, can not access for this action
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -237,7 +237,7 @@ paths:
                 error: '[]'
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: User with id=2 was not found
+                message: "User with id=1 is not found"
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -313,7 +313,7 @@ paths:
                 error: '[]'
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
-                message: User with role = %s, can not access for this action
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -325,7 +325,7 @@ paths:
                 error: '[]'
                 status: NOT_FOUND
                 reason: The required object was not found.
-                message: User with id=2 was not found
+                message: "User with id=1 is not found"
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -337,7 +337,7 @@ paths:
                 error: '[]'
                 status: CONFLICT
                 reason: For the requested operation the conditions are not met.
-                message: The client with id = 1 already has a pet with name = Бобик.
+                message: "The client with id = 1 already has a pet with name = Бобик."
                 timestamp: '2022-09-07 09:10:50'
               schema:
                 $ref: '#/components/schemas/Error'

@@ -203,7 +203,7 @@ public class BookingServiceIntegrationTest {
 
         service.deleteBookingById(requesterAdmin.getId(), booking.getId());
 
-        String error = String.format("booking with id=%d is not found", booking.getId());
+        String error = String.format("Booking with id=%d is not found", booking.getId());
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
                 () -> service.getBookingById(requesterAdmin.getId(), booking.getId())

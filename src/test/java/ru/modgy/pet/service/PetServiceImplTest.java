@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import ru.modgy.exception.AccessDeniedException;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.pet.dto.NewPetDto;
 import ru.modgy.pet.dto.PetDto;
@@ -19,10 +18,9 @@ import ru.modgy.pet.model.TypeOfPet;
 import ru.modgy.pet.repository.PetRepository;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
-import ru.modgy.user.repository.UserRepository;
+import ru.modgy.utility.EntityService;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -38,9 +36,6 @@ public class PetServiceImplTest {
     private static final LocalDate VET_VISIT_DATE = LocalDate.now().minusMonths(1);
     private static final LocalDate HEAT_DATE = LocalDate.now().plusMonths(1);
 
-    @Mock
-    private UserRepository mockUserRepository;
-
     @InjectMocks
     private PetServiceImpl petService;
 
@@ -49,6 +44,9 @@ public class PetServiceImplTest {
 
     @Mock
     private PetMapper mockPetMapper;
+
+    @Mock
+    private EntityService entityService;
 
     final User requesterBoss = User.builder()
             .email("boss@mail.ru")
@@ -425,7 +423,7 @@ public class PetServiceImplTest {
 
     @Test
     void addPet_whenAddPetByAdmin_thenPetAdded() {
-        when(mockUserRepository.findById(requesterAdmin.getId())).thenReturn(Optional.of(requesterAdmin));
+        when(entityService.getUserIfExists(requesterAdmin.getId())).thenReturn(requesterAdmin);
         when(mockPetMapper.toPet(newPetDto)).thenReturn(pet);
         when(mockPetRepository.save(any())).thenReturn(pet);
         when(mockPetMapper.toPetDto(pet)).thenReturn(petDto);
@@ -494,7 +492,7 @@ public class PetServiceImplTest {
 
     @Test
     void addPet_whenAddPetByBoss_thenPetAdded() {
-        when(mockUserRepository.findById(requesterBoss.getId())).thenReturn(Optional.of(requesterBoss));
+        when(entityService.getUserIfExists(requesterBoss.getId())).thenReturn(requesterBoss);
         when(mockPetMapper.toPet(newPetDto)).thenReturn(pet);
         when(mockPetRepository.save(any())).thenReturn(pet);
         when(mockPetMapper.toPetDto(pet)).thenReturn(petDto);
@@ -562,41 +560,9 @@ public class PetServiceImplTest {
     }
 
     @Test
-    void addPet_whenAddPetByUser_thenAccessDeniedExceptionThrown() {
-        when(mockUserRepository.findById(requesterUser.getId())).thenReturn(Optional.of(requesterUser));
-        when(mockPetMapper.toPet(newPetDto)).thenReturn(pet);
-        when(mockPetMapper.toPetDto(pet)).thenReturn(petDto);
-        String error = String.format("User with role = %s, can't access for this action",
-                requesterUser.getRole());
-
-        AccessDeniedException exception = assertThrows(
-                AccessDeniedException.class,
-                () -> petService.addPet(requesterUser.getId(), newPetDto)
-        );
-
-        assertEquals(error, exception.getMessage());
-        verify(mockPetRepository, times(0)).save(any());
-    }
-
-    @Test
-    void addPet_whenUserNotFound_thenNotFoundExceptionThrown() {
-        long userNotFoundId = 0L;
-        String error = String.format("User with id = %d not found", userNotFoundId);
-        when(mockUserRepository.findById(userNotFoundId)).thenThrow(new NotFoundException(error));
-
-        NotFoundException exception = assertThrows(
-                NotFoundException.class,
-                () -> petService.addPet(userNotFoundId, newPetDto)
-        );
-
-        assertEquals(error, exception.getMessage());
-        verify(mockPetRepository, times(0)).save(any());
-    }
-
-    @Test
     void getPetById_whenGetPetByUser_thenReturnPetDto() {
-        when(mockUserRepository.findById(requesterUser.getId())).thenReturn(Optional.of(requesterUser));
-        when(mockPetRepository.findById(any())).thenReturn(Optional.of(pet));
+        when(entityService.getUserIfExists(requesterUser.getId())).thenReturn(requesterUser);
+        when(entityService.getPetIfExists(anyLong())).thenReturn(pet);
         when(mockPetMapper.toPetDto(pet)).thenReturn(petDto);
 
         PetDto actualPetDto = petService.getPetById(requesterUser.getId(), pet.getId());
@@ -663,8 +629,8 @@ public class PetServiceImplTest {
     @Test
     void getPetById_whenGetPetByBossAndPetNotFound_thenNotFoundExceptionThrown() {
         String error = String.format("Pet with id = %d not found", pet.getId());
-        when(mockUserRepository.findById(requesterBoss.getId())).thenReturn(Optional.of(requesterBoss));
-        when(mockPetRepository.findById(any())).thenThrow(new NotFoundException(error));
+        when(entityService.getUserIfExists(requesterBoss.getId())).thenReturn(requesterBoss);
+        when(entityService.getPetIfExists(any())).thenThrow(new NotFoundException(error));
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
@@ -677,8 +643,8 @@ public class PetServiceImplTest {
     @Test
     void getPetById_whenGetPetByAdminAndPetNotFound_thenNotFoundExceptionThrown() {
         String error = String.format("Pet with id = %d not found", pet.getId());
-        when(mockUserRepository.findById(requesterAdmin.getId())).thenReturn(Optional.of(requesterAdmin));
-        when(mockPetRepository.findById(any())).thenThrow(new NotFoundException(error));
+        when(entityService.getUserIfExists(requesterAdmin.getId())).thenReturn(requesterAdmin);
+        when(entityService.getPetIfExists(any())).thenThrow(new NotFoundException(error));
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
@@ -691,8 +657,8 @@ public class PetServiceImplTest {
     @Test
     void getPetById_whenGetPetByUserAndPetNotFound_thenNotFoundExceptionThrown() {
         String error = String.format("Pet with id = %d not found", pet.getId());
-        when(mockUserRepository.findById(requesterUser.getId())).thenReturn(Optional.of(requesterUser));
-        when(mockPetRepository.findById(any())).thenThrow(new NotFoundException(error));
+        when(entityService.getUserIfExists(requesterUser.getId())).thenReturn(requesterUser);
+        when(entityService.getPetIfExists(any())).thenThrow(new NotFoundException(error));
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
@@ -706,7 +672,7 @@ public class PetServiceImplTest {
     void getPetById_whenUserNotFound_thenNotFoundExceptionThrown() {
         long userNotFoundId = 0L;
         String error = String.format("User with id = %d not found", userNotFoundId);
-        when(mockUserRepository.findById(userNotFoundId)).thenThrow(new NotFoundException(error));
+        when(entityService.getUserIfExists(userNotFoundId)).thenThrow(new NotFoundException(error));
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
@@ -719,8 +685,8 @@ public class PetServiceImplTest {
 
     @Test
     void updatePet_whenUpdatePetByBoss_thenReturnUpdatePetDto() {
-        when(mockUserRepository.findById(requesterBoss.getId())).thenReturn(Optional.of(requesterBoss));
-        when(mockPetRepository.findById(any())).thenReturn(Optional.of(pet));
+        when(entityService.getUserIfExists(requesterBoss.getId())).thenReturn(requesterBoss);
+        when(entityService.getPetIfExists(any())).thenReturn(pet);
         when(mockPetRepository.save(any())).thenReturn(updatePet);
         when(mockPetMapper.toPetDto(updatePet)).thenReturn(updatedPetDto);
         when(mockPetMapper.toPet(updatePetDto)).thenReturn(updatePet);
@@ -788,26 +754,9 @@ public class PetServiceImplTest {
     }
 
     @Test
-    void updatePet_whenUpdatePetByUser_thenAccessDeniedExceptionThrown() {
-        when(mockUserRepository.findById(requesterUser.getId())).thenReturn(Optional.of(requesterUser));
-        when(mockPetRepository.findById(any())).thenReturn(Optional.of(pet));
-
-        String error = String.format("User with role = %s, can't access for this action",
-                requesterUser.getRole());
-
-        AccessDeniedException exception = assertThrows(
-                AccessDeniedException.class,
-                () -> petService.updatePet(requesterUser.getId(), pet.getId(), updatePetDto)
-        );
-
-        assertEquals(error, exception.getMessage());
-        verify(mockPetRepository, times(0)).save(any());
-    }
-
-    @Test
     void updatePet_whenUpdatePetPetByAdmin_thenReturnUpdatePetDto() {
-        when(mockUserRepository.findById(requesterAdmin.getId())).thenReturn(Optional.of(requesterAdmin));
-        when(mockPetRepository.findById(any())).thenReturn(Optional.of(pet));
+        when(entityService.getUserIfExists(requesterAdmin.getId())).thenReturn(requesterAdmin);
+        when(entityService.getPetIfExists(any())).thenReturn(pet);
         when(mockPetRepository.save(any())).thenReturn(updatePet);
         when(mockPetMapper.toPetDto(updatePet)).thenReturn(updatedPetDto);
         when(mockPetMapper.toPet(updatePetDto)).thenReturn(updatePet);
@@ -876,8 +825,7 @@ public class PetServiceImplTest {
     @Test
     void updatePet_whenUpdatePetPetByBossAndPetNotFound_thenNotFoundExceptionThrown() {
         String error = String.format("Pet with id = %d not found", pet.getId());
-        when(mockUserRepository.findById(requesterBoss.getId())).thenReturn(Optional.of(requesterBoss));
-        when(mockPetRepository.findById(any())).thenThrow(new NotFoundException(error));
+        when(entityService.getPetIfExists(any())).thenThrow(new NotFoundException(error));
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
@@ -890,8 +838,7 @@ public class PetServiceImplTest {
     @Test
     void updatePet_whenUpdatePetByAdminAndPetNotFound_thenNotFoundExceptionThrown() {
         String error = String.format("Pet with id = %d not found", pet.getId());
-        when(mockUserRepository.findById(requesterAdmin.getId())).thenReturn(Optional.of(requesterAdmin));
-        when(mockPetRepository.findById(any())).thenThrow(new NotFoundException(error));
+        when(entityService.getPetIfExists(any())).thenThrow(new NotFoundException(error));
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
@@ -902,25 +849,8 @@ public class PetServiceImplTest {
     }
 
     @Test
-    void updatePet_whenUserNotFound_thenNotFoundExceptionThrown() {
-        long userNotFoundId = 0L;
-        String error = String.format("User with id = %d not found", userNotFoundId);
-        when(mockUserRepository.findById(userNotFoundId)).thenThrow(new NotFoundException(error));
-
-        NotFoundException exception = assertThrows(
-                NotFoundException.class,
-                () -> petService.updatePet(userNotFoundId, pet.getId(), updatePetDto)
-        );
-
-        assertEquals(error, exception.getMessage());
-        verify(mockPetRepository, times(0)).save(any());
-    }
-
-
-    @Test
     void deletePetById_whenDeletePetByBoss_thenDeletedPet() {
-        when(mockUserRepository.findById(requesterBoss.getId())).thenReturn(Optional.of(requesterBoss));
-        when(mockPetRepository.findById(any())).thenReturn(Optional.of(pet));
+        when(entityService.getPetIfExists(any())).thenReturn(pet);
         when(mockPetRepository.deletePetById(any())).thenReturn(1);
 
         petService.deletePetById(requesterBoss.getId(), pet.getId());
@@ -930,8 +860,7 @@ public class PetServiceImplTest {
 
     @Test
     void deletePetById_whenDeletePetByAdmin_thenDeletedPet() {
-        when(mockUserRepository.findById(requesterAdmin.getId())).thenReturn(Optional.of(requesterAdmin));
-        when(mockPetRepository.findById(any())).thenReturn(Optional.of(pet));
+        when(entityService.getPetIfExists(any())).thenReturn(pet);
         when(mockPetRepository.deletePetById(any())).thenReturn(1);
 
         petService.deletePetById(requesterAdmin.getId(), pet.getId());
@@ -940,24 +869,9 @@ public class PetServiceImplTest {
     }
 
     @Test
-    void deletePetById_whenDeletePetByUser_thenAccessDeniedExceptionThrown() {
-        when(mockUserRepository.findById(requesterUser.getId())).thenReturn(Optional.of(requesterUser));
-        String error = String.format("User with role = %s, can't access for this action",
-                requesterUser.getRole());
-
-        AccessDeniedException exception = assertThrows(
-                AccessDeniedException.class,
-                () -> petService.deletePetById(requesterUser.getId(), pet.getId()));
-
-        assertEquals(error, exception.getMessage());
-        verify(mockPetRepository, times(0)).deleteById(any());
-    }
-
-    @Test
     void deletePetById_whenDeletePetPetByBossAndPetNotFound_thenNotFoundExceptionThrown() {
         String error = String.format("pet with id=%d not found", 0);
-        when(mockUserRepository.findById(requesterBoss.getId())).thenReturn(Optional.of(requesterBoss));
-        when(mockPetRepository.findById(any())).thenThrow(new NotFoundException(error));
+        when(entityService.getPetIfExists(any())).thenThrow(new NotFoundException(error));
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
@@ -970,8 +884,7 @@ public class PetServiceImplTest {
     @Test
     void deletePetById_whenDeletePetByAdminAndPetNotFound_thenNotFoundExceptionThrown() {
         String error = String.format("pet with id=%d not found", 0);
-        when(mockUserRepository.findById(requesterAdmin.getId())).thenReturn(Optional.of(requesterAdmin));
-        when(mockPetRepository.findById(any())).thenThrow(new NotFoundException(error));
+        when(entityService.getPetIfExists(any())).thenThrow(new NotFoundException(error));
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
@@ -980,20 +893,4 @@ public class PetServiceImplTest {
 
         assertEquals(error, exception.getMessage());
     }
-
-    @Test
-    void deletePet_whenUserNotFound_thenNotFoundExceptionThrown() {
-        long userNotFoundId = 0L;
-        String error = String.format("User with id = %d not found", userNotFoundId);
-        when(mockUserRepository.findById(userNotFoundId)).thenThrow(new NotFoundException(error));
-
-        NotFoundException exception = assertThrows(
-                NotFoundException.class,
-                () -> petService.deletePetById(userNotFoundId, pet.getId())
-        );
-
-        assertEquals(error, exception.getMessage());
-        verify(mockPetRepository, times(0)).save(any());
-    }
-
 }

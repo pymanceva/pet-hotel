@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import ru.modgy.utility.EntityService;
 import ru.modgy.booking.dto.BookingDto;
 import ru.modgy.booking.dto.NewBookingDto;
 import ru.modgy.booking.dto.UpdateBookingDto;
@@ -16,25 +17,20 @@ import ru.modgy.booking.model.Booking;
 import ru.modgy.booking.model.StatusBooking;
 import ru.modgy.booking.model.TypesBooking;
 import ru.modgy.booking.repository.BookingRepository;
-import ru.modgy.exception.AccessDeniedException;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.pet.dto.PetDto;
 import ru.modgy.pet.model.Pet;
 import ru.modgy.pet.model.Sex;
 import ru.modgy.pet.model.TypeOfPet;
-import ru.modgy.pet.repository.PetRepository;
 import ru.modgy.room.category.dto.CategoryDto;
 import ru.modgy.room.category.model.Category;
 import ru.modgy.room.dto.RoomDto;
 import ru.modgy.room.model.Room;
-import ru.modgy.room.repository.RoomRepository;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
-import ru.modgy.user.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -79,13 +75,6 @@ public class BookingServiceImplTest {
             .id(2L)
             .firstName("user")
             .role(Roles.ROLE_USER)
-            .isActive(true)
-            .build();
-    private final User financial = User.builder()
-            .email("financial@pethotel.ru")
-            .id(2L)
-            .firstName("financial")
-            .role(Roles.ROLE_FINANCIAL)
             .isActive(true)
             .build();
     private final Room room = Room.builder()
@@ -181,20 +170,16 @@ public class BookingServiceImplTest {
     @Mock
     private BookingRepository bookingRepository;
     @Mock
-    private UserRepository userRepository;
-    @Mock
-    private RoomRepository roomRepository;
-    @Mock
-    private PetRepository petRepository;
+    private EntityService entityService;
     @Mock
     private BookingMapper bookingMapper;
 
     @Test
     void addBooking_whenAddBookingByBoss_thenBookingAdded() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
         when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
-        when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
-        when(petRepository.findAllByIdIn(any())).thenReturn(Optional.of(List.of(pet)));
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getListOfPetsByIds(any())).thenReturn(List.of(pet));
         when(bookingMapper.toBooking(any(NewBookingDto.class))).thenReturn(booking);
         when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(bookingDto);
 
@@ -220,10 +205,10 @@ public class BookingServiceImplTest {
 
     @Test
     void addBooking_whenAddBookingByAdmin_thenBookingAdded() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
+        when(entityService.getUserIfExists(anyLong())).thenReturn(admin);
         when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
-        when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
-        when(petRepository.findAllByIdIn(any())).thenReturn(Optional.of(List.of(pet)));
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getListOfPetsByIds(any())).thenReturn(List.of(pet));
         when(bookingMapper.toBooking(any(NewBookingDto.class))).thenReturn(booking);
         when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(bookingDto);
 
@@ -248,33 +233,9 @@ public class BookingServiceImplTest {
     }
 
     @Test
-    void addBooking_whenAddBookingByUser_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.addBooking(user.getId(), newBookingDto));
-    }
-
-    @Test
-    void addBooking_whenAddBookingByFinancial_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.addBooking(user.getId(), newBookingDto));
-    }
-
-    @Test
-    void addBooking_whenAddBookingAndRequesterNotFound_thenNotFoundException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class,
-                () -> bookingService.addBooking(user.getId(), newBookingDto));
-    }
-
-    @Test
     void addBooking_whenAddBookingAndRoomNotFound_thenNotFoundException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
-        when(roomRepository.findById(anyLong())).thenReturn(Optional.empty());
+        doThrow(new NotFoundException(String.format("Room with id=%d is not found", user.getId())))
+                .when(entityService).getRoomIfExists(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.addBooking(user.getId(), newBookingDto));
@@ -282,8 +243,8 @@ public class BookingServiceImplTest {
 
     @Test
     void getBookingById_whenGetBookingByBoss_thenReturnedBooking() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
-        when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
+        when(entityService.getBookingIfExists(anyLong())).thenReturn(booking);
         when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(bookingDto);
 
         BookingDto result = bookingService.getBookingById(boss.getId(), bookingId);
@@ -301,15 +262,12 @@ public class BookingServiceImplTest {
         Assertions.assertEquals(bookingDto.getIsPrepaid(), result.getIsPrepaid());
         Assertions.assertEquals(bookingDto.getRoom(), result.getRoom());
         Assertions.assertEquals(bookingDto.getPets(), result.getPets());
-
-        verify(bookingRepository, times(1)).findById(anyLong());
-        verifyNoMoreInteractions(bookingRepository);
     }
 
     @Test
     void getBookingById_whenGetBookingByAdmin_thenReturnedBooking() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
-        when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
+        when(entityService.getUserIfExists(anyLong())).thenReturn(admin);
+        when(entityService.getBookingIfExists(anyLong())).thenReturn(booking);
         when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(bookingDto);
 
         BookingDto result = bookingService.getBookingById(admin.getId(), bookingId);
@@ -327,39 +285,13 @@ public class BookingServiceImplTest {
         Assertions.assertEquals(bookingDto.getIsPrepaid(), result.getIsPrepaid());
         Assertions.assertEquals(bookingDto.getRoom(), result.getRoom());
         Assertions.assertEquals(bookingDto.getPets(), result.getPets());
-
-        verify(bookingRepository, times(1)).findById(anyLong());
-        verifyNoMoreInteractions(bookingRepository);
-    }
-
-    @Test
-    void getBookingById_whenGetBookingByUser_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.getBookingById(user.getId(), bookingId));
-    }
-
-    @Test
-    void getBookingById_whenGetBookingByFinancial_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.getBookingById(financial.getId(), bookingId));
-    }
-
-    @Test
-    void getBookingById_whenGetBookingByIdAndRequesterNotFound_thenNotFoundException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class,
-                () -> bookingService.getBookingById(user.getId(), bookingId));
     }
 
     @Test
     void getBookingById_whenGetBookingByIdAndBookingNotFound_thenNotFoundException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
-        when(bookingRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
+        doThrow(new NotFoundException(String.format("Booking with id=%d is not found", user.getId())))
+                .when(entityService).getBookingIfExists(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.getBookingById(user.getId(), bookingId));
@@ -367,11 +299,11 @@ public class BookingServiceImplTest {
 
     @Test
     void updateBookingById_whenRequesterBossAndBookingFound_thenUpdateAllFields() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
-        when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
+        when(entityService.getBookingIfExists(anyLong())).thenReturn(booking);
         when(bookingMapper.toBooking(any(UpdateBookingDto.class))).thenReturn(newBooking);
-        when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
-        when(petRepository.findById(anyLong())).thenReturn(Optional.of(pet));
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getPetIfExists(anyLong())).thenReturn(pet);
         when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(updatedBookingDto);
         when(bookingRepository.save(any(Booking.class))).thenReturn(updatedBooking);
 
@@ -391,18 +323,17 @@ public class BookingServiceImplTest {
         Assertions.assertEquals(updatedBookingDto.getRoom(), result.getRoom());
         Assertions.assertEquals(updatedBookingDto.getPets(), result.getPets());
 
-        verify(bookingRepository, times(1)).findById(anyLong());
         verify(bookingRepository, times(1)).save(any(Booking.class));
         verifyNoMoreInteractions(bookingRepository);
     }
 
     @Test
     void updateBookingById_whenRequesterAdminAndBookingFound_thenUpdateAllFields() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
-        when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
+        when(entityService.getUserIfExists(anyLong())).thenReturn(admin);
+        when(entityService.getBookingIfExists(anyLong())).thenReturn(booking);
         when(bookingMapper.toBooking(any(UpdateBookingDto.class))).thenReturn(newBooking);
-        when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
-        when(petRepository.findById(anyLong())).thenReturn(Optional.of(pet));
+        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
+        when(entityService.getPetIfExists(anyLong())).thenReturn(pet);
         when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(updatedBookingDto);
         when(bookingRepository.save(any(Booking.class))).thenReturn(updatedBooking);
 
@@ -422,39 +353,16 @@ public class BookingServiceImplTest {
         Assertions.assertEquals(updatedBookingDto.getRoom(), result.getRoom());
         Assertions.assertEquals(updatedBookingDto.getPets(), result.getPets());
 
-        verify(bookingRepository, times(1)).findById(anyLong());
         verify(bookingRepository, times(1)).save(any(Booking.class));
         verifyNoMoreInteractions(bookingRepository);
     }
 
     @Test
-    void updateBookingById_whenRequesterUser_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.updateBooking(user.getId(), bookingId, new UpdateBookingDto()));
-    }
-
-    @Test
-    void updateBookingById_whenRequesterFinancial_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.updateBooking(financial.getId(), bookingId, new UpdateBookingDto()));
-    }
-
-    @Test
-    void updateBookingById_whenRequesterNotFound_thenNotFoundException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class,
-                () -> bookingService.updateBooking(boss.getId(), bookingId, new UpdateBookingDto()));
-    }
-
-    @Test
     void updateBookingById_whenRequesterFoundAndBookingNotFound_thenNotFoundException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
-        when(bookingRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
+        doThrow(new NotFoundException(String.format("Booking with id=%d is not found", user.getId())))
+                .when(entityService).getBookingIfExists(anyLong());
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.updateBooking(boss.getId(), bookingId, new UpdateBookingDto()));
@@ -462,7 +370,7 @@ public class BookingServiceImplTest {
 
     @Test
     void deleteBookingId_whenRequesterBossAndBookingFound_thenBookingDeleted() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
         when(bookingRepository.deleteBookingById(anyLong())).thenReturn(1);
 
         bookingService.deleteBookingById(boss.getId(), bookingId);
@@ -473,7 +381,7 @@ public class BookingServiceImplTest {
 
     @Test
     void deleteBookingId_whenRequesterAdminAndBookingFound_thenBookingDeleted() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
+        when(entityService.getUserIfExists(anyLong())).thenReturn(admin);
         when(bookingRepository.deleteBookingById(anyLong())).thenReturn(1);
 
         bookingService.deleteBookingById(boss.getId(), bookingId);
@@ -483,24 +391,8 @@ public class BookingServiceImplTest {
     }
 
     @Test
-    void deleteBookingId_whenRequesterUser_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.deleteBookingById(user.getId(), bookingId));
-    }
-
-    @Test
-    void deleteBookingId_whenRequesterFinancial_thenAccessDeniedException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
-
-        assertThrows(AccessDeniedException.class,
-                () -> bookingService.deleteBookingById(financial.getId(), bookingId));
-    }
-
-    @Test
     void deleteBookingById_whenRequesterNotFound_thenNotFoundException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(entityService.getUserIfExists(anyLong())).thenReturn(null);
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.deleteBookingById(boss.getId(), bookingId));
@@ -508,8 +400,8 @@ public class BookingServiceImplTest {
 
     @Test
     void deleteBookingById_whenRequesterFoundAndBookingNotFound_thenNotFoundException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
-        when(bookingRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
+        when(entityService.getBookingIfExists(anyLong())).thenReturn(null);
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.deleteBookingById(boss.getId(), bookingId));

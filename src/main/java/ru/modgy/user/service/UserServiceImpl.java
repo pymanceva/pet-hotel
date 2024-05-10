@@ -13,8 +13,13 @@ import ru.modgy.user.dto.mapper.UserMapper;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
 import ru.modgy.user.repository.UserRepository;
+import ru.modgy.utility.EntityService;
+import ru.modgy.utility.UtilityService;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 
 @Slf4j
@@ -23,13 +28,13 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final EntityService entityService;
+    private final UtilityService utilityService;
 
     @Transactional(readOnly = true)
     @Override
     public List<UserDto> getAllUsers(Long requesterId, Boolean isActive) {
-        User requester = findUserById(requesterId);
-
-        checkAccessForBrowse(requester, Roles.ROLE_ADMIN);
+        User requester = entityService.getUserIfExists(requesterId);
 
         List<Roles> roles =
                 Arrays.asList(Roles.values()).subList(requester.getRole().ordinal(), Roles.values().length);
@@ -48,11 +53,7 @@ public class UserServiceImpl implements UserService {
     @Transactional()
     @Override
     public UserDto addUser(Long requesterId, NewUserDto newUserDto) {
-        User requester = findUserById(requesterId);
         User newUser = userMapper.toUser(newUserDto);
-
-        checkAccessForEdit(requester, newUser);
-
         User addedUser = userRepository.save(newUser);
         log.info("userService: addUser, requesterId={}, newUserDto={},  newUser={}",
                 requesterId, newUserDto, addedUser);
@@ -62,14 +63,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public UserDto getUserById(Long requesterId, Long userId) {
-        User requester = findUserById(requesterId);
-        if (userId.equals(requesterId)) {
-            log.info("UserService: getUserById, requesterId ={}, by userId={}", requesterId, userId);
-            return userMapper.toUserDto(requester);
-        }
-        User user = findUserById(userId);
-        checkAccessForBrowse(requester, user);
-
+        User user = entityService.getUserIfExists(userId);
         log.info("UserService: getUserById, requesterId ={}, by userId={}", requesterId, userId);
         return userMapper.toUserDto(user);
     }
@@ -77,14 +71,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void deleteUserById(Long requesterId, Long userId) {
-        User requester = findUserById(requesterId);
-        User user = findUserById(userId);
+        User user = entityService.getUserIfExists(userId);
 
         if (user.getRole().equals(Roles.ROLE_BOSS)) {
             throw new AccessDeniedException("User with role=ROLE_BOSS can't delete");
         }
-
-        checkAccessForEdit(requester, user);
 
         Integer result = userRepository.deleteUserById(userId);
         if (result == 0) {
@@ -96,8 +87,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public UserDto updateUser(Long requesterId, Long userId, UpdateUserDto updateUserDto) {
-        boolean updateBySelf = requesterId.equals(userId);
-        User requester = findUserById(requesterId);
+        boolean updateBySelf = utilityService.checkRequesterRequestsHimself(requesterId, userId);
+        User requester = entityService.getUserIfExists(requesterId);
 
         User newUser = userMapper.toUser(updateUserDto);
         newUser.setId(userId);
@@ -106,9 +97,8 @@ public class UserServiceImpl implements UserService {
         if (updateBySelf) {
             oldUser = requester;
         } else {
-            checkAccessForEdit(requester, newUser);
-            oldUser = findUserById(userId);
-            checkAccessForEdit(requester, oldUser);
+            utilityService.checkHigherOrdinalRoleAccess(requester, newUser);
+            oldUser = entityService.getUserIfExists(userId);
         }
 
         if (Objects.isNull(newUser.getLastName())) {
@@ -141,46 +131,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto setUserState(Long requesterId, Long userId, Boolean isActive) {
-        User requester = findUserById(requesterId);
-        User user = findUserById(userId);
-        checkAccessForEdit(requester, user);
+        User user = entityService.getUserIfExists(userId);
 
         user.setIsActive(isActive);
 
         User updatedUser = userRepository.save(user);
         return userMapper.toUserDto(updatedUser);
-    }
-
-    private void checkAccessForEdit(User requester, Roles role) {
-        if (requester.getRole().ordinal() < 2 &&
-                (role == null ||
-                        (requester.getRole().ordinal() < role.ordinal()))
-        ) {
-            return;
-        }
-        throw new AccessDeniedException(String.format("User with role=%s, can't access for edit this information",
-                requester.getRole()));
-    }
-
-    private User findUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("user with id=%d not found", userId)));
-    }
-
-    private void checkAccessForEdit(User requester, User user) {
-        checkAccessForEdit(requester, user.getRole());
-    }
-
-    private void checkAccessForBrowse(User requester, Roles role) {
-        if (requester.getRole().ordinal() < 2 &&
-                requester.getRole().ordinal() <= role.ordinal()) {
-            return;
-        }
-        throw new AccessDeniedException(String.format("User with role=%s, can't access for browsing this information",
-                requester.getRole()));
-    }
-
-    private void checkAccessForBrowse(User requester, User user) {
-        checkAccessForBrowse(requester, user.getRole());
     }
 }
