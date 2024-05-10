@@ -11,13 +11,14 @@ import ru.modgy.user.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
 import java.util.Collection;
 import java.util.Set;
 
 @Mapper(componentModel = "spring", uses = {UserRepository.class})
 public interface PetMapper {
 
-    //    @Mapping(source = "pet.owner", target = "owner")
+    //todo    @Mapping(source = "pet.owner", target = "owner")
     @Mapping(source = "pet.birthDate", target = "age", qualifiedByName = "calculateAge")
     PetDto toPetDto(Pet pet);
 
@@ -35,13 +36,13 @@ public interface PetMapper {
             } else {
                 return String.format("месяцев : %d", ageMonths);
             }
-        } else  {
+        } else {
             return String.format("лет : %d", ageYears);
         }
         return null;
     }
 
-    //    @Mapping(source = "newPetDto.ownerId", target = "owner", qualifiedBy = IdToUser.class)
+    //todo    @Mapping(source = "newPetDto.ownerId", target = "owner", qualifiedBy = IdToUser.class)
     @Mapping(target = "id", ignore = true)
     Pet toPet(NewPetDto newPetDto);
 
@@ -49,5 +50,6 @@ public interface PetMapper {
     Pet toPet(UpdatePetDto updatePetDto);
 
     Set<Pet> toPet(Collection<PetDto> pets);
-}
 
+    List<PetDto> toListPetDto(List<Pet> pets);
+}

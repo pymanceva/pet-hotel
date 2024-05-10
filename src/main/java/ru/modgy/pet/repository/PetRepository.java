@@ -6,7 +6,7 @@ import ru.modgy.pet.model.Pet;
 import java.util.List;
 import java.util.Optional;
 
-public interface PetRepository extends JpaRepository<Pet, Long> {
+public interface PetRepository extends JpaRepository<Pet, Long>, SearchPetRepository {
 //    Pet findByOwnerAndName(long ownerId, String namePet);
 
     Integer deletePetById(Long id);

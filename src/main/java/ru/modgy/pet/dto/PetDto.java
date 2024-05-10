@@ -6,6 +6,8 @@ import ru.modgy.pet.model.Sex;
 import ru.modgy.pet.model.TypeOfPet;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 
 @Getter
 @Setter
@@ -15,7 +17,7 @@ import java.time.LocalDate;
 @ToString
 public class PetDto {
     private long id;
-//    private long ownerId;
+//todo    private long ownerId;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private TypeOfPet type; // вид животного
     private String name;
@@ -77,4 +79,22 @@ public class PetDto {
     private Boolean isMedicine;
     private String medicineRegimen;
     private String additionalData;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
+    private LocalDateTime registrationDate;
+
+    public static final Comparator<PetDto> PET_COMPARATOR =
+            Comparator.comparing((PetDto::getName))
+                    .thenComparing((PetDto::getType))
+                    .thenComparing((PetDto::getBreed))
+                    .thenComparing((PetDto::getRegistrationDate));
+
+
+    public static Comparator<PetDto> getComparator() {
+        return PET_COMPARATOR;
+    }
+
+    public int compareTo(PetDto other) {
+        return this.name.compareTo(other.name);
+    }
+
 }
