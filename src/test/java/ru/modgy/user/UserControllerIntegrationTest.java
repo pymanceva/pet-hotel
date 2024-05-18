@@ -15,6 +15,7 @@ import ru.modgy.user.dto.UpdateUserDto;
 import ru.modgy.user.dto.UserDto;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.service.UserService;
+import ru.modgy.utility.UtilityService;
 
 import java.util.List;
 
@@ -38,6 +39,8 @@ class UserControllerIntegrationTest {
 
     @MockBean
     private UserService userService;
+    @MockBean
+    private UtilityService utilityService;
 
     long userId = 2L;
     long requesterId = 1L;

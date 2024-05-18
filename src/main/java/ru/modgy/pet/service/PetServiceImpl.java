@@ -2,38 +2,42 @@ package ru.modgy.pet.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.support.PagedListHolder;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.modgy.exception.AccessDeniedException;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.pet.dto.NewPetDto;
 import ru.modgy.pet.dto.PetDto;
+import ru.modgy.pet.dto.PetFilterParams;
 import ru.modgy.pet.dto.UpdatePetDto;
 import ru.modgy.pet.mapper.PetMapper;
 import ru.modgy.pet.model.Pet;
 import ru.modgy.pet.repository.PetRepository;
-import ru.modgy.user.model.User;
-import ru.modgy.user.repository.UserRepository;
+import ru.modgy.utility.EntityService;
 
+import java.util.List;
 import java.util.Objects;
+
+import static java.util.stream.Collectors.toList;
+import static ru.modgy.pet.dto.PetDto.getComparator;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PetServiceImpl implements PetService {
     private final PetRepository petRepository;
-    private final UserRepository userRepository;
     private final PetMapper petMapper;
+    private final EntityService entityService;
 
     @Override
     @Transactional
     public PetDto addPet(Long requesterId, NewPetDto newPetDto) {
-        User requester = findUserById(requesterId);
-        //метод проверки наличия хозяина питомца, будет дописан после добавления сущности оунеров
+        entityService.getUserIfExists(requesterId);
+        //todo метод проверки наличия хозяина питомца, будет дописан после добавления сущности оунеров
         //findOwnerById(newPetDto.getOwnerId());
-        checkAccess(requester);
-        //метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
-//        checkPet(newPetDto);
+        //todo метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
+        //checkPet(newPetDto);
         Pet newPet = petMapper.toPet(newPetDto);
         Pet savedPet = petRepository.save(newPet);
         log.info("PetService: addPet, requesterId={}, petId={}", requesterId, savedPet.getId());
@@ -43,8 +47,8 @@ public class PetServiceImpl implements PetService {
     @Override
     @Transactional(readOnly = true)
     public PetDto getPetById(Long requesterId, Long petId) {
-        findUserById(requesterId);
-        Pet pet = getPetIfExists(petId);
+        entityService.getUserIfExists(requesterId);
+        Pet pet = entityService.getPetIfExists(petId);
         log.info("PetService: getPetById, requesterId={}, petId={}", requesterId, petId);
         return petMapper.toPetDto(pet);
     }
@@ -52,13 +56,11 @@ public class PetServiceImpl implements PetService {
     @Override
     @Transactional
     public PetDto updatePet(Long requesterId, Long petId, UpdatePetDto updatePetDto) {
-        User requester = findUserById(requesterId);
-        checkAccess(requester);
-        Pet oldPet = getPetIfExists(petId);
+        Pet oldPet = entityService.getPetIfExists(petId);
         Pet newPet = petMapper.toPet(updatePetDto);
         newPet.setId(oldPet.getId());
-        //метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
-//        checkPet(pet, updatePetDto);
+        //todo метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
+        //checkPet(pet, updatePetDto);
         if (Objects.isNull(updatePetDto.getType())) {
             newPet.setType(oldPet.getType());
         }
@@ -227,6 +229,7 @@ public class PetServiceImpl implements PetService {
         if (Objects.isNull(updatePetDto.getAdditionalData()) || updatePetDto.getAdditionalData().isBlank()) {
             newPet.setAdditionalData(oldPet.getAdditionalData());
         }
+        newPet.setRegistrationDate(oldPet.getRegistrationDate());
         Pet savedPet = petRepository.save(newPet);
         log.info("PetService: updatePet, requesterId={}, petId={}, updatePetDto={}", requesterId, petId, updatePetDto);
         return petMapper.toPetDto(savedPet);
@@ -236,9 +239,6 @@ public class PetServiceImpl implements PetService {
     @Override
     @Transactional
     public void deletePetById(Long requesterId, Long petId) {
-        User requester = findUserById(requesterId);
-        checkAccess(requester);
-
         int result = petRepository.deletePetById(petId);
 
         if (result == 0) {
@@ -247,27 +247,51 @@ public class PetServiceImpl implements PetService {
         log.info("PetService: deletePetById, requesterId={}, petId={}", requesterId, petId);
     }
 
-    private User findUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("User with id = %d not found", userId)));
-    }
     //метод проверки наличия хозяина питомца, будет дописан после добавления сущности оунеров
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PetDto> getPetsBySearch(Long requesterId, String text, Integer page, Integer size) {
+        entityService.getUserIfExists(requesterId);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        if (text == null) {
+            Pageable pageableIfTextNull =
+                    PageRequest.of(0, size, Sort.by(Sort.Order.desc("registrationDate")));
+            Page<Pet> pets = petRepository.findAll(pageableIfTextNull);
+            List<PetDto> petsDto = pets.stream()
+                    .map(petMapper::toPetDto)
+                    .sorted(getComparator())
+                    .toList();
+
+            log.info("PetService: getPetsBySearch, requesterId={}, page={}, size={}", requesterId, page, size);
+            return new PageImpl<>(petsDto, pageableIfTextNull, petsDto.size());
+        } else {
+            PetFilterParams params = PetFilterParams.builder()
+                    .name(text)
+                    .build();
+
+            List<Pet> pets = petRepository.findAllPetsByParams(params);
+            List<PetDto> petsDto = petMapper.toListPetDto(pets)
+                    .stream()
+                    .sorted(getComparator())
+                    .collect(toList());
+
+            PagedListHolder<PetDto> pagedListHolder = new PagedListHolder<>(petsDto);
+            pagedListHolder.setPageSize(size);
+            pagedListHolder.setPage(page);
+
+            log.info("PetService: getPetsBySearch, requesterId={}, text={}, page={}, size={}", requesterId, text, page, size);
+            return new PageImpl<>(pagedListHolder.getPageList(), pageable, pets.size());
+        }
+
+    }
+    //todo метод проверки наличия хозяина питомца, будет дописан после добавления сущности оунеров
 //    private User findOwnerById(long userId) {
 //        return ownerRepository.findById(userId).orElseThrow(() ->
 //                new NotFoundException(String.format("Owner with id = %d not found", userId)));
 //    }
 
-    private void checkAccess(User requester) {
-        if (requester.getRole().ordinal() >= 2) {
-            throw new AccessDeniedException(String.format("User with role = %s, can't access for this action",
-                    requester.getRole()));
-        }
-    }
-
-    private Pet getPetIfExists(Long petId) {
-        return petRepository.findById(petId).orElseThrow(() ->
-                new NotFoundException(String.format("Pet with id = %d not found", petId)));
-    }
     //метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
 //    private void checkPet(NewPetDto newPetDto) {
 //        try {
@@ -281,7 +305,7 @@ public class PetServiceImpl implements PetService {
 //        }
 //
 //    }
-    //метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
+    //todo метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
 //    private void checkPet(Pet oldPet, UpdatePetDto updatePetDto) {
 //        try {
 //            Pet pet = petRepository.findByOwnerAndName(oldPet.getOwner(), updatePetDto.getName());

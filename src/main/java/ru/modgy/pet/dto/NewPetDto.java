@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NewPetDto {
-//    @NotNull(message = "Field: owner. Error: must not be blank.")
+//todo    @NotNull(message = "Field: owner. Error: must not be blank.")
 //    private long ownerId;
     @NotNull(message = "Field: typeOfPet. Error: must not be blank.")
     private TypeOfPet type; // вид животного

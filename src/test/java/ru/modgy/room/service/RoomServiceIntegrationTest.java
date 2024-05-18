@@ -182,7 +182,7 @@ public class RoomServiceIntegrationTest {
 
         service.permanentlyDeleteRoomById(requesterAdmin.getId(), room.getId());
 
-        String error = String.format("room with id=%d is not found", room.getId());
+        String error = String.format("Room with id=%d is not found", room.getId());
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
                 () -> service.getRoomById(requesterAdmin.getId(), room.getId())

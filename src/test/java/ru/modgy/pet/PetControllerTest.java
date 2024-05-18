@@ -19,8 +19,10 @@ import ru.modgy.pet.model.TypeOfPet;
 import ru.modgy.pet.service.PetService;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
+import ru.modgy.utility.UtilityService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -47,12 +49,17 @@ public class PetControllerTest {
     @MockBean
     private PetService petService;
 
-    private final String requesterHeader = "X-PetHotel-User-Id";
+    @MockBean
+    private UtilityService utilityService;
+
+    private final String requesterHeader = UtilityService.REQUESTER_ID_HEADER;
     private static final LocalDate BIRTH_DATE = LocalDate.now().minusYears(1);
     private static final LocalDate VET_VISIT_DATE = LocalDate.now().minusMonths(1);
     private static final LocalDate HEAT_DATE = LocalDate.now().plusMonths(1);
+    private static final LocalDateTime REGISTRATION_DATE = LocalDateTime.now();
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+    DateTimeFormatter formatterForRegistrationDate = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
     final User requesterBoss = User.builder()
             .email("boss@mail.ru")
@@ -132,6 +139,7 @@ public class PetControllerTest {
             .isMedicine(true)
             .medicineRegimen("Здоровая собака")
             .additionalData("Любит, чтоб чесали животик")
+            .registrationDate(REGISTRATION_DATE)
             .build();
 
     final UpdatePetDto updatePet = UpdatePetDto.builder()
@@ -249,6 +257,7 @@ public class PetControllerTest {
             .isMedicine(true)
             .medicineRegimen("Здоровая кошка")
             .additionalData("Любит, чтоб чесали за ушком")
+            .registrationDate(REGISTRATION_DATE)
             .build();
 
 
@@ -320,7 +329,8 @@ public class PetControllerTest {
                 .andExpect(jsonPath("$.treat", is(petDto.getTreat())))
                 .andExpect(jsonPath("$.isMedicine", is(petDto.getIsMedicine())))
                 .andExpect(jsonPath("$.medicineRegimen", is(petDto.getMedicineRegimen())))
-                .andExpect(jsonPath("$.additionalData", is(petDto.getAdditionalData())));
+                .andExpect(jsonPath("$.additionalData", is(petDto.getAdditionalData())))
+                .andExpect(jsonPath("$.registrationDate", is(petDto.getRegistrationDate().format(formatterForRegistrationDate))));
 
 
         mockMvc.perform(post("/pets")
@@ -386,7 +396,8 @@ public class PetControllerTest {
                 .andExpect(jsonPath("$.treat", is(petDto.getTreat())))
                 .andExpect(jsonPath("$.isMedicine", is(petDto.getIsMedicine())))
                 .andExpect(jsonPath("$.medicineRegimen", is(petDto.getMedicineRegimen())))
-                .andExpect(jsonPath("$.additionalData", is(petDto.getAdditionalData())));
+                .andExpect(jsonPath("$.additionalData", is(petDto.getAdditionalData())))
+                .andExpect(jsonPath("$.registrationDate", is(petDto.getRegistrationDate().format(formatterForRegistrationDate))));
 
 
         String errorAccessDenied = String.format("User with role = %s, can't access for this action",
@@ -483,7 +494,8 @@ public class PetControllerTest {
                 .andExpect(jsonPath("$.treat", is(petDto.getTreat())))
                 .andExpect(jsonPath("$.isMedicine", is(petDto.getIsMedicine())))
                 .andExpect(jsonPath("$.medicineRegimen", is(petDto.getMedicineRegimen())))
-                .andExpect(jsonPath("$.additionalData", is(petDto.getAdditionalData())));
+                .andExpect(jsonPath("$.additionalData", is(petDto.getAdditionalData())))
+                .andExpect(jsonPath("$.registrationDate", is(petDto.getRegistrationDate().format(formatterForRegistrationDate))));
 
         mockMvc.perform(get("/pets/{id}", petDto.getId())
                         .header(requesterHeader, requesterBoss.getId())
@@ -546,7 +558,8 @@ public class PetControllerTest {
                 .andExpect(jsonPath("$.treat", is(petDto.getTreat())))
                 .andExpect(jsonPath("$.isMedicine", is(petDto.getIsMedicine())))
                 .andExpect(jsonPath("$.medicineRegimen", is(petDto.getMedicineRegimen())))
-                .andExpect(jsonPath("$.additionalData", is(petDto.getAdditionalData())));
+                .andExpect(jsonPath("$.additionalData", is(petDto.getAdditionalData())))
+                .andExpect(jsonPath("$.registrationDate", is(petDto.getRegistrationDate().format(formatterForRegistrationDate))));
 
         when(petService.getPetById(anyLong(), anyLong())).thenReturn(petDto);
 
@@ -611,7 +624,8 @@ public class PetControllerTest {
                 .andExpect(jsonPath("$.treat", is(petDto.getTreat())))
                 .andExpect(jsonPath("$.isMedicine", is(petDto.getIsMedicine())))
                 .andExpect(jsonPath("$.medicineRegimen", is(petDto.getMedicineRegimen())))
-                .andExpect(jsonPath("$.additionalData", is(petDto.getAdditionalData())));
+                .andExpect(jsonPath("$.additionalData", is(petDto.getAdditionalData())))
+                .andExpect(jsonPath("$.registrationDate", is(petDto.getRegistrationDate().format(formatterForRegistrationDate))));
 
         mockMvc.perform(get("/pets/{id}", petDto.getId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -699,7 +713,8 @@ public class PetControllerTest {
                 .andExpect(jsonPath("$.treat", is(updatePet.getTreat())))
                 .andExpect(jsonPath("$.isMedicine", is(updatePet.getIsMedicine())))
                 .andExpect(jsonPath("$.medicineRegimen", is(updatePet.getMedicineRegimen())))
-                .andExpect(jsonPath("$.additionalData", is(updatePet.getAdditionalData())));
+                .andExpect(jsonPath("$.additionalData", is(updatePet.getAdditionalData())))
+                .andExpect(jsonPath("$.registrationDate", is(petDto.getRegistrationDate().format(formatterForRegistrationDate))));
 
         mockMvc.perform(patch("/pets/{id}", petDto.getId())
                         .header(requesterHeader, requesterBoss.getId())
@@ -764,7 +779,8 @@ public class PetControllerTest {
                 .andExpect(jsonPath("$.treat", is(updatePet.getTreat())))
                 .andExpect(jsonPath("$.isMedicine", is(updatePet.getIsMedicine())))
                 .andExpect(jsonPath("$.medicineRegimen", is(updatePet.getMedicineRegimen())))
-                .andExpect(jsonPath("$.additionalData", is(updatePet.getAdditionalData())));
+                .andExpect(jsonPath("$.additionalData", is(updatePet.getAdditionalData())))
+                .andExpect(jsonPath("$.registrationDate", is(petDto.getRegistrationDate().format(formatterForRegistrationDate))));
 
 
         String errorAccessDenied = String.format("User with role = %s, can't access for this action",
@@ -844,6 +860,4 @@ public class PetControllerTest {
 
         verify(petService, times(4)).deletePetById(anyLong(), anyLong());
     }
-
-
 }

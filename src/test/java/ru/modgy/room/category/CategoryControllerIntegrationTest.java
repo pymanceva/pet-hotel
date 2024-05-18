@@ -13,6 +13,7 @@ import ru.modgy.room.category.dto.CategoryDto;
 import ru.modgy.room.category.dto.NewCategoryDto;
 import ru.modgy.room.category.dto.UpdateCategoryDto;
 import ru.modgy.room.category.service.CategoryService;
+import ru.modgy.utility.UtilityService;
 
 import java.util.List;
 
@@ -40,6 +41,8 @@ public class CategoryControllerIntegrationTest {
     private MockMvc mockMvc;
     @MockBean
     private CategoryService categoryService;
+    @MockBean
+    private UtilityService utilityService;
 
     @Test
     @SneakyThrows
