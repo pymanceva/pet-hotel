@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
 
@@ -76,7 +75,7 @@ public class ErrorHandler {
         log.error("EH: MethodArgumentTypeMismatchException: {}", ex.getMessage(), ex);
         return new Error(
                 new ArrayList<>(),
-                String.format(ex.getMessage() + ". Param:" + ex.getName() + " Value=" + ex.getValue()),
+                String.format("%s. Param: %s Value=%s", ex.getMessage(), ex.getName(), ex.getValue()),
                 "Incorrectly made request",
                 HttpStatus.BAD_REQUEST,
                 now());
@@ -173,7 +172,7 @@ public class ErrorHandler {
         return new Error(
                 Arrays.stream(ex.getStackTrace())
                         .map(StackTraceElement::toString)
-                        .collect(Collectors.toList()),
+                        .toList(),
                 ex.getMessage(),
                 "Internal Server Error.",
                 HttpStatus.I_AM_A_TEAPOT,
