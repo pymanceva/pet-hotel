@@ -467,7 +467,7 @@ public class RoomServiceImplTest {
     void getAllRooms_whenGetAllRoomsByBossAndTrue_thenReturnAllRooms() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(boss));
         when(roomRepository.getAllRooms(anyBoolean())).thenReturn(Optional.of(List.of(room)));
-        when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
+        when(roomMapper.toListRoomDto(any())).thenReturn(List.of(roomDto));
 
         Collection<RoomDto> resultCollection = roomService.getAllRooms(boss.getId(), room.getIsVisible());
         List<RoomDto> result = resultCollection.stream().toList();
@@ -488,7 +488,7 @@ public class RoomServiceImplTest {
     void getAllRooms_whenGetAllRoomsByAdmin_thenReturnAllRooms() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(admin));
         when(roomRepository.getAllRooms(anyBoolean())).thenReturn(Optional.of(List.of(room)));
-        when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
+        when(roomMapper.toListRoomDto(any())).thenReturn(List.of(roomDto));
 
         Collection<RoomDto> resultCollection = roomService.getAllRooms(admin.getId(), room.getIsVisible());
         List<RoomDto> result = resultCollection.stream().toList();
@@ -509,7 +509,7 @@ public class RoomServiceImplTest {
     void getAllRooms_whenGetAllRoomsByFinancial_thenReturnAllRooms() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(financial));
         when(roomRepository.getAllRooms(anyBoolean())).thenReturn(Optional.of(List.of(room)));
-        when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
+        when(roomMapper.toListRoomDto(any())).thenReturn(List.of(roomDto));
 
         Collection<RoomDto> resultCollection = roomService.getAllRooms(financial.getId(), room.getIsVisible());
         List<RoomDto> result = resultCollection.stream().toList();
