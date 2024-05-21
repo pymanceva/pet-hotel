@@ -7,6 +7,8 @@ import ru.modgy.booking.model.Booking;
 import ru.modgy.booking.repository.BookingRepository;
 import ru.modgy.exception.ConflictException;
 import ru.modgy.exception.NotFoundException;
+import ru.modgy.owner.model.Owner;
+import ru.modgy.owner.repository.OwnerRepository;
 import ru.modgy.pet.model.Pet;
 import ru.modgy.pet.repository.PetRepository;
 import ru.modgy.room.category.model.Category;
@@ -27,10 +29,16 @@ public class EntityService {
     private final RoomRepository roomRepository;
     private final PetRepository petRepository;
     private final BookingRepository bookingRepository;
+    private final OwnerRepository ownerRepository;
 
     public User getUserIfExists(Long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("User with id=%d is not found", userId)));
+    }
+
+    public Owner getOwnerIfExists(Long ownerId) {
+        return ownerRepository.findById(ownerId).orElseThrow(() ->
+                new NotFoundException(String.format("Owner with id=%d is not found", ownerId)));
     }
 
     public Category getCategoryIfExists(Long id) {

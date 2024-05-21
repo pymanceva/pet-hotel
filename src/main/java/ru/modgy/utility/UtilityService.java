@@ -39,23 +39,10 @@ public class UtilityService {
     }
 
     public void checkHigherOrdinalRoleAccess(User requester, Roles role) {
-        if (requester.getRole().ordinal() < 2 &&
-                (role == null ||
-                        (requester.getRole().ordinal() < role.ordinal()))
-        ) {
-            return;
+        if (requester.getRole().ordinal() > role.ordinal()) {
+            throw new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                    requester.getRole()));
         }
-        throw new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                requester.getRole()));
-    }
-
-    public void checkHigherOrdinalRoleAccess(User requester, User user) {
-        checkHigherOrdinalRoleAccess(requester, user.getRole());
-    }
-
-    public void checkHigherOrdinalRoleAccess(Long requesterId, User user) {
-        User requester = entityService.getUserIfExists(requesterId);
-        checkHigherOrdinalRoleAccess(requester, user.getRole());
     }
 
     public void checkHigherOrdinalRoleAccess(Long requesterId, Roles role) {
@@ -63,39 +50,64 @@ public class UtilityService {
         checkHigherOrdinalRoleAccess(requester, role);
     }
 
-    public void checkHigherOrdinalRoleAccess(Long requesterId, Long userId) {
-        User requester = entityService.getUserIfExists(requesterId);
-        User user = entityService.getUserIfExists(userId);
-        checkHigherOrdinalRoleAccess(requester, user);
-    }
-
-    public void checkHigherOrEqualOrdinalRoleAccess(User requester, Roles role) {
+    public void checkHigherOrdinalRoleAccessForUsers(User requester, Roles role) {
         if (requester.getRole().ordinal() < 2 &&
-                requester.getRole().ordinal() <= role.ordinal()) {
+            (role == null ||
+             (requester.getRole().ordinal() < role.ordinal()))
+        ) {
             return;
         }
         throw new AccessDeniedException(String.format("User with role=%s, can't access for this action",
                 requester.getRole()));
     }
 
-    public void checkHigherOrEqualOrdinalRoleAccess(User requester, User user) {
-        checkHigherOrEqualOrdinalRoleAccess(requester, user.getRole());
+    public void checkHigherOrdinalRoleAccessForUsers(User requester, User user) {
+        checkHigherOrdinalRoleAccessForUsers(requester, user.getRole());
     }
 
-    public void checkHigherOrEqualOrdinalRoleAccess(Long requesterId, User user) {
+    public void checkHigherOrdinalRoleAccessForUsers(Long requesterId, User user) {
         User requester = entityService.getUserIfExists(requesterId);
-        checkHigherOrEqualOrdinalRoleAccess(requester, user.getRole());
+        checkHigherOrdinalRoleAccessForUsers(requester, user.getRole());
     }
 
-    public void checkHigherOrEqualOrdinalRoleAccess(Long requesterId, Roles role) {
+    public void checkHigherOrdinalRoleAccessForUsers(Long requesterId, Roles role) {
         User requester = entityService.getUserIfExists(requesterId);
-        checkHigherOrEqualOrdinalRoleAccess(requester, role);
+        checkHigherOrdinalRoleAccessForUsers(requester, role);
     }
 
-    public void checkHigherOrEqualOrdinalRoleAccess(Long requesterId, Long userId) {
+    public void checkHigherOrdinalRoleAccessForUsers(Long requesterId, Long userId) {
         User requester = entityService.getUserIfExists(requesterId);
         User user = entityService.getUserIfExists(userId);
-        checkHigherOrEqualOrdinalRoleAccess(requester, user);
+        checkHigherOrdinalRoleAccessForUsers(requester, user);
+    }
+
+    public void checkHigherOrEqualOrdinalRoleAccessForUsers(User requester, Roles role) {
+        if (requester.getRole().ordinal() < 2 &&
+            requester.getRole().ordinal() <= role.ordinal()) {
+            return;
+        }
+        throw new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                requester.getRole()));
+    }
+
+    public void checkHigherOrEqualOrdinalRoleAccessForUsers(User requester, User user) {
+        checkHigherOrEqualOrdinalRoleAccessForUsers(requester, user.getRole());
+    }
+
+    public void checkHigherOrEqualOrdinalRoleAccessForUsers(Long requesterId, User user) {
+        User requester = entityService.getUserIfExists(requesterId);
+        checkHigherOrEqualOrdinalRoleAccessForUsers(requester, user.getRole());
+    }
+
+    public void checkHigherOrEqualOrdinalRoleAccessForUsers(Long requesterId, Roles role) {
+        User requester = entityService.getUserIfExists(requesterId);
+        checkHigherOrEqualOrdinalRoleAccessForUsers(requester, role);
+    }
+
+    public void checkHigherOrEqualOrdinalRoleAccessForUsers(Long requesterId, Long userId) {
+        User requester = entityService.getUserIfExists(requesterId);
+        User user = entityService.getUserIfExists(userId);
+        checkHigherOrEqualOrdinalRoleAccessForUsers(requester, user);
     }
 
     public boolean checkRequesterRequestsHimself(Long requesterId, Long userId) {

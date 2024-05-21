@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.owner.dto;
+package ru.modgy.owner.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OwnerShortDto {
-    private String name;
-    private String contact;
+public class SearchOwnerDto {
+    private String wanted;
 }
