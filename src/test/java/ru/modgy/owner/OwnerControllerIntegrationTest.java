@@ -1,4 +1,4 @@
-package ru.dogudacha.PetHotel.owner;
+package ru.modgy.owner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -8,18 +8,20 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.dogudacha.PetHotel.exception.NotFoundException;
-import ru.dogudacha.PetHotel.owner.controller.OwnerController;
-import ru.dogudacha.PetHotel.owner.dto.NewOwnerDto;
-import ru.dogudacha.PetHotel.owner.dto.OwnerDto;
-import ru.dogudacha.PetHotel.owner.dto.OwnerShortDto;
-import ru.dogudacha.PetHotel.owner.dto.UpdateOwnerDto;
-import ru.dogudacha.PetHotel.owner.model.MethodsOfCommunication;
-import ru.dogudacha.PetHotel.owner.service.OwnerService;
-import ru.dogudacha.PetHotel.user.service.UserService;
+import ru.modgy.exception.NotFoundException;
+import ru.modgy.owner.controller.OwnerController;
+import ru.modgy.owner.dto.NewOwnerDto;
+import ru.modgy.owner.dto.OwnerDto;
+import ru.modgy.owner.dto.OwnerShortDto;
+import ru.modgy.owner.dto.UpdateOwnerDto;
+import ru.modgy.owner.service.OwnerService;
+import ru.modgy.utility.UtilityService;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import static java.time.LocalDateTime.now;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -38,34 +40,31 @@ class OwnerControllerIntegrationTest {
     private MockMvc mockMvc;
     @MockBean
     private OwnerService ownerService;
-
+    @MockBean
+    private UtilityService utilityService;
 
     long ownerId = 2L;
     long requesterId = 1L;
-    private final String requesterHeader = "X-PetHotel-User-Id";
-    final String ownerName = "new Owner";
-    final String email = "newOwner@mail.com";
+    private final String requesterHeader = UtilityService.REQUESTER_ID_HEADER;
+    final String ownerLastName = "new OwnerLast";
+    final String ownerFirstName = "new OwnerFirst";
+    final String ownerMiddleName = "new OwnerMiddle";
     final String mainPhone = "+79123456789";
     final String optionalPhone = "8(495)1234567";
-    final String instagram = "instagram";
-    final String youtube = "youtube";
-    final String facebook = "facebook";
-    final String tiktok = "tiktok";
-    final String twitter = "twitter";
-    final String telegram = "telegram";
-    final String whatsapp = "whatsapp";
-    final String viber = "viber";
-    final String vk = "vk";
-    MethodsOfCommunication preferCommunication = MethodsOfCommunication.MAIN_PHONE;
-    final String carRegistrationNumber = "А100МР777";
-    NewOwnerDto newOwnerDto = new NewOwnerDto(ownerName, email, mainPhone, optionalPhone, instagram,
-            youtube, facebook, tiktok, twitter, telegram, whatsapp, viber, vk, preferCommunication,
-            carRegistrationNumber);
-    OwnerDto ownerDto = new OwnerDto(ownerId, ownerName, email, mainPhone, optionalPhone, instagram,
-            youtube, facebook, tiktok, twitter, telegram, whatsapp, viber, vk, preferCommunication,
-            carRegistrationNumber);
+    final String otherContacts = "instagram";
+    final String actualAddress = "г. Воронеж, ул. Лизюкова, 16";
+    final String trustedMan = "Деверя золовки сват, 8(800)555-35-35";
+    final String source = "По радио передавали";
+    final String comment = "Норм парень";
+    final int rating = 1;
+    final LocalDateTime registrationDate = now().truncatedTo(ChronoUnit.MILLIS);;
+    NewOwnerDto newOwnerDto = new NewOwnerDto(ownerLastName, ownerFirstName, ownerMiddleName, mainPhone, optionalPhone,
+            otherContacts, actualAddress, trustedMan, source, comment, rating);
+    OwnerDto ownerDto = new OwnerDto(ownerId, ownerLastName, ownerFirstName, ownerMiddleName, mainPhone, optionalPhone,
+            otherContacts, actualAddress, trustedMan, source, comment, rating, registrationDate);
 
-    OwnerShortDto ownerShortDto = new OwnerShortDto(ownerName, null);
+    OwnerShortDto ownerShortDto = new OwnerShortDto(ownerId, ownerLastName, ownerFirstName, ownerMiddleName, mainPhone,
+            optionalPhone, registrationDate);
 
     @Test
     @SneakyThrows
@@ -79,23 +78,18 @@ class OwnerControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(newOwnerDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", is(ownerDto.getId()), Long.class))
-                .andExpect(jsonPath("$.name", is(ownerDto.getName())))
-                .andExpect(jsonPath("$.email", is(ownerDto.getEmail())))
+                .andExpect(jsonPath("$.lastName", is(ownerDto.getLastName())))
+                .andExpect(jsonPath("$.firstName", is(ownerDto.getFirstName())))
+                .andExpect(jsonPath("$.middleName", is(ownerDto.getMiddleName())))
                 .andExpect(jsonPath("$.mainPhone", is(ownerDto.getMainPhone())))
                 .andExpect(jsonPath("$.optionalPhone", is(ownerDto.getOptionalPhone())))
-                .andExpect(jsonPath("$.instagram", is(ownerDto.getInstagram())))
-                .andExpect(jsonPath("$.youtube", is(ownerDto.getYoutube())))
-                .andExpect(jsonPath("$.facebook", is(ownerDto.getFacebook())))
-                .andExpect(jsonPath("$.tiktok", is(ownerDto.getTiktok())))
-                .andExpect(jsonPath("$.twitter", is(ownerDto.getTwitter())))
-                .andExpect(jsonPath("$.telegram", is(ownerDto.getTelegram())))
-                .andExpect(jsonPath("$.whatsapp", is(ownerDto.getWhatsapp())))
-                .andExpect(jsonPath("$.viber", is(ownerDto.getViber())))
-                .andExpect(jsonPath("$.vk", is(ownerDto.getVk())))
-                .andExpect(jsonPath("$.preferCommunication",
-                        is(ownerDto.getPreferCommunication().toString())))
-                .andExpect(jsonPath("$.carRegistrationNumber", is(ownerDto.getCarRegistrationNumber())))
-        ;
+                .andExpect(jsonPath("$.otherContacts", is(ownerDto.getOtherContacts())))
+                .andExpect(jsonPath("$.actualAddress", is(ownerDto.getActualAddress())))
+                .andExpect(jsonPath("$.trustedMan", is(ownerDto.getTrustedMan())))
+                .andExpect(jsonPath("$.source", is(ownerDto.getSource())))
+                .andExpect(jsonPath("$.comment", is(ownerDto.getComment())))
+                .andExpect(jsonPath("$.rating", is(ownerDto.getRating())))
+                .andExpect(jsonPath("$.registrationDate").value(ownerDto.getRegistrationDate().toString()));
 
         verify(ownerService).addOwner(anyLong(), any(NewOwnerDto.class));
 
@@ -124,23 +118,19 @@ class OwnerControllerIntegrationTest {
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(ownerDto.getId()), Long.class))
-                .andExpect(jsonPath("$.name", is(ownerDto.getName())))
-                .andExpect(jsonPath("$.email", is(ownerDto.getEmail())))
+                                .andExpect(jsonPath("$.id", is(ownerDto.getId()), Long.class))
+                .andExpect(jsonPath("$.lastName", is(ownerDto.getLastName())))
+                .andExpect(jsonPath("$.firstName", is(ownerDto.getFirstName())))
+                .andExpect(jsonPath("$.middleName", is(ownerDto.getMiddleName())))
                 .andExpect(jsonPath("$.mainPhone", is(ownerDto.getMainPhone())))
                 .andExpect(jsonPath("$.optionalPhone", is(ownerDto.getOptionalPhone())))
-                .andExpect(jsonPath("$.instagram", is(ownerDto.getInstagram())))
-                .andExpect(jsonPath("$.youtube", is(ownerDto.getYoutube())))
-                .andExpect(jsonPath("$.facebook", is(ownerDto.getFacebook())))
-                .andExpect(jsonPath("$.tiktok", is(ownerDto.getTiktok())))
-                .andExpect(jsonPath("$.twitter", is(ownerDto.getTwitter())))
-                .andExpect(jsonPath("$.telegram", is(ownerDto.getTelegram())))
-                .andExpect(jsonPath("$.whatsapp", is(ownerDto.getWhatsapp())))
-                .andExpect(jsonPath("$.viber", is(ownerDto.getViber())))
-                .andExpect(jsonPath("$.vk", is(ownerDto.getVk())))
-                .andExpect(jsonPath("$.preferCommunication",
-                        is(ownerDto.getPreferCommunication().toString())))
-                .andExpect(jsonPath("$.carRegistrationNumber", is(ownerDto.getCarRegistrationNumber())));
+                .andExpect(jsonPath("$.otherContacts", is(ownerDto.getOtherContacts())))
+                .andExpect(jsonPath("$.actualAddress", is(ownerDto.getActualAddress())))
+                .andExpect(jsonPath("$.trustedMan", is(ownerDto.getTrustedMan())))
+                .andExpect(jsonPath("$.source", is(ownerDto.getSource())))
+                .andExpect(jsonPath("$.comment", is(ownerDto.getComment())))
+                .andExpect(jsonPath("$.rating", is(ownerDto.getRating())))
+                .andExpect(jsonPath("$.registrationDate").value(ownerDto.getRegistrationDate().toString()));
 
         verify(ownerService).getOwnerById(requesterId, ownerId);
 
@@ -155,15 +145,18 @@ class OwnerControllerIntegrationTest {
     @Test
     @SneakyThrows
     void getShortOwnerById() {
-        ownerShortDto.setContact(whatsapp);
         when(ownerService.getShortOwnerById(anyLong(), anyLong())).thenReturn(ownerShortDto);
 
         mockMvc.perform(get("/owners/{id}/short", ownerId)
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is(ownerDto.getName())))
-                .andExpect(jsonPath("$.contact", is(ownerDto.getWhatsapp())));
+                .andExpect(jsonPath("$.lastName", is(ownerDto.getLastName())))
+                .andExpect(jsonPath("$.firstName", is(ownerDto.getFirstName())))
+                .andExpect(jsonPath("$.middleName", is(ownerDto.getMiddleName())))
+                .andExpect(jsonPath("$.mainPhone", is(ownerDto.getMainPhone())))
+                .andExpect(jsonPath("$.optionalPhone", is(ownerDto.getOptionalPhone())))
+                .andExpect(jsonPath("$.registrationDate").value(ownerDto.getRegistrationDate().toString()));
 
         verify(ownerService).getShortOwnerById(requesterId, ownerId);
 
@@ -187,22 +180,18 @@ class OwnerControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(ownerDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(ownerDto.getId()), Long.class))
-                .andExpect(jsonPath("$.name", is(ownerDto.getName())))
-                .andExpect(jsonPath("$.email", is(ownerDto.getEmail())))
+                .andExpect(jsonPath("$.lastName", is(ownerDto.getLastName())))
+                .andExpect(jsonPath("$.firstName", is(ownerDto.getFirstName())))
+                .andExpect(jsonPath("$.middleName", is(ownerDto.getMiddleName())))
                 .andExpect(jsonPath("$.mainPhone", is(ownerDto.getMainPhone())))
                 .andExpect(jsonPath("$.optionalPhone", is(ownerDto.getOptionalPhone())))
-                .andExpect(jsonPath("$.instagram", is(ownerDto.getInstagram())))
-                .andExpect(jsonPath("$.youtube", is(ownerDto.getYoutube())))
-                .andExpect(jsonPath("$.facebook", is(ownerDto.getFacebook())))
-                .andExpect(jsonPath("$.tiktok", is(ownerDto.getTiktok())))
-                .andExpect(jsonPath("$.twitter", is(ownerDto.getTwitter())))
-                .andExpect(jsonPath("$.telegram", is(ownerDto.getTelegram())))
-                .andExpect(jsonPath("$.whatsapp", is(ownerDto.getWhatsapp())))
-                .andExpect(jsonPath("$.viber", is(ownerDto.getViber())))
-                .andExpect(jsonPath("$.vk", is(ownerDto.getVk())))
-                .andExpect(jsonPath("$.preferCommunication",
-                        is(ownerDto.getPreferCommunication().toString())))
-                .andExpect(jsonPath("$.carRegistrationNumber", is(ownerDto.getCarRegistrationNumber())));
+                .andExpect(jsonPath("$.otherContacts", is(ownerDto.getOtherContacts())))
+                .andExpect(jsonPath("$.actualAddress", is(ownerDto.getActualAddress())))
+                .andExpect(jsonPath("$.trustedMan", is(ownerDto.getTrustedMan())))
+                .andExpect(jsonPath("$.source", is(ownerDto.getSource())))
+                .andExpect(jsonPath("$.comment", is(ownerDto.getComment())))
+                .andExpect(jsonPath("$.rating", is(ownerDto.getRating())))
+                .andExpect(jsonPath("$.registrationDate").value(ownerDto.getRegistrationDate().toString()));
 
 
         when(ownerService.updateOwner(anyLong(), eq(ownerId), any(UpdateOwnerDto.class)))
@@ -226,22 +215,19 @@ class OwnerControllerIntegrationTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(ownerDto.getId()), Long.class))
-                .andExpect(jsonPath("$.[0].name", is(ownerDto.getName())))
-                .andExpect(jsonPath("$.[0].email", is(ownerDto.getEmail())))
+                .andExpect(jsonPath("$.[0].lastName", is(ownerDto.getLastName())))
+                .andExpect(jsonPath("$.[0].firstName", is(ownerDto.getFirstName())))
+                .andExpect(jsonPath("$.[0].middleName", is(ownerDto.getMiddleName())))
                 .andExpect(jsonPath("$.[0].mainPhone", is(ownerDto.getMainPhone())))
                 .andExpect(jsonPath("$.[0].optionalPhone", is(ownerDto.getOptionalPhone())))
-                .andExpect(jsonPath("$.[0].instagram", is(ownerDto.getInstagram())))
-                .andExpect(jsonPath("$.[0].youtube", is(ownerDto.getYoutube())))
-                .andExpect(jsonPath("$.[0].facebook", is(ownerDto.getFacebook())))
-                .andExpect(jsonPath("$.[0].tiktok", is(ownerDto.getTiktok())))
-                .andExpect(jsonPath("$.[0].twitter", is(ownerDto.getTwitter())))
-                .andExpect(jsonPath("$.[0].telegram", is(ownerDto.getTelegram())))
-                .andExpect(jsonPath("$.[0].whatsapp", is(ownerDto.getWhatsapp())))
-                .andExpect(jsonPath("$.[0].viber", is(ownerDto.getViber())))
-                .andExpect(jsonPath("$.[0].vk", is(ownerDto.getVk())))
-                .andExpect(jsonPath("$.[0].preferCommunication",
-                        is(ownerDto.getPreferCommunication().toString())))
-                .andExpect(jsonPath("$.[0].carRegistrationNumber", is(ownerDto.getCarRegistrationNumber())));
+                .andExpect(jsonPath("$.[0].otherContacts", is(ownerDto.getOtherContacts())))
+                .andExpect(jsonPath("$.[0].actualAddress", is(ownerDto.getActualAddress())))
+                .andExpect(jsonPath("$.[0].trustedMan", is(ownerDto.getTrustedMan())))
+                .andExpect(jsonPath("$.[0].source", is(ownerDto.getSource())))
+                .andExpect(jsonPath("$.[0].comment", is(ownerDto.getComment())))
+                .andExpect(jsonPath("$.[0].rating", is(ownerDto.getRating())))
+                .andExpect(jsonPath("$.[0].registrationDate")
+                        .value(ownerDto.getRegistrationDate().toString()));
     }
 
     @Test

@@ -29,7 +29,7 @@ public class UserController {
                            @RequestBody @Valid NewUserDto userDto
 
     ) {
-        utilityService.checkHigherOrdinalRoleAccess(requesterId, userDto.getRole());
+        utilityService.checkHigherOrdinalRoleAccessForUsers(requesterId, userDto.getRole());
         log.info("UserController: POST/addUser, requesterId={}, user={}", requesterId, userDto);
         return userService.addUser(requesterId, userDto);
     }
@@ -38,7 +38,7 @@ public class UserController {
     public Collection<UserDto> getAllUsers(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                            @RequestParam(value = "isActive", required = false) Boolean isActive
     ) {
-        utilityService.checkHigherOrEqualOrdinalRoleAccess(requesterId, Roles.ROLE_ADMIN);
+        utilityService.checkHigherOrEqualOrdinalRoleAccessForUsers(requesterId, Roles.ROLE_ADMIN);
         log.info("UserController: GET/getAllUsers, requesterId={}, isActive={}", requesterId, isActive);
         return userService.getAllUsers(requesterId, isActive);
     }
@@ -49,7 +49,7 @@ public class UserController {
                                @PathVariable(value = "id") long userId
     ) {
         if (!utilityService.checkRequesterRequestsHimself(requesterId, userId)) {
-            utilityService.checkHigherOrEqualOrdinalRoleAccess(requesterId, userId);
+            utilityService.checkHigherOrEqualOrdinalRoleAccessForUsers(requesterId, userId);
         }
         log.info("UserController: GET/getUserById, requesterId={}, userId={}", requesterId, userId);
         return userService.getUserById(requesterId, userId);
@@ -60,7 +60,7 @@ public class UserController {
     public void deleteUserById(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                @PathVariable("id") Long userId
     ) {
-        utilityService.checkHigherOrdinalRoleAccess(requesterId, userId);
+        utilityService.checkHigherOrdinalRoleAccessForUsers(requesterId, userId);
         log.info("UserController: DELETE/deleteUserById, requesterId={}, userId={}", requesterId, userId);
         userService.deleteUserById(requesterId, userId);
     }
@@ -71,7 +71,7 @@ public class UserController {
                               @RequestBody @Valid UpdateUserDto updateUserDto
     ) {
         if (!utilityService.checkRequesterRequestsHimself(requesterId, userId)) {
-            utilityService.checkHigherOrEqualOrdinalRoleAccess(requesterId, userId);
+            utilityService.checkHigherOrEqualOrdinalRoleAccessForUsers(requesterId, userId);
         }
         log.info("UserController: PATCH/updateUser, requesterId={}, userId={}, requestBody={}",
                 requesterId, userId, updateUserDto);
@@ -83,7 +83,7 @@ public class UserController {
                                 @PathVariable(value = "id") Long userId,
                                 @RequestParam(value = "isActive", defaultValue = "true") Boolean isActive
     ) {
-        utilityService.checkHigherOrdinalRoleAccess(requesterId, userId);
+        utilityService.checkHigherOrdinalRoleAccessForUsers(requesterId, userId);
         log.info("UserController: PATCH/setUserState, requesterId={}, userId={}, isActive={}",
                 requesterId, userId, isActive);
         return userService.setUserState(requesterId, userId, isActive);

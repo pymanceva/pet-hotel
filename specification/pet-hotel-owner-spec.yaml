@@ -1,14 +1,14 @@
 openapi: '3.0.1'
 info:
-  title: 'PetHotel: Owners Specification'
-  description: Pet hotel owners
+  title: 'Modgy: Owners Specification'
+  description: Modgy owners
   version: 'v3'
 
 servers:
-  - url: http://localhost:8080
-    description: Local server for develop
-  - url: http://212.109.192.9:8080
-    description: backend server для тестирования кода и работы фронтэнда
+    - url: http://212.109.192.9:8080
+      description: Local server for develop
+    - url: http://localhost:8080
+      description: backend server для тестирования кода и работы фронтэнда
 
 paths:
   /owners:
@@ -97,6 +97,7 @@ paths:
       operationId: getAllOwners
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
+
       responses:
         200:
           description: OK,
@@ -161,12 +162,7 @@ paths:
       operationId: getOwnerById
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/ownerId'
       responses:
         200:
           description: OK,
@@ -208,7 +204,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         500:
-          description: Объект не найден.
+          description: Внутренняя ошибка сервера.
           content:
             application/json:
               example:
@@ -218,21 +214,17 @@ paths:
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
+
     delete:
       tags:
-        - owner-controller
+          - owner-controller
       summary: Удаление пользователя по id
       description: >-
         Удаление пользователя по id не может осуществляться пользователями - данный эндпоинт является служебным.
       operationId: deleteOwnerById
       parameters:
-        - $ref: '#/components/parameters/requesterHeader'
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+          - $ref: '#/components/parameters/requesterHeader'
+          - $ref: '#/components/parameters/ownerId'
       responses:
         204:
           description: NO_CONTENT
@@ -283,19 +275,14 @@ paths:
                 $ref: '#/components/schemas/Error'
     patch:
       tags:
-        - owner-controller
+          - owner-controller
       summary: Изменить данные клиента
       operationId: updateOwner
       description: >-
         Изменение данных клиента может осуществляться только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
       parameters:
-        - $ref: '#/components/parameters/requesterHeader'
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+          - $ref: '#/components/parameters/requesterHeader'
+          - $ref: '#/components/parameters/ownerId'
       requestBody:
         required: true
         content:
@@ -364,6 +351,231 @@ paths:
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
+  /owners/short:
+    get:
+      tags:
+        - owner-controller
+      summary: Получение краткой информации о последних num зарегистрированных клиентах
+      description: >-
+        Получение информации может осуществляться только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
+      operationId: getSomeShortOwners
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - name: num
+          in: query
+          description: число запрашиваемых пользователей
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 10
+      responses:
+        200:
+          description: OK,
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OwnerShortDto"
+        403:
+          description: Недостаточно прав для совершения действия.
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /owners/short/{id}:
+    get:
+      tags:
+        - owner-controller
+      summary: Получение по id краткой информации о клиенте
+      description: >-
+        Получение информации может осуществляться только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
+      operationId: getShortOwnerById
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - $ref: '#/components/parameters/ownerId'
+      responses:
+        200:
+          description: OK,
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnerShortDto"
+        403:
+          description: Недостаточно прав для совершения действия.
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Объект не найден.
+          content:
+            application/json:
+              example:
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "Owner with id=42 is not found"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: []
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /owners/check:
+    post:
+      tags:
+        - owner-controller
+      summary: Проверка наличия в базе клиента с указанным номером телефона
+      description: >-
+        Проверка может осуществляться только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
+      operationId: checkOwnerPhoneNumber
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckOwnerDto'
+      responses:
+        200:
+          description: OK,
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnerDto"
+        400:
+          description: Запрос составлен неверно.
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: ""
+                timestamp: 2023-12-03 09:10:50
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: Недостаточно прав для совершения действия.
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: [ ]
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
+
+  /owners/search:
+    post:
+      tags:
+        - owner-controller
+      summary: Поиск клиента по ФИО или номеру телефонов
+      description: >-
+        Поиск может осуществляться только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
+      operationId: searchOwner
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - name: direction
+          in: query
+          description: направление поиска
+          required: false
+          schema:
+            type: string
+            enum: ["name", "phone"]
+            default: "name"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchOwnerDto'
+      responses:
+        200:
+          description: OK,
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnerDto"
+        400:
+          description: Запрос составлен неверно.
+          content:
+            application/json:
+              example:
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: ""
+                timestamp: 2023-12-03 09:10:50
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: Недостаточно прав для совершения действия.
+          content:
+            application/json:
+              example:
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              example:
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error.
+                message: [ ]
+                timestamp: 2023-12-03 09:10:55
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   parameters:
@@ -375,21 +587,29 @@ components:
       schema:
         type: integer
         format: int64
-
-
+    ownerId:
+      name: id
+      in: path
+      description: ID клиента в отношении которого совершается действие
+      required: true
+      schema:
+        type: integer
+        format: int64
   schemas:
     NewOwnerDto:
       title: NewOwnerDto
       type: object
-      required: [ name, mainPhone, rating ]
+      required:
+        - firstName
+        - mainPhone
       properties:
-        lastname:
+        lastName:
           description: Фамилия клиента
           type: string
           maxLength: 30
           minLength: 2
           example: Сумкин
-        name:
+        firstName:
           description: Имя клиента
           type: string
           maxLength: 15
@@ -428,6 +648,10 @@ components:
           type: string
           maxLength: 150
           example: Гендальф, +79217775533
+        comment:
+          description: Заметки о пользователе
+          type: string
+          example: Старый пират, друг Флинта. Жаден. Ради денег готов на всё. Характер мерзкий. Не женат.
         source:
           description: Откуда узнали о гостинице
           type: string
@@ -437,8 +661,33 @@ components:
           description: Рейтинг клиента
           type: integer
           format: int32
+          maximum: 10
+          minimum: 0
           default: 0
           example: 3
+
+    CheckOwnerDto:
+      title: CheckOwnerDto
+      type: object
+      required:
+        - phone
+      properties:
+        phone:
+          description: Номер телефона клиента для проверки
+          type: string
+          pattern: ^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$
+          uniqueItems: true
+          example: "+79123456789"
+
+    SearchOwnerDto:
+      title: SearchOwnerDto
+      type: object
+      required:
+      properties:
+        wanted:
+          description: Искомое значение
+          type: string
+          example: "9123456789"
 
     OwnerDto:
       title: OwnerDto
@@ -453,7 +702,7 @@ components:
           description: Фамилия клиента
           type: string
           example: Сумкин
-        name:
+        firstname:
           description: Имя клиента
           type: string
           example: Фёдор
@@ -481,6 +730,11 @@ components:
           description: Доверенное лицо клиента
           type: string
           example: Гендальф, +79217775533
+        comment:
+          description: Заметки о пользователе
+          type: string
+          example: Очень, очень хороший мальчик. Вежлив, правдив, скромен, добр. Слушает маму,
+            каждое утро делает зарядку. Характер очень мягкий.
         source:
           description: Откуда узнали о гостинице
           type: string
@@ -489,7 +743,7 @@ components:
           description: Рейтинг клиента
           type: integer
           format: int32
-          example: 3
+          example: 1
         registrationDate:
           description: Дата регистрации клиента
           type: string
@@ -500,15 +754,14 @@ components:
       title: UpdateOwnerDto
       description: DTO для обновления данных пользователя
       type: object
-      required: [ rating ]
       properties:
-        lastname:
+        lastName:
           description: Фамилия клиента
           type: string
           maxLength: 20
           minLength: 2
           example: Пинкман
-        name:
+        firstName:
           description: Имя клиента
           type: string
           maxLength: 15
@@ -547,6 +800,10 @@ components:
           type: string
           maxLength: 150
           example: Гендальф, +79217775533
+        comment:
+          description: Заметки о пользователе
+          type: string
+          example: Старый пират, друг Флинта. Жаден. Ради денег готов на всё. Характер мерзкий. Не женат.
         source:
           description: Откуда узнали о гостинице
           type: string
@@ -556,8 +813,41 @@ components:
           description: Рейтинг клиента
           type: integer
           format: int32
+          maximum: 10
+          minimum: 0
           default: 0
-          example: 3
+          example: 2
+
+    OwnerShortDto:
+      title: OwnerShortDto
+      type: object
+      properties:
+        lastName:
+          description: Фамилия клиента
+          type: string
+          example: Сумкин
+        firstName:
+          description: Имя клиента
+          type: string
+          example: Фёдор
+        middleName:
+          description: Отчество клиента
+          type: string
+          example: Святославович
+        mainPhone:
+          description: Основной номер телефона клиента
+          type: string
+          example: "+79123456789"
+        optionalPhone:
+          description: Дополнительный номер телефона клиента
+          type: string
+          example: "+71234567890"
+        registrationDate:
+          description: Дата регистрации клиента
+          type: string
+          format: date-time
+          example: 23.12.2023 12:00
+
 
     Error:
       title: Error
@@ -661,6 +951,9 @@ components:
             type: string
             description: Cтектрейс или описание ошибок
             example: "[]"
+
+
+
 
 
 
