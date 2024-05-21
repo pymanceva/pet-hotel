@@ -11,15 +11,13 @@ import ru.modgy.exception.ConflictException;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.room.category.dto.mapper.CategoryMapper;
 import ru.modgy.room.category.model.Category;
-import ru.modgy.room.category.repository.CategoryRepository;
 import ru.modgy.room.dto.NewRoomDto;
 import ru.modgy.room.dto.RoomDto;
 import ru.modgy.room.dto.UpdateRoomDto;
 import ru.modgy.room.dto.mapper.RoomMapper;
 import ru.modgy.room.model.Room;
 import ru.modgy.room.repository.RoomRepository;
-import ru.modgy.user.model.User;
-import ru.modgy.user.repository.UserRepository;
+import ru.modgy.utility.EntityService;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -28,19 +26,16 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService {
-    final private RoomRepository roomRepository;
-    final private RoomMapper roomMapper;
-    final private CategoryRepository categoryRepository;
-    final private UserRepository userRepository;
-    final private BookingRepository bookingRepository;
+    private final RoomRepository roomRepository;
+    private final RoomMapper roomMapper;
+    private final CategoryMapper categoryMapper;
+    private final EntityService entityService;
 
     @Transactional
     @Override
     public RoomDto addRoom(Long userId, NewRoomDto newRoomDto) {
-        checkAdminAccess(userId);
-
         Room newRoom = roomMapper.toRoom(newRoomDto);
-        Category category = findCategoryById(newRoomDto.getCategoryId());
+        Category category = entityService.getCategoryIfExists(newRoomDto.getCategoryId());
         newRoom.setCategory(category);
         Room addedRoom = roomRepository.save(newRoom);
         RoomDto addedRoomDto = roomMapper.toRoomDto(addedRoom);
@@ -51,9 +46,7 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(readOnly = true)
     @Override
     public RoomDto getRoomById(Long userId, Long roomId) {
-        checkViewAccess(userId);
-
-        Room room = findRoomById(roomId);
+        Room room = entityService.getRoomIfExists(roomId);
         RoomDto roomDto = roomMapper.toRoomDto(room);
         log.info("RoomService: getRoomById, userId={}, roomId={}", userId, roomId);
         return roomDto;
@@ -62,12 +55,11 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     @Override
     public RoomDto updateRoom(Long userId, Long roomId, UpdateRoomDto roomDto) {
-        checkAdminAccess(userId);
-        Room oldRoom = findRoomById(roomId);
+        Room oldRoom = entityService.getRoomIfExists(roomId);
         Room newRoom = roomMapper.toRoom(roomDto);
         Category category;
         if (roomDto.getCategoryId() != null) {
-            category = findCategoryById(roomDto.getCategoryId());
+            category = entityService.getCategoryIfExists(roomDto.getCategoryId());
         } else {
             category = oldRoom.getCategory();
         }
@@ -98,8 +90,6 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(readOnly = true)
     @Override
     public Collection<RoomDto> getAllRooms(Long userId, Boolean isVisible) {
-        checkViewAccess(userId);
-
         List<Room> allRooms = roomRepository.getAllRooms(isVisible).orElse(Collections.emptyList());
         List<RoomDto> allRoomsDto = new ArrayList<>();
         for (Room room : allRooms) {
@@ -114,8 +104,7 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     @Override
     public RoomDto hideRoomById(Long userId, Long roomId) {
-        checkAdminAccess(userId);
-        Room room = findRoomById(roomId);
+        Room room = entityService.getRoomIfExists(roomId);
 
         List<Booking> futureBookings = bookingRepository.findFutureBookingsForRoom(roomId, LocalDate.now())
                 .orElse(Collections.emptyList());
@@ -132,8 +121,7 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     @Override
     public RoomDto unhideRoomById(Long userId, Long roomId) {
-        checkAdminAccess(userId);
-        Room room = findRoomById(roomId);
+        Room room = entityService.getRoomIfExists(roomId);
 
         room.setIsVisible(true);
         roomRepository.save(room);
@@ -144,8 +132,6 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     @Override
     public void permanentlyDeleteRoomById(Long userId, Long roomId) {
-        checkAdminAccess(userId);
-
         int result = roomRepository.deleteRoomById(roomId);
 
         if (result == 0) {

@@ -13,18 +13,13 @@ import ru.modgy.booking.model.ReasonOfStopBooking;
 import ru.modgy.booking.model.StatusBooking;
 import ru.modgy.booking.model.TypesBooking;
 import ru.modgy.booking.repository.BookingRepository;
-import ru.modgy.exception.AccessDeniedException;
 import ru.modgy.exception.ConflictException;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.pet.model.Pet;
-import ru.modgy.pet.repository.PetRepository;
 import ru.modgy.room.model.Room;
-import ru.modgy.room.repository.RoomRepository;
-import ru.modgy.user.model.User;
-import ru.modgy.user.repository.UserRepository;
+import ru.modgy.utility.EntityService;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,14 +29,11 @@ import java.util.Objects;
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
-    private final RoomRepository roomRepository;
-    private final PetRepository petRepository;
-    private final UserRepository userRepository;
+    private final EntityService entityService;
 
     @Transactional
     @Override
     public BookingDto addBooking(Long userId, NewBookingDto newBookingDto) {
-        checkAdminAccess(userId);
         checkDates(newBookingDto.getCheckInDate(), newBookingDto.getCheckOutDate());
         checkReasonWhenTypeClosing(newBookingDto.getType(), newBookingDto.getReasonOfStop());
         checkRoomAvailabilityByDates(
@@ -51,8 +43,7 @@ public class BookingServiceImpl implements BookingService {
 
         Booking newBooking = bookingMapper.toBooking(newBookingDto);
 
-        Room room = findRoomById(newBookingDto.getRoomId());
-        checkRoom(room);
+        Room room = entityService.getRoomIfExists(newBookingDto.getRoomId());
         newBooking.setRoom(room);
 
         if (newBooking.getStatus() == null) {
@@ -63,13 +54,11 @@ public class BookingServiceImpl implements BookingService {
             }
         }
 
-        List<Pet> pets = petRepository.findAllByIdIn(newBookingDto.getPetIds())
-                .orElseThrow(() -> new ConflictException("At least one pet should be in list"));
+        List<Pet> pets = entityService.getListOfPetsByIds(newBookingDto.getPetIds());
         checkPetsInBooking(pets, newBookingDto.getPetIds());
         newBooking.setPets(pets);
 
         Booking addedBooking = bookingRepository.save(newBooking);
-
         log.info("BookingService: addBooking, userId={}, bookingDto={}", userId, addedBooking);
 
         return bookingMapper.toBookingDto(addedBooking);
@@ -78,9 +67,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     @Override
     public BookingDto getBookingById(Long userId, Long bookingId) {
-        checkAdminAccess(userId);
-
-        Booking booking = findBookingById(bookingId);
+        Booking booking = entityService.getBookingIfExists(bookingId);
         log.info("BookingService: getBookingById, userId={}, bookingId={}", userId, bookingId);
         return bookingMapper.toBookingDto(booking);
     }
@@ -88,9 +75,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public BookingDto updateBooking(Long userId, Long bookingId, UpdateBookingDto updateBookingDto) {
-        checkAdminAccess(userId);
-
-        Booking oldBooking = findBookingById(bookingId);
+        Booking oldBooking = entityService.getBookingIfExists(bookingId);
         Booking newBooking = bookingMapper.toBooking(updateBookingDto);
         newBooking.setId(oldBooking.getId());
         newBooking.setType(oldBooking.getType());
@@ -158,9 +143,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (updateBookingDto.getRoomId() != null) {
-            Room room = findRoomById(updateBookingDto.getRoomId());
-            checkRoom(room);
-            newBooking.setRoom(room);
+            newBooking.setRoom(entityService.getRoomIfExists(updateBookingDto.getRoomId()));
         } else {
             newBooking.setRoom(oldBooking.getRoom());
         }
@@ -168,8 +151,7 @@ public class BookingServiceImpl implements BookingService {
         if (Objects.isNull(updateBookingDto.getPetIds())) {
             newBooking.setPets(oldBooking.getPets());
         } else {
-            List<Pet> pets = petRepository.findAllByIdIn(updateBookingDto.getPetIds())
-                    .orElseThrow(() -> new ConflictException("At least one pet should be in list"));
+            List<Pet> pets = entityService.getListOfPetsByIds(updateBookingDto.getPetIds());
             checkPetsInBooking(pets, updateBookingDto.getPetIds());
             newBooking.setPets(pets);
         }
@@ -191,8 +173,6 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public void deleteBookingById(Long userId, Long bookingId) {
-        checkAdminAccess(userId);
-
         int result = bookingRepository.deleteBookingById(bookingId);
 
         if (result == 0) {

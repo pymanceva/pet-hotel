@@ -14,6 +14,7 @@ import ru.modgy.room.dto.NewRoomDto;
 import ru.modgy.room.dto.RoomDto;
 import ru.modgy.room.dto.UpdateRoomDto;
 import ru.modgy.room.service.RoomService;
+import ru.modgy.utility.UtilityService;
 
 import java.util.List;
 
@@ -61,6 +62,8 @@ public class RoomControllerIntegrationTest {
     private MockMvc mockMvc;
     @MockBean
     private RoomService roomService;
+    @MockBean
+    private UtilityService utilityService;
 
     @Test
     @SneakyThrows

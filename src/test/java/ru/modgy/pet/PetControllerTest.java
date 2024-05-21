@@ -23,6 +23,7 @@ import ru.modgy.pet.model.TypeOfPet;
 import ru.modgy.pet.service.PetService;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
+import ru.modgy.utility.UtilityService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -54,7 +55,10 @@ public class PetControllerTest {
     @MockBean
     private PetService petService;
 
-    private final String requesterHeader = "X-PetHotel-User-Id";
+    @MockBean
+    private UtilityService utilityService;
+
+    private final String requesterHeader = UtilityService.REQUESTER_ID_HEADER;
     private static final LocalDate BIRTH_DATE = LocalDate.now().minusYears(1);
     private static final LocalDate VET_VISIT_DATE = LocalDate.now().minusMonths(1);
     private static final LocalDate HEAT_DATE = LocalDate.now().plusMonths(1);

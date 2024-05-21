@@ -18,6 +18,7 @@ import ru.modgy.booking.service.BookingService;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.room.category.dto.CategoryDto;
 import ru.modgy.room.dto.RoomDto;
+import ru.modgy.utility.UtilityService;
 
 import java.time.LocalDate;
 
@@ -71,6 +72,8 @@ public class BookingControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private BookingService bookingService;
+    @MockBean
+    private UtilityService utilityService;
 
     @Test
     @SneakyThrows
