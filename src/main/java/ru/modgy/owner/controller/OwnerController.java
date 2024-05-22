@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.modgy.exception.BadRequestException;
 import ru.modgy.owner.dto.*;
 import ru.modgy.owner.service.OwnerService;
 import ru.modgy.user.model.Roles;
@@ -59,7 +60,7 @@ public class OwnerController {
     @GetMapping("/short")
     public Collection<OwnerShortDto> getSomeShortOwners(
             @RequestHeader(value = UtilityService.REQUESTER_ID_HEADER) Long requesterId,
-            @RequestParam (value = "num") @Positive int num
+            @RequestParam(value = "num", required = false, defaultValue = "10") @Positive int num
     ) {
         log.info("OwnerController: requesterId={} GET/getSomeShortOwners num={}", requesterId, num);
         utilityService.checkHigherOrdinalRoleAccess(requesterId, Roles.ROLE_ADMIN);
@@ -115,6 +116,9 @@ public class OwnerController {
             @RequestParam(value = "direction") String directionString
     ) {
         Direction direction = Direction.fromString(directionString);
+        if (direction == null) {
+            throw new BadRequestException("RequestParam direction error");
+        }
         log.info("OwnerController: requesterId={} GET/searchOwner searchOwnerDto={}, direction={}",
                 requesterId, searchOwnerDto, direction);
         utilityService.checkHigherOrdinalRoleAccess(requesterId, Roles.ROLE_ADMIN);

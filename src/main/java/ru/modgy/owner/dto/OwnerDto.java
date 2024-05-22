@@ -23,6 +23,6 @@ public class OwnerDto {
     private String trustedMan;
     private String comment;
     private String source;
-    private int rating;
+    private Integer rating;
     private LocalDateTime registrationDate;
 }
