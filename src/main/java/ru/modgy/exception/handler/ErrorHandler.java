@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.modgy.exception.AccessDeniedException;
-import ru.modgy.exception.ConflictException;
-import ru.modgy.exception.InvalidDateRangeException;
-import ru.modgy.exception.NotFoundException;
+import ru.modgy.exception.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -57,10 +54,22 @@ public class ErrorHandler {
         );
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Error errorMethodArgumentNotValidException(final MethodArgumentNotValidException ex) {
         log.error("EH: MethodArgumentNotValidException: {}", ex.getMessage(), ex);
+        return new Error(
+                new ArrayList<>(),
+                ex.getMessage(),
+                "Incorrectly made request",
+                HttpStatus.BAD_REQUEST,
+                now());
+    }
+
+    @ExceptionHandler(jakarta.validation.ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Error errorConstraintViolationExceptionJakarta(final jakarta.validation.ConstraintViolationException ex) {
+        log.error("EH: errorConstraintViolationExceptionJakarta: {}", ex.getMessage(), ex);
         return new Error(
                 new ArrayList<>(),
                 ex.getMessage(),
@@ -105,7 +114,7 @@ public class ErrorHandler {
                 now());
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
+    @ExceptionHandler({ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public Error errorConstraintViolationException(final ConstraintViolationException ex) {
         log.error("EH: ConstraintViolationException: {}", ex.getMessage(), ex);
@@ -162,6 +171,18 @@ public class ErrorHandler {
                 ex.getMessage(),
                 "For the requested operation the conditions are not met.",
                 HttpStatus.CONFLICT,
+                now());
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Error handleBadRequestException(final BadRequestException ex) {
+        log.error("EH: BadRequestException: {}", ex.getMessage());
+        return new Error(
+                new ArrayList<>(),
+                ex.getMessage(),
+                "For the requested operation the conditions are not met.",
+                HttpStatus.BAD_REQUEST,
                 now());
     }
 

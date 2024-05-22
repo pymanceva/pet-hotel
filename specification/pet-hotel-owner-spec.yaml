@@ -587,6 +587,7 @@ components:
       schema:
         type: integer
         format: int64
+        example: 1
     ownerId:
       name: id
       in: path

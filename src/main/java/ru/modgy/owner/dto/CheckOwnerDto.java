@@ -1,5 +1,6 @@
 package ru.modgy.owner.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CheckOwnerDto {
+    @NotBlank(message = "Номер телефона не помешал бы")
     @Pattern(regexp = "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$",
             message = """
                     Field: mainPhoneNumber. Error: wrong phone format. Right examples:
