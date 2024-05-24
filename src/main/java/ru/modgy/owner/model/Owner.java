@@ -39,7 +39,7 @@ public class Owner {
     @Column(name = "comment_owners")
     private String comment;
     @Column(name = "rating_owners")
-    private int rating;
+    private Integer rating;
     @Column(name = "registration_date_owners")
     private LocalDateTime registrationDate;
 }

@@ -69,6 +69,5 @@ public class UpdateOwnerDto {
     private String source;
     @Max(value = 10, message = "Значение 'рейтинг' должно быть не больше {value}")
     @PositiveOrZero(message = "В нашей компании не применяется отрицательный рейтинг")
-    @Builder.Default
-    private int rating = 0;
+    private Integer rating;
 }

@@ -13,6 +13,6 @@ public interface PhoneFormatMapper {
         }
         String clearNumber = phoneNumber.replaceAll("\\D", "");
         int length = clearNumber.length();
-        return "+7" + clearNumber.substring(length - 11, length);
+        return "+7" + clearNumber.substring(length - 10, length);
     }
 }

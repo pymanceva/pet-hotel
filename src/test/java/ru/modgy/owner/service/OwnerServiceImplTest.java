@@ -1,795 +1,423 @@
 package ru.modgy.owner.service;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.data.domain.*;
+import ru.modgy.owner.controller.Direction;
+import ru.modgy.owner.dto.*;
 import ru.modgy.owner.dto.mapper.OwnerMapper;
+import ru.modgy.owner.model.Owner;
 import ru.modgy.owner.repository.OwnerRepository;
-import ru.modgy.user.model.Roles;
-import ru.modgy.user.model.User;
-import ru.modgy.user.repository.UserRepository;
+import ru.modgy.utility.EntityService;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static java.time.LocalDateTime.now;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class OwnerServiceImplTest {
-
     @InjectMocks
     private OwnerServiceImpl ownerService;
-
-    @Mock
-    private UserRepository userRepository;
     @Mock
     private OwnerRepository ownerRepository;
     @Mock
     private OwnerMapper ownerMapper;
+    @Mock
+    private EntityService entityService;
 
     final long requesterId = 1L;
-    final User requesterBoss = User.builder()
-            .email("boss@mail.ru")
-            .firstName("boss")
-            .id(1L)
-            .role(Roles.ROLE_BOSS)
-            .build();
     long ownerId = 2L;
-    final String ownerName = "new Owner";
-    final String email = "newOwner@mail.com";
+    final String ownerLastName = "new OwnerLast";
+    final String ownerFirstName = "new OwnerFirst";
+    final String ownerMiddleName = "new OwnerMiddle";
     final String mainPhone = "+79123456789";
-    final String optionalPhone = "8(495)1234567";
-    final String instagram = "instagram";
-    final String youtube = "youtube";
-    final String facebook = "facebook";
-    final String tiktok = "tiktok";
-    final String twitter = "twitter";
-    final String telegram = "telegram";
-    final String whatsapp = "whatsapp";
-    final String viber = "viber";
-    final String vk = "vk";
-    final String carRegistrationNumber = "А100МР777";
-//
-//    NewOwnerDto newOwnerDto = new NewOwnerDto(ownerName, email, mainPhone, optionalPhone, instagram, youtube,
-//            facebook, tiktok, twitter, telegram, whatsapp, viber, vk, MethodsOfCommunication.MAIN_PHONE,
-//            carRegistrationNumber);
-//    Owner owner = new Owner(ownerId, ownerName, email, mainPhone, optionalPhone, instagram, youtube,
-//            facebook, tiktok, twitter, telegram, whatsapp, viber, vk, MethodsOfCommunication.MAIN_PHONE,
-//            carRegistrationNumber);
-//    OwnerDto ownerDto = new OwnerDto(ownerId, ownerName, email, mainPhone, optionalPhone, instagram, youtube,
-//            facebook, tiktok, twitter, telegram, whatsapp, viber, vk, MethodsOfCommunication.MAIN_PHONE,
-//            carRegistrationNumber);
-//
-//    @Captor
-//    private ArgumentCaptor<Owner> ownerArgumentCaptor;
-//
-//    @Captor
-//    private ArgumentCaptor<Long> longArgumentCaptor;
-//
-//    @Test
-//    void addOwner_whenAddOwnerByBoss_thenOwnerAdded() {
-//        Roles requesterRole = Roles.ROLE_BOSS;
-//        requesterBoss.setRole(requesterRole);
-//
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerMapper.toOwner(newOwnerDto)).thenReturn(owner);
-//        when(ownerRepository.save(owner)).thenReturn(owner);
-//        when(ownerMapper.toOwnerDto(owner)).thenReturn(ownerDto);
-//
-//        OwnerDto addedOwnerDto = ownerService.addOwner(requesterId, newOwnerDto);
-//
-//        assertAll(
-//                () -> assertEquals(addedOwnerDto, ownerDto),
-//                () -> verify(ownerMapper).toOwner(newOwnerDto),
-//                () -> verify(ownerRepository).save(owner),
-//                () -> verify(ownerMapper).toOwnerDto(owner)
-//        );
-//    }
-//
-//    @Test
-//    void addOwner_whenAddOwnerByAdmin_thenOwnerAdded() {
-//        Roles requesterRole = Roles.ROLE_ADMIN;
-//        requesterBoss.setRole(requesterRole);
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerMapper.toOwner(newOwnerDto)).thenReturn(owner);
-//        when(ownerRepository.save(owner)).thenReturn(owner);
-//        when(ownerMapper.toOwnerDto(owner)).thenReturn(ownerDto);
-//
-//        OwnerDto addedOwnerDto = ownerService.addOwner(requesterId, newOwnerDto);
-//
-//        assertAll(
-//                () -> assertEquals(addedOwnerDto, ownerDto),
-//                () -> verify(ownerMapper).toOwner(newOwnerDto),
-//                () -> verify(ownerRepository).save(owner),
-//                () -> verify(ownerMapper).toOwnerDto(owner)
-//        );
-//    }
-//
-//    @Test
-//    void addOwner_whenAddOwnerByUser_thenReturnedOwner() {
-//        Roles requesterRole = Roles.ROLE_USER;
-//        requesterBoss.setRole(requesterRole);
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerMapper.toOwner(newOwnerDto)).thenReturn(owner);
-//
-//        assertThrows(AccessDeniedException.class,
-//                () -> ownerService.addOwner(requesterId, newOwnerDto));
-//    }
-//
-//    @Test
-//    void getOwnerById_whenRequesterIsBoss_thenReturnedOwner() {
-//        Roles requesterRole = Roles.ROLE_BOSS;
-//        requesterBoss.setRole(requesterRole);
-//        Owner expectedOwner = owner;
-//        OwnerDto expectedOwnerDto = ownerDto;
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.of(expectedOwner));
-//        when(ownerMapper.toOwnerDto(expectedOwner)).thenReturn(expectedOwnerDto);
-//
-//        OwnerDto returnedOwnerDto = ownerService.getOwnerById(requesterId, ownerId);
-//
-//        assertAll(
-//                () -> assertEquals(expectedOwnerDto, returnedOwnerDto),
-//                () -> verify(userRepository).findById(requesterId),
-//                () -> verify(ownerRepository).findById(ownerId),
-//                () -> verify(ownerMapper).toOwnerDto(expectedOwner)
-//        );
-//    }
-//
-//    @Test
-//    void getOwnerById_whenRequesterIsAdmin_thenReturnedOwner() {
-//        Roles requesterRole = Roles.ROLE_ADMIN;
-//        requesterBoss.setRole(requesterRole);
-//        Owner expectedOwner = owner;
-//        OwnerDto expectedOwnerDto = ownerDto;
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.of(expectedOwner));
-//        when(ownerMapper.toOwnerDto(expectedOwner)).thenReturn(expectedOwnerDto);
-//
-//        OwnerDto returnedOwnerDto = ownerService.getOwnerById(requesterId, ownerId);
-//
-//        assertAll(
-//                () -> assertEquals(expectedOwnerDto, returnedOwnerDto),
-//                () -> verify(userRepository).findById(requesterId),
-//                () -> verify(ownerRepository).findById(ownerId),
-//                () -> verify(ownerMapper).toOwnerDto(expectedOwner)
-//        );
-//    }
-//
-//    @Test
-//    void getShortOwnerById_whenGetFromUserAndPreferCommunicationIsMainPhone_thenReturnedOwnerWithMainPhoneValue() {
-//        Roles requesterRole = Roles.ROLE_USER;
-//        requesterBoss.setRole(requesterRole);
-//        Owner expectedOwner = owner;
-//        owner.setPreferCommunication(MethodsOfCommunication.MAIN_PHONE);
-//        OwnerShortDto expectedOwnerShortDto = new OwnerShortDto(expectedOwner.getFirstname(), expectedOwner.getMainPhone());
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.of(expectedOwner));
-//        when(ownerMapper.toOwnerShortDto(expectedOwner)).thenReturn(expectedOwnerShortDto);
-//
-//        OwnerShortDto returnedOwnerShortDto = ownerService.getShortOwnerById(requesterId, ownerId);
-//
-//        assertAll(
-//                () -> assertEquals(expectedOwnerShortDto, returnedOwnerShortDto),
-//                () -> verify(userRepository).findById(requesterId),
-//                () -> verify(ownerRepository).findById(ownerId),
-//                () -> verify(ownerMapper).toOwnerShortDto(expectedOwner)
-//        );
-//    }
-//
-//    @Test
-//    void getShortOwnerById_whenGetFromUserAndPreferCommunicationIsOptionalPhone_thenReturnedWithOptionalPhoneValue() {
-//        Roles requesterRole = Roles.ROLE_USER;
-//        requesterBoss.setRole(requesterRole);
-//        Owner expectedOwner = owner;
-//        owner.setPreferCommunication(MethodsOfCommunication.OPTIONAL_PHONE);
-//        OwnerShortDto expectedOwnerShortDto =
-//                new OwnerShortDto(expectedOwner.getFirstname(), expectedOwner.getOptionalPhone());
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.of(expectedOwner));
-//        when(ownerMapper.toOwnerShortDto(expectedOwner)).thenReturn(expectedOwnerShortDto);
-//
-//        OwnerShortDto returnedOwnerShortDto = ownerService.getShortOwnerById(requesterId, ownerId);
-//
-//        assertAll(
-//                () -> assertEquals(expectedOwnerShortDto, returnedOwnerShortDto),
-//                () -> verify(userRepository).findById(requesterId),
-//                () -> verify(ownerRepository).findById(ownerId),
-//                () -> verify(ownerMapper).toOwnerShortDto(expectedOwner)
-//        );
-//    }
-//
-//    @Test
-//    void getShortOwnerById_whenGetFromUserAndPreferCommunicationIsTelegram_thenReturnedWithTelegramValue() {
-//        Roles requesterRole = Roles.ROLE_USER;
-//        requesterBoss.setRole(requesterRole);
-//        Owner expectedOwner = owner;
-//        owner.setPreferCommunication(MethodsOfCommunication.TELEGRAM);
-//        OwnerShortDto expectedOwnerShortDto =
-//                new OwnerShortDto(expectedOwner.getFirstname(), expectedOwner.getTelegram());
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.of(expectedOwner));
-//        when(ownerMapper.toOwnerShortDto(expectedOwner)).thenReturn(expectedOwnerShortDto);
-//
-//        OwnerShortDto returnedOwnerShortDto = ownerService.getShortOwnerById(requesterId, ownerId);
-//
-//        assertAll(
-//                () -> assertEquals(expectedOwnerShortDto, returnedOwnerShortDto),
-//                () -> verify(userRepository).findById(requesterId),
-//                () -> verify(ownerRepository).findById(ownerId),
-//                () -> verify(ownerMapper).toOwnerShortDto(expectedOwner)
-//        );
-//    }
-//
-//    @Test
-//    void getShortOwnerById_whenGetFromUserAndPreferCommunicationIsWhatsapp_thenReturnedWithWhatsappValue() {
-//        Roles requesterRole = Roles.ROLE_USER;
-//        requesterBoss.setRole(requesterRole);
-//        Owner expectedOwner = owner;
-//        owner.setPreferCommunication(MethodsOfCommunication.WHATSAPP);
-//        OwnerShortDto expectedOwnerShortDto =
-//                new OwnerShortDto(expectedOwner.getFirstname(), expectedOwner.getWhatsapp());
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.of(expectedOwner));
-//        when(ownerMapper.toOwnerShortDto(expectedOwner)).thenReturn(expectedOwnerShortDto);
-//
-//        OwnerShortDto returnedOwnerShortDto = ownerService.getShortOwnerById(requesterId, ownerId);
-//
-//        assertAll(
-//                () -> assertEquals(expectedOwnerShortDto, returnedOwnerShortDto),
-//                () -> verify(userRepository).findById(requesterId),
-//                () -> verify(ownerRepository).findById(ownerId),
-//                () -> verify(ownerMapper).toOwnerShortDto(expectedOwner)
-//        );
-//    }
-//
-//    @Test
-//    void getShortOwnerById_whenGetFromUserAndPreferCommunicationIsViber_thenReturnedWithViberValue() {
-//        Roles requesterRole = Roles.ROLE_USER;
-//        requesterBoss.setRole(requesterRole);
-//        Owner expectedOwner = owner;
-//        owner.setPreferCommunication(MethodsOfCommunication.VIBER);
-//        OwnerShortDto expectedOwnerShortDto =
-//                new OwnerShortDto(expectedOwner.getFirstname(), expectedOwner.getViber());
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.of(expectedOwner));
-//        when(ownerMapper.toOwnerShortDto(expectedOwner)).thenReturn(expectedOwnerShortDto);
-//
-//        OwnerShortDto returnedOwnerShortDto = ownerService.getShortOwnerById(requesterId, ownerId);
-//
-//        assertAll(
-//                () -> assertEquals(expectedOwnerShortDto, returnedOwnerShortDto),
-//                () -> verify(userRepository).findById(requesterId),
-//                () -> verify(ownerRepository).findById(ownerId),
-//                () -> verify(ownerMapper).toOwnerShortDto(expectedOwner)
-//        );
-//    }
-//
-//    @Test
-//    void getShortOwnerById_whenGetFromUserAndPreferCommunicationIsVk_thenReturnedWithVkValue() {
-//        Roles requesterRole = Roles.ROLE_USER;
-//        requesterBoss.setRole(requesterRole);
-//        Owner expectedOwner = owner;
-//        owner.setPreferCommunication(MethodsOfCommunication.VK);
-//        OwnerShortDto expectedOwnerShortDto =
-//                new OwnerShortDto(expectedOwner.getFirstname(), expectedOwner.getVk());
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.of(expectedOwner));
-//        when(ownerMapper.toOwnerShortDto(expectedOwner)).thenReturn(expectedOwnerShortDto);
-//
-//        OwnerShortDto returnedOwnerShortDto = ownerService.getShortOwnerById(requesterId, ownerId);
-//
-//        assertAll(
-//                () -> assertEquals(expectedOwnerShortDto, returnedOwnerShortDto),
-//                () -> verify(userRepository).findById(requesterId),
-//                () -> verify(ownerRepository).findById(ownerId),
-//                () -> verify(ownerMapper).toOwnerShortDto(expectedOwner)
-//        );
-//    }
-//
-//    @Test
-//    void getShortOwnerById_whenRequesterNotFound_thenNotFoundException() {
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.empty());
-//
-//        assertThrows(NotFoundException.class,
-//                () -> ownerService.getShortOwnerById(requesterId, ownerId));
-//    }
-//
-//    @Test
-//    void getOwnerById_whenRequesterNotFound_thenNotFoundException() {
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.empty());
-//
-//        assertThrows(NotFoundException.class,
-//                () -> ownerService.getOwnerById(requesterId, ownerId));
-//    }
-//
-//    @Test
-//    void getShortOwnerById_whenOwnerNotFound_thenNotFoundException() {
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.empty());
-//
-//        assertThrows(NotFoundException.class,
-//                () -> ownerService.getShortOwnerById(requesterId, ownerId));
-//    }
-//
-//    @Test
-//    void getOwnerById_whenOwnerNotFound_thenNotFoundException() {
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.empty());
-//
-//        assertThrows(NotFoundException.class,
-//                () -> ownerService.getOwnerById(requesterId, ownerId));
-//    }
-//
-//    @Test
-//    void getShortOwnerById_whenRequesterIsFinancial_thenAccessDeniedException() {
-//        Roles requesterRole = Roles.ROLE_FINANCIAL;
-//        requesterBoss.setRole(requesterRole);
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//
-//        assertThrows(AccessDeniedException.class,
-//                () -> ownerService.getShortOwnerById(requesterId, ownerId));
-//    }
-//
-//    @Test
-//    void getOwnerById_whenRequesterIsUser_thenAccessDeniedException() {
-//        Roles requesterRole = Roles.ROLE_USER;
-//        requesterBoss.setRole(requesterRole);
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//
-//        assertThrows(AccessDeniedException.class,
-//                () -> ownerService.getOwnerById(requesterId, ownerId));
-//    }
-//
-//    @Test
-//    void updateUser_whenRequesterBossFoundAndNewFieldsAllThenName_thenUpdateAllFieldsThanIdAndName() {
-//        Roles requesterRole = Roles.ROLE_BOSS;
-//        requesterBoss.setRole(requesterRole);
-//
-//        UpdateOwnerDto newOwnerDto = new UpdateOwnerDto(null, "new" + email,
-//                "new" + mainPhone, "new" + optionalPhone, "new" + instagram,
-//                "new" + youtube, "new" + facebook, "new" + tiktok, "new" + twitter,
-//                "new" + telegram, "new" + whatsapp, "new" + viber, "new" + vk,
-//                MethodsOfCommunication.WHATSAPP, "new" + carRegistrationNumber);
-//
-//        Owner oldOwner = owner;
-//
-//        Owner newOwner = new Owner(null, null, newOwnerDto.getEmail(),
-//                newOwnerDto.getMainPhone(), newOwnerDto.getOptionalPhone(), newOwnerDto.getInstagram(),
-//                newOwnerDto.getYoutube(), newOwnerDto.getFacebook(), newOwnerDto.getTiktok(), newOwnerDto.getTwitter(),
-//                newOwnerDto.getTelegram(), newOwnerDto.getWhatsapp(), newOwnerDto.getViber(), newOwnerDto.getVk(),
-//                newOwnerDto.getPreferCommunication(), newOwnerDto.getCarRegistrationNumber());
-//
-//        Owner ownerAfter = new Owner(
-//                oldOwner.getId(),
-//                oldOwner.getFirstname(),
-//                newOwner.getEmail(),
-//                newOwner.getMainPhone(), newOwner.getOptionalPhone(), newOwner.getInstagram(),
-//                newOwner.getYoutube(), newOwner.getFacebook(), newOwner.getTiktok(), newOwner.getTwitter(),
-//                newOwner.getTelegram(), newOwner.getWhatsapp(), newOwner.getViber(), newOwner.getVk(),
-//                newOwner.getPreferCommunication(), newOwner.getCarRegistrationNumber()
-//        );
-//
-//        OwnerDto ownerDtoAfter = new OwnerDto(ownerAfter.getId(), ownerAfter.getFirstname(), ownerAfter.getEmail(),
-//                ownerAfter.getMainPhone(), ownerAfter.getOptionalPhone(), ownerAfter.getInstagram(),
-//                ownerAfter.getYoutube(), ownerAfter.getFacebook(), ownerAfter.getTiktok(), ownerAfter.getTwitter(),
-//                ownerAfter.getTelegram(), ownerAfter.getWhatsapp(), ownerAfter.getViber(), ownerAfter.getVk(),
-//                ownerAfter.getPreferCommunication(), ownerAfter.getCarRegistrationNumber());
-//
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.of(oldOwner));
-//        when(ownerMapper.toOwner(newOwnerDto)).thenReturn(newOwner);
-//        when(ownerRepository.save(newOwner)).thenReturn(ownerAfter);
-//        when(ownerMapper.toOwnerDto(ownerAfter)).thenReturn(ownerDtoAfter);
-//
-//        OwnerDto returnedOwnerDto = ownerService.updateOwner(requesterId, ownerId, newOwnerDto);
-//
-//        verify(ownerRepository).save(ownerArgumentCaptor.capture());
-//        Owner ownerForSave = ownerArgumentCaptor.getValue();
-//
-//        assertAll(
-//                () -> assertEquals(ownerDtoAfter, returnedOwnerDto, "entity test failed"),
-//                () -> assertEquals(oldOwner.getId(), ownerForSave.getId(),
-//                        "id field test failed"),
-//                () -> assertEquals(oldOwner.getFirstname(), ownerForSave.getFirstname(),
-//                        "name field test failed"),
-//                () -> assertEquals(newOwnerDto.getEmail(), ownerForSave.getEmail(),
-//                        "email field test failed"),
-//                () -> assertEquals(newOwnerDto.getMainPhone(), ownerForSave.getMainPhone(),
-//                        "MainPhone field test failed"),
-//                () -> assertEquals(newOwnerDto.getOptionalPhone(), ownerForSave.getOptionalPhone(),
-//                        "OptionalPhone field test failed"),
-//                () -> assertEquals(newOwnerDto.getInstagram(), ownerForSave.getInstagram(),
-//                        "Instagram field test failed"),
-//                () -> assertEquals(newOwnerDto.getYoutube(), ownerForSave.getYoutube(),
-//                        "Youtube field test failed"),
-//                () -> assertEquals(newOwnerDto.getFacebook(), ownerForSave.getFacebook(),
-//                        "Facebook field test failed"),
-//                () -> assertEquals(newOwnerDto.getTiktok(), ownerForSave.getTiktok(),
-//                        "Tiktok field test failed"),
-//                () -> assertEquals(newOwnerDto.getTwitter(), ownerForSave.getTwitter(),
-//                        "Twitter field test failed"),
-//                () -> assertEquals(newOwnerDto.getTelegram(), ownerForSave.getTelegram(),
-//                        "Telegram field test failed"),
-//                () -> assertEquals(newOwnerDto.getWhatsapp(), ownerForSave.getWhatsapp(),
-//                        "Whatsapp field test failed"),
-//                () -> assertEquals(newOwnerDto.getViber(), ownerForSave.getViber(),
-//                        "Viber field test failed"),
-//                () -> assertEquals(newOwnerDto.getVk(), ownerForSave.getVk(),
-//                        "Vk field test failed"),
-//                () -> assertEquals(newOwnerDto.getPreferCommunication(), ownerForSave.getPreferCommunication(),
-//                        "preferCommunication field test failed"),
-//                () -> assertEquals(newOwnerDto.getCarRegistrationNumber(), ownerForSave.getCarRegistrationNumber(),
-//                        "carRegistrationNumber field test failed"),
-//
-//
-//                () -> verify(userRepository).findById(requesterId),
-//                () -> verify(ownerRepository).findById(ownerId),
-//                () -> verify(ownerMapper).toOwner(newOwnerDto),
-//                () -> verify(ownerMapper).toOwnerDto(ownerAfter)
-//        );
-//    }
-//
-//    @Test
-//    void updateUser_whenRequesterBossFoundAndNewNameFieldsNotNull_thenUpdateNameFieldOnly() {
-//        Roles requesterRole = Roles.ROLE_BOSS;
-//        requesterBoss.setRole(requesterRole);
-//
-//        UpdateOwnerDto newOwnerDto = new UpdateOwnerDto("new" + ownerName, null, null,
-//                null, null, null, null, null, null, null,
-//                null, null, null, null, null);
-//
-//        Owner oldOwner = owner;
-//
-//        Owner newOwner = new Owner(
-//                null,
-//                newOwnerDto.getFirstname(),
-//                newOwnerDto.getEmail(),
-//                newOwnerDto.getMainPhone(), newOwnerDto.getOptionalPhone(), newOwnerDto.getInstagram(),
-//                newOwnerDto.getYoutube(), newOwnerDto.getFacebook(), newOwnerDto.getTiktok(), newOwnerDto.getTwitter(),
-//                newOwnerDto.getTelegram(), newOwnerDto.getWhatsapp(), newOwnerDto.getViber(), newOwnerDto.getVk(),
-//                newOwnerDto.getPreferCommunication(), newOwnerDto.getCarRegistrationNumber());
-//
-//        Owner ownerAfter = new Owner(
-//                oldOwner.getId(),
-//                newOwner.getFirstname(),
-//                oldOwner.getEmail(),
-//                oldOwner.getMainPhone(), oldOwner.getOptionalPhone(), oldOwner.getInstagram(),
-//                oldOwner.getYoutube(), oldOwner.getFacebook(), oldOwner.getTiktok(), oldOwner.getTwitter(),
-//                oldOwner.getTelegram(), oldOwner.getWhatsapp(), oldOwner.getViber(), oldOwner.getVk(),
-//                oldOwner.getPreferCommunication(), oldOwner.getCarRegistrationNumber()
-//        );
-//
-//        OwnerDto ownerDtoAfter = new OwnerDto(ownerAfter.getId(), ownerAfter.getFirstname(), ownerAfter.getEmail(),
-//                ownerAfter.getMainPhone(), ownerAfter.getOptionalPhone(), ownerAfter.getInstagram(),
-//                ownerAfter.getYoutube(), ownerAfter.getFacebook(), ownerAfter.getTiktok(), ownerAfter.getTwitter(),
-//                ownerAfter.getTelegram(), ownerAfter.getWhatsapp(), ownerAfter.getViber(), ownerAfter.getVk(),
-//                ownerAfter.getPreferCommunication(), ownerAfter.getCarRegistrationNumber());
-//
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.of(oldOwner));
-//        when(ownerMapper.toOwner(newOwnerDto)).thenReturn(newOwner);
-//        when(ownerRepository.save(newOwner)).thenReturn(ownerAfter);
-//        when(ownerMapper.toOwnerDto(ownerAfter)).thenReturn(ownerDtoAfter);
-//
-//        OwnerDto returnedOwnerDto = ownerService.updateOwner(requesterId, ownerId, newOwnerDto);
-//
-//        verify(ownerRepository).save(ownerArgumentCaptor.capture());
-//        Owner ownerForSave = ownerArgumentCaptor.getValue();
-//
-//        assertAll(
-//                () -> assertEquals(ownerDtoAfter, returnedOwnerDto, "entity test failed"),
-//                () -> assertEquals(oldOwner.getId(), ownerForSave.getId(),
-//                        "id field test failed"),
-//                () -> assertEquals(newOwnerDto.getFirstname(), ownerForSave.getFirstname(),
-//                        "name field test failed"),
-//                () -> assertEquals(oldOwner.getEmail(), ownerForSave.getEmail(),
-//                        "email field test failed"),
-//                () -> assertEquals(oldOwner.getMainPhone(), ownerForSave.getMainPhone(),
-//                        "MainPhone field test failed"),
-//                () -> assertEquals(oldOwner.getOptionalPhone(), ownerForSave.getOptionalPhone(),
-//                        "OptionalPhone field test failed"),
-//                () -> assertEquals(oldOwner.getInstagram(), ownerForSave.getInstagram(),
-//                        "Instagram field test failed"),
-//                () -> assertEquals(oldOwner.getYoutube(), ownerForSave.getYoutube(),
-//                        "Youtube field test failed"),
-//                () -> assertEquals(oldOwner.getFacebook(), ownerForSave.getFacebook(),
-//                        "Facebook field test failed"),
-//                () -> assertEquals(oldOwner.getTiktok(), ownerForSave.getTiktok(),
-//                        "Tiktok field test failed"),
-//                () -> assertEquals(oldOwner.getTwitter(), ownerForSave.getTwitter(),
-//                        "Twitter field test failed"),
-//                () -> assertEquals(oldOwner.getTelegram(), ownerForSave.getTelegram(),
-//                        "Telegram field test failed"),
-//                () -> assertEquals(oldOwner.getWhatsapp(), ownerForSave.getWhatsapp(),
-//                        "Whatsapp field test failed"),
-//                () -> assertEquals(oldOwner.getViber(), ownerForSave.getViber(),
-//                        "Viber field test failed"),
-//                () -> assertEquals(oldOwner.getVk(), ownerForSave.getVk(),
-//                        "Vk field test failed"),
-//                () -> assertEquals(oldOwner.getPreferCommunication(), ownerForSave.getPreferCommunication(),
-//                        "PreferCommunication field test failed"),
-//                () -> assertEquals(oldOwner.getCarRegistrationNumber(), ownerForSave.getCarRegistrationNumber(),
-//                        "carRegistrationNumber field test failed"),
-//
-//
-//                () -> verify(userRepository).findById(requesterId),
-//                () -> verify(ownerRepository).findById(ownerId),
-//                () -> verify(ownerMapper).toOwner(newOwnerDto),
-//                () -> verify(ownerMapper).toOwnerDto(ownerAfter)
-//        );
-//    }
-//
-//    @Test
-//    void updateUser_whenRequesterAdminFoundAndAllNewFieldsNotNull_thenUpdateAllFieldsThanId() {
-//        Roles requesterRole = Roles.ROLE_ADMIN;
-//        requesterBoss.setRole(requesterRole);
-//
-//        UpdateOwnerDto newOwnerDto = new UpdateOwnerDto("new" + ownerName, "new" + email,
-//                "new" + mainPhone, "new" + optionalPhone, "new" + instagram,
-//                "new" + youtube, "new" + facebook, "new" + tiktok, "new" + twitter,
-//                "new" + telegram, "new" + whatsapp, "new" + viber, "new" + vk,
-//                MethodsOfCommunication.WHATSAPP, "new" + carRegistrationNumber);
-//
-//        Owner oldOwner = owner;
-//
-//        Owner newOwner = new Owner(oldOwner.getId(), newOwnerDto.getFirstname(), newOwnerDto.getEmail(),
-//                newOwnerDto.getMainPhone(), newOwnerDto.getOptionalPhone(), newOwnerDto.getInstagram(),
-//                newOwnerDto.getYoutube(), newOwnerDto.getFacebook(), newOwnerDto.getTiktok(), newOwnerDto.getTwitter(),
-//                newOwnerDto.getTelegram(), newOwnerDto.getWhatsapp(), newOwnerDto.getViber(), newOwnerDto.getVk(),
-//                newOwnerDto.getPreferCommunication(), newOwnerDto.getCarRegistrationNumber());
-//
-//        Owner ownerAfter = new Owner(
-//                oldOwner.getId(),
-//                newOwnerDto.getFirstname(),
-//                newOwner.getEmail(),
-//                newOwnerDto.getMainPhone(), newOwnerDto.getOptionalPhone(), newOwnerDto.getInstagram(),
-//                newOwnerDto.getYoutube(), newOwnerDto.getFacebook(), newOwnerDto.getTiktok(), newOwnerDto.getTwitter(),
-//                newOwnerDto.getTelegram(), newOwnerDto.getWhatsapp(), newOwnerDto.getViber(), newOwnerDto.getVk(),
-//                newOwnerDto.getPreferCommunication(), newOwnerDto.getCarRegistrationNumber());
-//
-//        OwnerDto ownerDtoAfter = new OwnerDto(ownerAfter.getId(), ownerAfter.getFirstname(), ownerAfter.getEmail(),
-//                ownerAfter.getMainPhone(), ownerAfter.getOptionalPhone(), ownerAfter.getInstagram(),
-//                ownerAfter.getYoutube(), ownerAfter.getFacebook(), ownerAfter.getTiktok(), ownerAfter.getTwitter(),
-//                ownerAfter.getTelegram(), ownerAfter.getWhatsapp(), ownerAfter.getViber(), ownerAfter.getVk(),
-//                ownerAfter.getPreferCommunication(), ownerAfter.getCarRegistrationNumber());
-//
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.of(oldOwner));
-//        when(ownerMapper.toOwner(newOwnerDto)).thenReturn(newOwner);
-//        when(ownerRepository.save(newOwner)).thenReturn(ownerAfter);
-//        when(ownerMapper.toOwnerDto(ownerAfter)).thenReturn(ownerDtoAfter);
-//
-//        OwnerDto returnedOwnerDto = ownerService.updateOwner(requesterId, ownerId, newOwnerDto);
-//
-//        verify(ownerRepository).save(ownerArgumentCaptor.capture());
-//        Owner ownerForSave = ownerArgumentCaptor.getValue();
-//
-//        assertAll(
-//                () -> assertEquals(ownerDtoAfter, returnedOwnerDto,
-//                        "entity field test failed"),
-//                () -> assertEquals(oldOwner.getId(), ownerForSave.getId(),
-//                        "id field test failed"),
-//                () -> assertEquals(newOwnerDto.getFirstname(), ownerForSave.getFirstname(),
-//                        "name field test failed"),
-//                () -> assertEquals(newOwnerDto.getEmail(), ownerForSave.getEmail(),
-//                        "email field test failed"),
-//                () -> assertEquals(newOwnerDto.getMainPhone(), ownerForSave.getMainPhone(),
-//                        "MainPhone field test failed"),
-//                () -> assertEquals(newOwnerDto.getOptionalPhone(), ownerForSave.getOptionalPhone(),
-//                        "OptionalPhone field test failed"),
-//                () -> assertEquals(newOwnerDto.getInstagram(), ownerForSave.getInstagram(),
-//                        "Instagram field test failed"),
-//                () -> assertEquals(newOwnerDto.getYoutube(), ownerForSave.getYoutube(),
-//                        "Youtube field test failed"),
-//                () -> assertEquals(newOwnerDto.getFacebook(), ownerForSave.getFacebook(),
-//                        "Facebook field test failed"),
-//                () -> assertEquals(newOwnerDto.getTiktok(), ownerForSave.getTiktok(),
-//                        "Tiktok field test failed"),
-//                () -> assertEquals(newOwnerDto.getTwitter(), ownerForSave.getTwitter(),
-//                        "Twitter field test failed"),
-//                () -> assertEquals(newOwnerDto.getTelegram(), ownerForSave.getTelegram(),
-//                        "Telegram field test failed"),
-//                () -> assertEquals(newOwnerDto.getWhatsapp(), ownerForSave.getWhatsapp(),
-//                        "Whatsapp field test failed"),
-//                () -> assertEquals(newOwnerDto.getViber(), ownerForSave.getViber(),
-//                        "Viber field test failed"),
-//                () -> assertEquals(newOwnerDto.getVk(), ownerForSave.getVk(),
-//                        "Vk field test failed"),
-//                () -> assertEquals(newOwnerDto.getPreferCommunication(), ownerForSave.getPreferCommunication(),
-//                        "PreferCommunication field test failed"),
-//                () -> assertEquals(newOwnerDto.getCarRegistrationNumber(), ownerForSave.getCarRegistrationNumber(),
-//                        "carRegistrationNumber field test failed"),
-//
-//                () -> verify(userRepository).findById(requesterId),
-//                () -> verify(ownerRepository).findById(ownerId),
-//                () -> verify(ownerMapper).toOwner(newOwnerDto),
-//                () -> verify(ownerMapper).toOwnerDto(ownerAfter)
-//        );
-//    }
-//
-//    @Test
-//    void updateOwner_whenRequesterNotFound_thenNotFoundException() {
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.empty());
-//
-//        assertThrows(NotFoundException.class,
-//                () -> ownerService.updateOwner(requesterId, ownerId, new UpdateOwnerDto()));
-//    }
-//
-//    @Test
-//    void updateUser_whenOwnerNotFound_thenNotFoundException() {
-//        Roles requesterRole = Roles.ROLE_ADMIN;
-//        requesterBoss.setRole(requesterRole);
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.empty());
-//
-//        assertThrows(NotFoundException.class,
-//                () -> ownerService.updateOwner(requesterId, ownerId, new UpdateOwnerDto()));
-//    }
-//
-//    @Test
-//    void updateOwner_whenRequesterUser_thenAccessDeniedException() {
-//        Roles requesterRole = Roles.ROLE_USER;
-//        requesterBoss.setRole(requesterRole);
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//
-//        assertThrows(AccessDeniedException.class,
-//                () -> ownerService.updateOwner(requesterId, ownerId, new UpdateOwnerDto()));
-//    }
-//
-//    @Test
-//    void getAllOwners_whenBossGetAllOwners_returnAllOwners() {
-//        Roles requesterRole = Roles.ROLE_BOSS;
-//        List<Roles> roles = Arrays.stream(Roles.values()).toList();
-//        requesterBoss.setRole(requesterRole);
-//
-//        Owner owner1 = new Owner(ownerId + 1, "1" + ownerName, "1" + email, "1" + mainPhone,
-//                "1" + optionalPhone, "1" + instagram, "1" + youtube,
-//                "1" + facebook, "1" + tiktok, "1" + twitter, "1" + telegram,
-//                "1" + whatsapp, "1" + viber, "1" + vk, MethodsOfCommunication.OPTIONAL_PHONE,
-//                carRegistrationNumber.replaceFirst("1", "1"));
-//        Owner owner2 = new Owner(ownerId + 2, "2" + ownerName, "2" + email, "2" + mainPhone,
-//                "2" + optionalPhone, "2" + instagram, "2" + youtube,
-//                "2" + facebook, "2" + tiktok, "2" + twitter, "2" + telegram,
-//                "2" + whatsapp, "2" + viber, "2" + vk, MethodsOfCommunication.TELEGRAM,
-//                carRegistrationNumber.replaceFirst("2", "2"));
-//        Owner owner3 = new Owner(ownerId + 3, "3" + ownerName, "3" + email, "3" + mainPhone,
-//                "3" + optionalPhone, "3" + instagram, "3" + youtube,
-//                "3" + facebook, "3" + tiktok, "3" + twitter, "3" + telegram,
-//                "3" + whatsapp, "3" + viber, "3" + vk, MethodsOfCommunication.WHATSAPP,
-//                carRegistrationNumber.replaceFirst("3", "3"));
-//        List<Owner> ownerList = List.of(owner1, owner2, owner3);
-//        OwnerDto ownerDto1 = new OwnerDto(owner1.getId(), owner1.getFirstname(), owner1.getEmail(),
-//                owner1.getMainPhone(), owner1.getOptionalPhone(), owner1.getInstagram(),
-//                owner1.getYoutube(), owner1.getFacebook(), owner1.getTiktok(), owner1.getTwitter(),
-//                owner1.getTelegram(), owner1.getWhatsapp(), owner1.getViber(), owner1.getVk(),
-//                owner1.getPreferCommunication(), owner1.getCarRegistrationNumber());
-//        OwnerDto ownerDto2 = new OwnerDto(owner2.getId(), owner2.getFirstname(), owner2.getEmail(),
-//                owner2.getMainPhone(), owner2.getOptionalPhone(), owner2.getInstagram(),
-//                owner2.getYoutube(), owner2.getFacebook(), owner2.getTiktok(), owner2.getTwitter(),
-//                owner2.getTelegram(), owner2.getWhatsapp(), owner2.getViber(), owner2.getVk(),
-//                owner2.getPreferCommunication(), owner2.getCarRegistrationNumber());
-//        OwnerDto ownerDto3 = new OwnerDto(owner3.getId(), owner3.getFirstname(), owner3.getEmail(),
-//                owner3.getMainPhone(), owner3.getOptionalPhone(), owner3.getInstagram(),
-//                owner3.getYoutube(), owner3.getFacebook(), owner3.getTiktok(), owner3.getTwitter(),
-//                owner3.getTelegram(), owner3.getWhatsapp(), owner3.getViber(), owner3.getVk(),
-//                owner3.getPreferCommunication(), owner3.getCarRegistrationNumber());
-//        List<OwnerDto> ownerDtoList = List.of(ownerDto1, ownerDto2, ownerDto3);
-//
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findAll()).thenReturn(ownerList);
-//        when(ownerMapper.map(ownerList)).thenReturn(ownerDtoList);
-//
-//        List<OwnerDto> returnedOwnersDto = ownerService.getAllOwners(requesterId);
-//
-//        assertAll(
-//                () -> assertEquals(ownerDtoList, returnedOwnersDto),
-//                () -> verify(ownerRepository).findAll(),
-//                () -> verify(ownerMapper).map(ownerList)
-//        );
-//    }
-//
-//    @Test
-//    void getAllOwners_whenAdminGetAllOwners_returnAllOwners() {
-//        Roles requesterRole = Roles.ROLE_ADMIN;
-//        List<Roles> roles = Arrays.stream(Roles.values()).toList();
-//        requesterBoss.setRole(requesterRole);
-//
-//        Owner owner1 = new Owner(ownerId + 1, "1" + ownerName, "1" + email, "1" + mainPhone,
-//                "1" + optionalPhone, "1" + instagram, "1" + youtube,
-//                "1" + facebook, "1" + tiktok, "1" + twitter, "1" + telegram,
-//                "1" + whatsapp, "1" + viber, "1" + vk, MethodsOfCommunication.VIBER,
-//                carRegistrationNumber.replaceFirst("1", "1"));
-//        Owner owner2 = new Owner(ownerId + 2, "2" + ownerName, "2" + email, "2" + mainPhone,
-//                "2" + optionalPhone, "2" + instagram, "2" + youtube,
-//                "2" + facebook, "2" + tiktok, "2" + twitter, "2" + telegram,
-//                "2" + whatsapp, "2" + viber, "2" + vk, MethodsOfCommunication.VK,
-//                carRegistrationNumber.replaceFirst("2", "2"));
-//        Owner owner3 = new Owner(ownerId + 3, "3" + ownerName, "3" + email, "3" + mainPhone,
-//                "3" + optionalPhone, "3" + instagram, "3" + youtube,
-//                "3" + facebook, "3" + tiktok, "3" + twitter, "3" + telegram,
-//                "3" + whatsapp, "3" + viber, "3" + vk, MethodsOfCommunication.MAIN_PHONE,
-//                carRegistrationNumber.replaceFirst("3", "3"));
-//        List<Owner> ownerList = List.of(owner1, owner2, owner3);
-//        OwnerDto ownerDto1 = new OwnerDto(owner1.getId(), owner1.getFirstname(), owner1.getEmail(),
-//                owner1.getMainPhone(), owner1.getOptionalPhone(), owner1.getInstagram(),
-//                owner1.getYoutube(), owner1.getFacebook(), owner1.getTiktok(), owner1.getTwitter(),
-//                owner1.getTelegram(), owner1.getWhatsapp(), owner1.getViber(), owner1.getVk(),
-//                owner1.getPreferCommunication(), owner1.getCarRegistrationNumber());
-//        OwnerDto ownerDto2 = new OwnerDto(owner2.getId(), owner2.getFirstname(), owner2.getEmail(),
-//                owner2.getMainPhone(), owner2.getOptionalPhone(), owner2.getInstagram(),
-//                owner2.getYoutube(), owner2.getFacebook(), owner2.getTiktok(), owner2.getTwitter(),
-//                owner2.getTelegram(), owner2.getWhatsapp(), owner2.getViber(), owner2.getVk(),
-//                owner2.getPreferCommunication(), owner2.getCarRegistrationNumber());
-//        OwnerDto ownerDto3 = new OwnerDto(owner3.getId(), owner3.getFirstname(), owner3.getEmail(),
-//                owner3.getMainPhone(), owner3.getOptionalPhone(), owner3.getInstagram(),
-//                owner3.getYoutube(), owner3.getFacebook(), owner3.getTiktok(), owner3.getTwitter(),
-//                owner3.getTelegram(), owner3.getWhatsapp(), owner3.getViber(), owner3.getVk(),
-//                owner3.getPreferCommunication(), owner3.getCarRegistrationNumber());
-//        List<OwnerDto> ownerDtoList = List.of(ownerDto1, ownerDto2, ownerDto3);
-//
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findAll()).thenReturn(ownerList);
-//        when(ownerMapper.map(ownerList)).thenReturn(ownerDtoList);
-//
-//        List<OwnerDto> returnedOwnersDto = ownerService.getAllOwners(requesterId);
-//
-//        assertAll(
-//                () -> assertEquals(ownerDtoList, returnedOwnersDto),
-//                () -> verify(ownerRepository).findAll(),
-//                () -> verify(ownerMapper).map(ownerList)
-//        );
-//    }
-//
-//    @Test
-//    void getAllOwners_whenUserGetAllOwners_ThenAccessDeniedException() {
-//        Roles requesterRole = Roles.ROLE_USER;
-//        requesterBoss.setRole(requesterRole);
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//
-//        assertThrows(AccessDeniedException.class,
-//                () -> ownerService.getAllOwners(requesterId));
-//    }
-//
-//    @Test
-//    void deleteOwnerById_whenRequesterBoss_thenOwnerWillDelete() {
-//        Roles requesterRole = Roles.ROLE_BOSS;
-//        requesterBoss.setRole(requesterRole);
-//
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.of(owner));
-//
-//        ownerService.deleteOwnerById(requesterId, ownerId);
-//
-//        verify(ownerRepository).deleteById(longArgumentCaptor.capture());
-//        Long idForDelete = longArgumentCaptor.getValue();
-//        assertEquals(ownerId, idForDelete);
-//    }
-//
-//    @Test
-//    void deleteOwnerById_whenAdminDeleteOwner_thenOwnerWillDelete() {
-//        Roles requesterRole = Roles.ROLE_ADMIN;
-//        requesterBoss.setRole(requesterRole);
-//
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.of(owner));
-//
-//        ownerService.deleteOwnerById(requesterId, ownerId);
-//
-//        verify(ownerRepository).deleteById(longArgumentCaptor.capture());
-//        Long idForDelete = longArgumentCaptor.getValue();
-//        assertEquals(ownerId, idForDelete);
-//    }
-//
-//    @Test
-//    void deleteOwnerById_whenOwnerDeleteSmb_thenAccessDenied() {
-//        Roles requesterRole = Roles.ROLE_USER;
-//        requesterBoss.setRole(requesterRole);
-//
-//        when(userRepository.findById(requesterId)).thenReturn(Optional.of(requesterBoss));
-//        when(ownerRepository.findById(ownerId)).thenReturn(Optional.of(owner));
-//
-//        assertThrows(AccessDeniedException.class,
-//                () -> ownerService.deleteOwnerById(requesterId, ownerId));
-//    }
+    final String optionalPhone = "84951234567";
+    final String otherContacts = "instagram";
+    final String actualAddress = "г. Воронеж, ул. Лизюкова, 16";
+    final String trustedMan = "Деверя золовки сват, 8(800)555-35-35";
+    final String source = "По радио передавали";
+    final String comment = "Норм парень";
+    final int rating = 1;
+    final LocalDateTime registrationDate = now().truncatedTo(ChronoUnit.SECONDS);
 
+    Owner owner = new Owner(ownerId, ownerLastName, ownerFirstName, ownerMiddleName, mainPhone, optionalPhone,
+            otherContacts, actualAddress, trustedMan, source, comment, rating, registrationDate);
+    NewOwnerDto newOwnerDto = new NewOwnerDto(ownerLastName, ownerFirstName, ownerMiddleName, mainPhone, optionalPhone,
+            otherContacts, actualAddress, trustedMan, source, comment, rating);
+    OwnerDto ownerDto = new OwnerDto(ownerId, ownerLastName, ownerFirstName, ownerMiddleName, mainPhone, optionalPhone,
+            otherContacts, actualAddress, trustedMan, source, comment, rating, registrationDate);
+
+    OwnerShortDto ownerShortDto = new OwnerShortDto(ownerId, ownerLastName, ownerFirstName, ownerMiddleName, mainPhone,
+            optionalPhone, registrationDate);
+
+    @Captor
+    private ArgumentCaptor<Owner> ownerArgumentCaptor;
+
+    @Captor
+    private ArgumentCaptor<Long> longArgumentCaptor;
+
+    @Test
+    void addOwner() {
+        when(ownerMapper.toOwner(newOwnerDto)).thenReturn(owner);
+        when(ownerRepository.save(owner)).thenReturn(owner);
+        when(ownerMapper.toOwnerDto(owner)).thenReturn(ownerDto);
+
+        OwnerDto addedOwnerDto = ownerService.addOwner(requesterId, newOwnerDto);
+
+        assertAll(
+                () -> assertEquals(addedOwnerDto, ownerDto),
+                () -> verify(ownerMapper).toOwner(newOwnerDto),
+                () -> verify(ownerRepository).save(owner),
+                () -> verify(ownerMapper).toOwnerDto(owner)
+        );
+    }
+
+    @Test
+    void getSomeShortOwners() {
+        Owner owner1 = new Owner(ownerId + 1, "1" + ownerLastName, "1" + ownerFirstName,
+                "1" + ownerMiddleName, "1" + mainPhone, "1" + optionalPhone,
+                "1" + otherContacts, "1" + actualAddress, "1" + trustedMan,
+                "1" + source, "1" + comment, 1 + rating, registrationDate.plusHours(1));
+        Owner owner2 = new Owner(ownerId + 2, "2" + ownerLastName, "2" + ownerFirstName,
+                "2" + ownerMiddleName, "2" + mainPhone, "2" + optionalPhone,
+                "2" + otherContacts, "2" + actualAddress, "2" + trustedMan,
+                "2" + source, "2" + comment, 2 + rating, registrationDate.plusHours(2));
+        Owner owner3 = new Owner(ownerId + 3, "3" + ownerLastName, "3" + ownerFirstName,
+                "3" + ownerMiddleName, "3" + mainPhone, "3" + optionalPhone,
+                "3" + otherContacts, "3" + actualAddress, "3" + trustedMan,
+                "3" + source, "3" + comment, 3 + rating, registrationDate.plusHours(3));
+
+        Page<Owner> ownerList = new PageImpl<>(List.of(owner1, owner2, owner3));
+
+        OwnerShortDto ownerShortDto1 = new OwnerShortDto(owner1.getId(), owner1.getLastName(), owner1.getFirstName(),
+                owner1.getMiddleName(), owner1.getMainPhone(), owner1.getOptionalPhone(), owner1.getRegistrationDate());
+        OwnerShortDto ownerShortDto2 = new OwnerShortDto(owner2.getId(), owner2.getLastName(), owner2.getFirstName(),
+                owner2.getMiddleName(), owner2.getMainPhone(), owner2.getOptionalPhone(), owner2.getRegistrationDate());
+        OwnerShortDto ownerShortDto3 = new OwnerShortDto(owner3.getId(), owner3.getLastName(), owner3.getFirstName(),
+                owner3.getMiddleName(), owner3.getMainPhone(), owner3.getOptionalPhone(), owner3.getRegistrationDate());
+
+        List<OwnerShortDto> ownerShortDtoList = List.of(ownerShortDto1, ownerShortDto2, ownerShortDto3);
+
+        var num = 10;
+        Pageable pageable = PageRequest.of(0, num, Sort.by("registrationDate").descending());
+
+        when(ownerRepository.findAll(pageable)).thenReturn(ownerList);
+        when(ownerMapper.shortMap(ownerList.toList())).thenReturn(ownerShortDtoList);
+
+        List<OwnerShortDto> resultOwnersShortDto = ownerService.getSomeShortOwners(requesterId, num);
+
+        assertAll(
+                () -> assertEquals(ownerShortDtoList, resultOwnersShortDto),
+                () -> verify(ownerRepository).findAll(pageable),
+                () -> verify(ownerMapper).shortMap(ownerList.toList())
+        );
+    }
+
+    @Test
+    void getShortOwnerById() {
+        when(entityService.getOwnerIfExists(ownerId)).thenReturn(owner);
+        when(ownerMapper.toOwnerShortDto(owner)).thenReturn(ownerShortDto);
+
+        OwnerShortDto resultOwnerShotDto = ownerService.getShortOwnerById(requesterId, ownerId);
+
+        assertAll(
+                () -> assertEquals(ownerShortDto, resultOwnerShotDto),
+                () -> verify(entityService).getOwnerIfExists(ownerId),
+                () -> verify(ownerMapper).toOwnerShortDto(owner)
+        );
+    }
+
+    @Test
+    void getOwnerById() {
+        when(entityService.getOwnerIfExists(ownerId)).thenReturn(owner);
+        when(ownerMapper.toOwnerDto(owner)).thenReturn(ownerDto);
+
+        OwnerDto resultOwnerDto = ownerService.getOwnerById(requesterId, ownerId);
+
+        assertAll(
+                () -> assertEquals(ownerDto, resultOwnerDto),
+                () -> verify(entityService).getOwnerIfExists(ownerId),
+                () -> verify(ownerMapper).toOwnerDto(owner)
+        );
+    }
+
+    @Test
+    void updateUser_whenNewFieldsAllThenLastName_thenUpdateAllFieldsThanIdAndRegistrationDateAndLastName() {
+        UpdateOwnerDto newOwnerDto = new UpdateOwnerDto(null, "upd " + ownerFirstName,
+                "upd " + ownerMiddleName, "upd " + mainPhone, "upd " + optionalPhone,
+                "upd " + otherContacts, "upd" + actualAddress, "upd " + trustedMan,
+                "upd " + source, "upd " + comment, 1 + rating);
+
+        Owner oldOwner = owner;
+
+        Owner newOwner = new Owner(null, null, newOwnerDto.getFirstName(), newOwnerDto.getMiddleName(),
+                newOwnerDto.getMainPhone(), newOwnerDto.getOptionalPhone(), newOwnerDto.getOtherContacts(),
+                newOwnerDto.getActualAddress(), newOwnerDto.getTrustedMan(), newOwnerDto.getSource(),
+                newOwnerDto.getComment(), newOwnerDto.getRating(), null);
+
+        Owner ownerAfter = new Owner(oldOwner.getId(), oldOwner.getFirstName(),
+                newOwner.getLastName(), newOwner.getMiddleName(), newOwner.getMainPhone(), newOwner.getOptionalPhone(),
+                newOwner.getOtherContacts(), newOwner.getActualAddress(), newOwner.getTrustedMan(),
+                newOwner.getSource(), newOwner.getComment(), newOwner.getRating(),
+                oldOwner.getRegistrationDate());
+
+        OwnerDto ownerDtoAfter = new OwnerDto(ownerAfter.getId(), ownerAfter.getFirstName(), ownerAfter.getLastName(),
+                ownerAfter.getMiddleName(), ownerAfter.getMainPhone(), ownerAfter.getOptionalPhone(),
+                ownerAfter.getOtherContacts(), ownerAfter.getActualAddress(), ownerAfter.getTrustedMan(),
+                ownerAfter.getSource(), ownerAfter.getComment(), ownerAfter.getRating(),
+                ownerAfter.getRegistrationDate());
+
+        when(entityService.getOwnerIfExists(ownerId)).thenReturn(oldOwner);
+        when(ownerMapper.toOwner(newOwnerDto)).thenReturn(newOwner);
+        when(ownerRepository.save(newOwner)).thenReturn(ownerAfter);
+        when(ownerMapper.toOwnerDto(ownerAfter)).thenReturn(ownerDtoAfter);
+
+        OwnerDto resultOwnerDto = ownerService.updateOwner(requesterId, ownerId, newOwnerDto);
+
+        verify(ownerRepository).save(ownerArgumentCaptor.capture());
+        Owner ownerForSave = ownerArgumentCaptor.getValue();
+
+        assertAll(
+                () -> assertEquals(ownerDtoAfter, resultOwnerDto, "entity test failed"),
+                () -> assertEquals(oldOwner.getId(), ownerForSave.getId(),
+                        "id field test failed"),
+                () -> assertEquals(oldOwner.getLastName(), ownerForSave.getLastName(),
+                        "LastName field test failed"),
+                () -> assertEquals(newOwnerDto.getFirstName(), ownerForSave.getFirstName(),
+                        "FirstName field test failed"),
+                () -> assertEquals(newOwnerDto.getMiddleName(), ownerForSave.getMiddleName(),
+                        "MiddleName field test failed"),
+                () -> assertEquals(newOwnerDto.getMainPhone(), ownerForSave.getMainPhone(),
+                        "MainPhone field test failed"),
+                () -> assertEquals(newOwnerDto.getOptionalPhone(), ownerForSave.getOptionalPhone(),
+                        "OptionalPhone field test failed"),
+                () -> assertEquals(newOwnerDto.getOtherContacts(), ownerForSave.getOtherContacts(),
+                        "OtherContacts field test failed"),
+                () -> assertEquals(newOwnerDto.getActualAddress(), ownerForSave.getActualAddress(),
+                        "ActualAddress field test failed"),
+                () -> assertEquals(newOwnerDto.getTrustedMan(), ownerForSave.getTrustedMan(),
+                        "TrustedMan field test failed"),
+                () -> assertEquals(newOwnerDto.getSource(), ownerForSave.getSource(),
+                        "Source field test failed"),
+                () -> assertEquals(newOwnerDto.getComment(), ownerForSave.getComment(),
+                        "Comment field test failed"),
+                () -> assertEquals(newOwnerDto.getRating(), ownerForSave.getRating(),
+                        "Rating field test failed"),
+                () -> assertEquals(oldOwner.getRegistrationDate(), ownerForSave.getRegistrationDate(),
+                        "RegistrationDate field test failed"),
+
+                () -> verify(entityService).getOwnerIfExists(ownerId),
+                () -> verify(ownerMapper).toOwner(newOwnerDto),
+                () -> verify(ownerRepository).save(newOwner),
+                () -> verify(ownerMapper).toOwnerDto(ownerAfter)
+        );
+    }
+
+    @Test
+    void updateUser_whenNewLastNameFieldsNotNull_thenUpdateNameFieldOnly() {
+        UpdateOwnerDto newOwnerDto = UpdateOwnerDto.builder()
+                .lastName("upd " + ownerLastName)
+                .build();
+        Owner oldOwner = owner;
+
+        Owner newOwner = new Owner(null, newOwnerDto.getLastName(), newOwnerDto.getFirstName(),
+                newOwnerDto.getMiddleName(), newOwnerDto.getMainPhone(), newOwnerDto.getOptionalPhone(),
+                newOwnerDto.getOtherContacts(), newOwnerDto.getActualAddress(), newOwnerDto.getTrustedMan(),
+                newOwnerDto.getSource(), newOwnerDto.getComment(), newOwnerDto.getRating(), null);
+
+        Owner ownerAfter = new Owner(oldOwner.getId(), oldOwner.getFirstName(),
+                newOwner.getLastName(), newOwner.getMiddleName(), newOwner.getMainPhone(), newOwner.getOptionalPhone(),
+                newOwner.getOtherContacts(), newOwner.getActualAddress(), newOwner.getTrustedMan(),
+                newOwner.getSource(), newOwner.getComment(), newOwner.getRating(),
+                oldOwner.getRegistrationDate());
+
+        OwnerDto ownerDtoAfter = new OwnerDto(ownerAfter.getId(), ownerAfter.getFirstName(), ownerAfter.getLastName(),
+                ownerAfter.getMiddleName(), ownerAfter.getMainPhone(), ownerAfter.getOptionalPhone(),
+                ownerAfter.getOtherContacts(), ownerAfter.getActualAddress(), ownerAfter.getTrustedMan(),
+                ownerAfter.getSource(), ownerAfter.getComment(), ownerAfter.getRating(),
+                ownerAfter.getRegistrationDate());
+
+        when(entityService.getOwnerIfExists(ownerId)).thenReturn(oldOwner);
+        when(ownerMapper.toOwner(newOwnerDto)).thenReturn(newOwner);
+        when(ownerRepository.save(newOwner)).thenReturn(ownerAfter);
+        when(ownerMapper.toOwnerDto(ownerAfter)).thenReturn(ownerDtoAfter);
+
+        OwnerDto resultOwnerDto = ownerService.updateOwner(requesterId, ownerId, newOwnerDto);
+
+        verify(ownerRepository).save(ownerArgumentCaptor.capture());
+        Owner ownerForSave = ownerArgumentCaptor.getValue();
+
+        assertAll(
+                () -> assertEquals(ownerDtoAfter, resultOwnerDto, "entity test failed"),
+                () -> assertEquals(oldOwner.getId(), ownerForSave.getId(),
+                        "id field test failed"),
+                () -> assertEquals(newOwner.getLastName(), ownerForSave.getLastName(),
+                        "LastName field test failed"),
+                () -> assertEquals(oldOwner.getFirstName(), ownerForSave.getFirstName(),
+                        "FirstName field test failed"),
+                () -> assertEquals(oldOwner.getMiddleName(), ownerForSave.getMiddleName(),
+                        "MiddleName field test failed"),
+                () -> assertEquals(oldOwner.getMainPhone(), ownerForSave.getMainPhone(),
+                        "MainPhone field test failed"),
+                () -> assertEquals(oldOwner.getOptionalPhone(), ownerForSave.getOptionalPhone(),
+                        "OptionalPhone field test failed"),
+                () -> assertEquals(oldOwner.getOtherContacts(), ownerForSave.getOtherContacts(),
+                        "OtherContacts field test failed"),
+                () -> assertEquals(oldOwner.getActualAddress(), ownerForSave.getActualAddress(),
+                        "ActualAddress field test failed"),
+                () -> assertEquals(oldOwner.getTrustedMan(), ownerForSave.getTrustedMan(),
+                        "TrustedMan field test failed"),
+                () -> assertEquals(oldOwner.getSource(), ownerForSave.getSource(),
+                        "Source field test failed"),
+                () -> assertEquals(oldOwner.getComment(), ownerForSave.getComment(),
+                        "Comment field test failed"),
+                () -> assertEquals(oldOwner.getRating(), ownerForSave.getRating(),
+                        "ёRating field test failed"),
+                () -> assertEquals(oldOwner.getRegistrationDate(), ownerForSave.getRegistrationDate(),
+                        "RegistrationDate field test failed"),
+
+                () -> verify(entityService).getOwnerIfExists(ownerId),
+                () -> verify(ownerMapper).toOwner(newOwnerDto),
+                () -> verify(ownerRepository).save(newOwner),
+                () -> verify(ownerMapper).toOwnerDto(ownerAfter)
+        );
+    }
+
+    @Test
+    void getAllOwners() {
+        Owner owner1 = new Owner(ownerId + 1, "1" + ownerLastName, "1" + ownerFirstName,
+                "1" + ownerMiddleName, "1" + mainPhone, "1" + optionalPhone,
+                "1" + otherContacts, "1" + actualAddress, "1" + trustedMan,
+                "1" + source, "1" + comment, 1 + rating, registrationDate.plusHours(1));
+        Owner owner2 = new Owner(ownerId + 2, "2" + ownerLastName, "2" + ownerFirstName,
+                "2" + ownerMiddleName, "2" + mainPhone, "2" + optionalPhone,
+                "2" + otherContacts, "2" + actualAddress, "2" + trustedMan,
+                "2" + source, "2" + comment, 2 + rating, registrationDate.plusHours(2));
+        Owner owner3 = new Owner(ownerId + 3, "3" + ownerLastName, "3" + ownerFirstName,
+                "3" + ownerMiddleName, "3" + mainPhone, "3" + optionalPhone,
+                "3" + otherContacts, "3" + actualAddress, "3" + trustedMan,
+                "3" + source, "3" + comment, 3 + rating, registrationDate.plusHours(3));
+
+        List<Owner> ownerList = List.of(owner1, owner2, owner3);
+
+        OwnerDto ownerDto1 = new OwnerDto(owner1.getId(), owner1.getLastName(), owner1.getFirstName(),
+                owner1.getMiddleName(), owner1.getMainPhone(), owner1.getOptionalPhone(), owner1.getOtherContacts(),
+                owner1.getActualAddress(), owner1.getTrustedMan(), owner1.getSource(), owner1.getComment(),
+                owner1.getRating(), owner1.getRegistrationDate());
+        OwnerDto ownerDto2 = new OwnerDto(owner2.getId(), owner2.getLastName(), owner2.getFirstName(),
+                owner2.getMiddleName(), owner2.getMainPhone(), owner2.getOptionalPhone(), owner2.getOtherContacts(),
+                owner2.getActualAddress(), owner2.getTrustedMan(), owner2.getSource(), owner2.getComment(),
+                owner2.getRating(), owner2.getRegistrationDate());
+        OwnerDto ownerDto3 = new OwnerDto(owner3.getId(), owner3.getLastName(), owner3.getFirstName(),
+                owner3.getMiddleName(), owner3.getMainPhone(), owner3.getOptionalPhone(), owner3.getOtherContacts(),
+                owner3.getActualAddress(), owner3.getTrustedMan(), owner3.getSource(), owner3.getComment(),
+                owner3.getRating(), owner3.getRegistrationDate());
+
+        List<OwnerDto> ownerDtoList = List.of(ownerDto1, ownerDto2, ownerDto3);
+
+        when(ownerRepository.findAll()).thenReturn(ownerList);
+        when(ownerMapper.map(ownerList)).thenReturn(ownerDtoList);
+
+        List<OwnerDto> returnedOwnersDto = ownerService.getAllOwners(requesterId);
+
+        assertAll(
+                () -> assertEquals(ownerDtoList, returnedOwnersDto),
+                () -> verify(ownerRepository).findAll(),
+                () -> verify(ownerMapper).map(ownerList)
+        );
+    }
+
+    @Test
+    void deleteOwnerById() {
+        when(entityService.getOwnerIfExists(ownerId)).thenReturn(owner);
+
+        ownerService.deleteOwnerById(requesterId, ownerId);
+
+        verify(entityService).getOwnerIfExists(ownerId);
+        verify(ownerRepository).deleteById(longArgumentCaptor.capture());
+        Long idForDelete = longArgumentCaptor.getValue();
+        assertEquals(ownerId, idForDelete);
+    }
+
+    @Test
+    void checkOwnerPhoneNumber_whenOwnerAlreadyExist_thenReturnExistedOwner() {
+        CheckOwnerDto checkOwnerDto = new CheckOwnerDto(mainPhone);
+        when(ownerRepository.findByMainPhoneOrOptionalPhone(mainPhone, mainPhone)).thenReturn(Optional.of(owner));
+        when(ownerMapper.toOwnerDto(owner)).thenReturn(ownerDto);
+
+        OwnerDto resultOwnerDto = ownerService.checkOwnerPhoneNumber(requesterId, checkOwnerDto);
+
+        assertAll(
+                () -> verify(ownerRepository).findByMainPhoneOrOptionalPhone(mainPhone, mainPhone),
+                () -> verify(ownerMapper).toOwnerDto(owner),
+                () -> assertEquals(ownerDto, resultOwnerDto)
+        );
+    }
+
+    @Test
+    void checkOwnerPhoneNumber_whenOwnerNotyExist_thenReturnEmptyOwner() {
+        CheckOwnerDto checkOwnerDto = new CheckOwnerDto(mainPhone);
+        when(ownerRepository.findByMainPhoneOrOptionalPhone(mainPhone, mainPhone)).thenReturn(Optional.empty());
+        when(ownerMapper.toOwnerDto(any(Owner.class))).thenReturn(new OwnerDto());
+
+        OwnerDto resultOwnerDto = ownerService.checkOwnerPhoneNumber(requesterId, checkOwnerDto);
+
+        assertAll(
+                () -> assertEquals(new OwnerDto(), resultOwnerDto),
+                () -> verify(ownerRepository).findByMainPhoneOrOptionalPhone(mainPhone, mainPhone),
+                () -> verify(ownerMapper).toOwnerDto(any(Owner.class))
+        );
+    }
+
+    @Test
+    void searchOwner_whenOwnersFound_thenReturnFoundOwners() {
+        SearchOwnerDto searchOwnerDto = new SearchOwnerDto("123");
+        Direction direction = Direction.PHONE;
+        List<Owner> foundOwners = List.of(owner);
+        when(ownerRepository.searchOwner(searchOwnerDto.getWanted(), direction.getTitle())).thenReturn(foundOwners);
+        when(ownerMapper.map(foundOwners)).thenReturn(List.of(ownerDto));
+
+        Collection<OwnerDto> resultOwnersDto = ownerService.searchOwner(requesterId, searchOwnerDto, direction);
+
+        assertAll(
+                () -> assertEquals(List.of(ownerDto), resultOwnersDto),
+                () -> verify(ownerRepository).searchOwner(searchOwnerDto.getWanted(), direction.getTitle()),
+                () -> verify(ownerMapper).map(foundOwners)
+        );
+    }
+
+    @Test
+    void searchOwner_whenOwnersNotFound_thenReturnEmptyList() {
+        SearchOwnerDto searchOwnerDto = new SearchOwnerDto("123");
+        Direction direction = Direction.PHONE;
+        List<Owner> foundOwners = Collections.emptyList();
+        when(ownerRepository.searchOwner(searchOwnerDto.getWanted(), direction.getTitle())).thenReturn(foundOwners);
+        when(ownerMapper.map(foundOwners)).thenReturn(Collections.emptyList());
+
+        Collection<OwnerDto> resultOwnersDto = ownerService.searchOwner(requesterId, searchOwnerDto, direction);
+
+        assertAll(
+                () -> assertEquals(Collections.emptyList(), resultOwnersDto),
+                () -> verify(ownerRepository).searchOwner(searchOwnerDto.getWanted(), direction.getTitle()),
+                () -> verify(ownerMapper).map(foundOwners)
+        );
+    }
 }
