@@ -6,10 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.modgy.booking.model.Booking;
 import ru.modgy.booking.repository.BookingRepository;
-import ru.modgy.exception.AccessDeniedException;
 import ru.modgy.exception.ConflictException;
 import ru.modgy.exception.NotFoundException;
-import ru.modgy.room.category.dto.mapper.CategoryMapper;
 import ru.modgy.room.category.model.Category;
 import ru.modgy.room.dto.NewRoomDto;
 import ru.modgy.room.dto.RoomDto;
@@ -28,7 +26,7 @@ import java.util.*;
 public class RoomServiceImpl implements RoomService {
     private final RoomRepository roomRepository;
     private final RoomMapper roomMapper;
-    private final CategoryMapper categoryMapper;
+    private final BookingRepository bookingRepository;
     private final EntityService entityService;
 
     @Transactional
@@ -54,12 +52,12 @@ public class RoomServiceImpl implements RoomService {
 
     @Transactional
     @Override
-    public RoomDto updateRoom(Long userId, Long roomId, UpdateRoomDto roomDto) {
+    public RoomDto updateRoom(Long userId, Long roomId, UpdateRoomDto updateRoomDto) {
         Room oldRoom = entityService.getRoomIfExists(roomId);
-        Room newRoom = roomMapper.toRoom(roomDto);
+        Room newRoom = roomMapper.toRoom(updateRoomDto);
         Category category;
-        if (roomDto.getCategoryId() != null) {
-            category = entityService.getCategoryIfExists(roomDto.getCategoryId());
+        if (updateRoomDto.getCategoryId() != null) {
+            category = entityService.getCategoryIfExists(updateRoomDto.getCategoryId());
         } else {
             category = oldRoom.getCategory();
         }
@@ -82,7 +80,7 @@ public class RoomServiceImpl implements RoomService {
         Room updatedRoom = roomRepository.save(newRoom);
         RoomDto updatedRoomDto = roomMapper.toRoomDto(updatedRoom);
 
-        log.info("RoomService: updateRoom, userId={}, roomId={}, roomDto={}", userId, roomId, roomDto);
+        log.info("RoomService: updateRoom, userId={}, roomId={}, roomDto={}", userId, roomId, updateRoomDto);
 
         return updatedRoomDto;
     }
@@ -148,7 +146,6 @@ public class RoomServiceImpl implements RoomService {
             Long catId,
             LocalDate checkInDate,
             LocalDate checkOutDate) {
-        checkAdminAccess(userId);
         List<Room> foundRooms = findAvailableRoomsByCategoryInDates(catId, checkInDate, checkOutDate);
         log.info("RoomService: findAvailableRoomsByCategoryInDates, " +
                 "userId={}, catId={}, checkInDate={}, checkOutDate={}",
@@ -161,38 +158,5 @@ public class RoomServiceImpl implements RoomService {
                                                            LocalDate checkOutDate) {
         return roomRepository.findAvailableRoomsByCategoryInDates(catId, checkInDate, checkOutDate)
                 .orElse(Collections.emptyList());
-    }
-
-    private Room findRoomById(Long id) {
-        return roomRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("room with id=%d is not found", id)));
-    }
-
-    private User findUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("user with id=%d is not found", userId)));
-    }
-
-    private void checkAdminAccess(Long userId) {
-        User user = findUserById(userId);
-
-        if (user.getRole().ordinal() >= 2) {
-            throw new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                    user.getRole()));
-        }
-    }
-
-    private void checkViewAccess(Long userId) {
-        User user = findUserById(userId);
-
-        if (user.getRole().ordinal() == 2) {
-            throw new AccessDeniedException(String.format("User with role=%s, can't access for this information",
-                    user.getRole()));
-        }
-    }
-
-    private Category findCategoryById(Long id) {
-        return categoryRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("category with id=%d is not found", id)));
     }
 }

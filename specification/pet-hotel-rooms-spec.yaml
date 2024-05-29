@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: 'PetHotel: Rooms Specification'
-  version: v2
+  version: v3
 servers:
   - url: http://localhost:8080
     description: Generated server url
@@ -17,7 +17,7 @@ paths:
         - room-controller
       operationId: getAllRooms
       summary: Получение списка всех номеров
-      description: Получение списка всех номеров. Доступно только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
+      description: Получение списка всех номеров. Доступно только пользователями с ролью ROLE_BOSS, ROLE_ADMIN, ROLE_FINANCIAL.
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
         - name: isVisible
@@ -89,6 +89,8 @@ paths:
       tags:
         - room-controller
       operationId: addRoom
+      summary: Добавление нового номера
+      description: Добавление в БД нового номера. Доступно только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
       requestBody:
@@ -169,6 +171,8 @@ paths:
       tags:
         - room-controller
       operationId: getRoomById
+      summary: Получение номера по его ID
+      description: Получение номера по его ID. Доступно только пользователями с ролью ROLE_BOSS, ROLE_ADMIN, ROLE_FINANCIAL.
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
         - $ref: '#/components/parameters/roomId'
@@ -231,6 +235,8 @@ paths:
       tags:
         - room-controller
       operationId: deleteRoomById
+      summary: Удаление номера по его ID
+      description: Удаление номера по его ID. Доступно только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
         - $ref: '#/components/parameters/roomId'
@@ -289,6 +295,8 @@ paths:
       tags:
         - room-controller
       operationId: updateRoom
+      summary: Изменение номера по его ID
+      description: Изменение номера по его ID. Доступно только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
         - $ref: '#/components/parameters/roomId'
@@ -370,6 +378,8 @@ paths:
       tags:
         - room-controller
       operationId: unhideRoomById
+      summary: Возвращение номера в отображаемые списки по его ID
+      description: Возвращение номера в отображаемые списки по его ID. Доступно только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
         - $ref: '#/components/parameters/roomId'
@@ -433,6 +443,8 @@ paths:
       tags:
         - room-controller
       operationId: hideRoomById
+      summary: Сокрытие номера из отображаемых списков по его ID
+      description: Сокрытие номера из отображаемых списков по его ID. Доступно только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
         - $ref: '#/components/parameters/roomId'
@@ -491,6 +503,75 @@ paths:
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
+  /rooms/{catId}/getAvailableRooms:
+    get:
+      tags:
+        - room-controller
+      operationId: getAvailableRoomsByCategoryInDates
+      summary: Получение списка всех доступных номеров в категории
+      description: Получение списка всех доступных на определенные даты номеров, относящихся к заданной категории. Доступно только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - $ref: '#/components/parameters/catId'
+        - $ref: '#/components/parameters/checkInDate'
+        - $ref: '#/components/parameters/checkOutDate'
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoomDto'
+        '400':
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: 'Required request header X-PetHotel-User-Id for method parameter type Long is not present'
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Запрос составлен некорректно.Например, переданы невалидные данные.
+        '403':
+          description: У пользователя с данной ролью нет прав на совершение данного действия.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Объект не найден - в БД отсутствует пользователь с id, переданном в header.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=1 is not found"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error. Все прочие неотлавливаемые исключения.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error
+                message: [ ]
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   parameters:
     requesterHeader:
@@ -509,6 +590,31 @@ components:
       schema:
         type: integer
         format: int64
+    catId:
+      name: catId
+      in: path
+      description: ID категории, к которой относятся искомые номера
+      required: true
+      schema:
+        type: integer
+        format: int64
+    checkInDate:
+      name: checkInDate
+      in: query
+      description: Дата планируемого заезда в формате "dd.MM.yyyy"
+      required: true
+      schema:
+        type: string
+        format: date
+    checkOutDate:
+      name: checkOutDate
+      in: query
+      description: Дата планируемого выезда в формате "dd.MM.yyyy"
+      required: true
+      schema:
+        type: string
+        format: date
+
   schemas:
     Error:
       type: object
