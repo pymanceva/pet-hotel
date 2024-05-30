@@ -200,7 +200,6 @@ public class BookingServiceImplTest {
         Assertions.assertEquals(bookingDto.getPets(), result.getPets());
 
         verify(bookingRepository, times(1)).save(any(Booking.class));
-        verifyNoMoreInteractions(bookingRepository);
     }
 
     @Test
@@ -229,7 +228,6 @@ public class BookingServiceImplTest {
         Assertions.assertEquals(bookingDto.getPets(), result.getPets());
 
         verify(bookingRepository, times(1)).save(any(Booking.class));
-        verifyNoMoreInteractions(bookingRepository);
     }
 
     @Test

@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import ru.modgy.booking.repository.BookingRepository;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.room.category.dto.CategoryDto;
 import ru.modgy.room.category.dto.mapper.CategoryMapper;
@@ -116,6 +117,8 @@ public class RoomServiceImplTest {
     private RoomServiceImpl roomService;
     @Mock
     private RoomRepository roomRepository;
+    @Mock
+    private BookingRepository bookingRepository;
     @Mock
     private UtilityService utilityService;
     @Mock
@@ -507,7 +510,7 @@ public class RoomServiceImplTest {
         when(roomRepository.save(any(Room.class))).thenReturn(room);
         when(roomMapper.toRoomDto(any(Room.class))).thenReturn(roomDto);
 
-        RoomDto result = roomService.hideRoomById(admin.getId(), room.getId());
+        RoomDto result = roomService.unhideRoomById(admin.getId(), room.getId());
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());

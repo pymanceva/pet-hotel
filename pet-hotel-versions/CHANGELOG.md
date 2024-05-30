@@ -46,3 +46,8 @@ API: *<https://github.com/pymanceva/pet-hotel/blob/add-bookings/Specification/pe
 
 **0.0.11: Добавлен UtilityService для получения сущностей всех типов и проверки прав доступа.**
 Карточка задачи: *<https://nkiblyk.kaiten.ru/space/167883/card/27549007?filter=eyJrZXkiOiJhbmQiLCJ2YWx1ZSI6W3sia2V5IjoiYW5kIiwidmFsdWUiOlt7ImNvbXBhcmlzb24iOiJlcSIsImtleSI6InRhZyIsInZhbHVlIjo0OTA5MDF9XX1dfQ>*
+
+**0.0.12: Добавлена проверка доступности номеров, поиск блокирующих и пересекающихся бронирований 
+и поиск номеров заданной категории, доступных в указанные даты.**
+Карточки задачи: *https://nkiblyk.kaiten.ru/space/167883/card/27548967?filter=eyJrZXkiOiJhbmQiLCJ2YWx1ZSI6W3sia2V5IjoiYW5kIiwidmFsdWUiOlt7ImNvbXBhcmlzb24iOiJlcSIsImtleSI6InJlc3BvbnNpYmxlIiwidmFsdWUiOjQ5NDU3MH1dfV19*
+*https://nkiblyk.kaiten.ru/space/167883/card/27548993?filter=eyJrZXkiOiJhbmQiLCJ2YWx1ZSI6W3sia2V5IjoiYW5kIiwidmFsdWUiOlt7ImNvbXBhcmlzb24iOiJlcSIsImtleSI6InJlc3BvbnNpYmxlIiwidmFsdWUiOjQ5NDU3MH1dfV19*
