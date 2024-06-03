@@ -9,7 +9,9 @@ servers:
   - url: https://212.109.192.9:443
     description: Удалённый backend сервер для тестирования и работы frontend. 
       По вопросам работы сервера обращаться к Руслану
-
+  - url: http://212.109.192.9:8080
+    description: backend server для тестирования кода и работы фронтэнда
+      По вопросам работы сервера обращаться к Руслану
 tags:
   - description: API для работы с пользователями.
     name: user-controller

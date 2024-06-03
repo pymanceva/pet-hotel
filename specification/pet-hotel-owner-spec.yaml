@@ -5,11 +5,14 @@ info:
   version: 'v3'
 
 servers:
-    - url: http://212.109.192.9:8080
-      description: Local server for develop
     - url: http://localhost:8080
+      description: Local server for develop
+    - url: http://212.109.192.9:8080
       description: backend server для тестирования кода и работы фронтэнда
-
+        По вопросам работы сервера обращаться к Руслану
+    - url: https://212.109.192.9:443
+      description: Удалённый backend сервер для тестирования и работы frontend.
+        По вопросам работы сервера обращаться к Руслану
 paths:
   /owners:
     post:
@@ -494,7 +497,7 @@ paths:
               example:
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
-                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                message: "User with role=FINANCIAL, can't access for this action"
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'
@@ -561,7 +564,7 @@ paths:
               example:
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
-                message: "User with role=FINANCIAL, hasn't access for browse this information"
+                message: "User with role=FINANCIAL, can't access for this action"
                 timestamp: 2023-12-03 09:10:55
               schema:
                 $ref: '#/components/schemas/Error'

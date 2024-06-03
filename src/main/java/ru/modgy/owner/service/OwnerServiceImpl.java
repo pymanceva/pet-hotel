@@ -8,7 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.modgy.owner.controller.Direction;
+import ru.modgy.exception.NotFoundException;
+import ru.modgy.owner.controller.SearchDirection;
 import ru.modgy.owner.dto.*;
 import ru.modgy.owner.dto.mapper.OwnerMapper;
 import ru.modgy.owner.model.Owner;
@@ -105,8 +106,11 @@ public class OwnerServiceImpl implements OwnerService {
     @Transactional
     @Override
     public void deleteOwnerById(Long requesterId, Long ownerId) {
-        entityService.getOwnerIfExists(ownerId);
-        ownerRepository.deleteById(ownerId);
+        int result = ownerRepository.deleteOwnerById(ownerId);
+
+        if (result == 0) {
+            throw new NotFoundException(String.format("owner with id=%d not found", ownerId));
+        }
         log.info("ownerService: deleteOwnerById, requesterId={}, ownerId={}", requesterId, ownerId);
     }
 
@@ -122,12 +126,12 @@ public class OwnerServiceImpl implements OwnerService {
 
     @Transactional(readOnly = true)
     @Override
-    public Collection<OwnerDto> searchOwner(Long requesterId, SearchOwnerDto searchOwnerDto, Direction direction) {
+    public Collection<OwnerDto> searchOwner(Long requesterId, SearchOwnerDto searchOwnerDto, SearchDirection searchDirection) {
         String searchLine = searchOwnerDto.getWanted();
-        List<Owner> foundOwners = ownerRepository.searchOwner(searchLine, direction.getTitle());
+        List<Owner> foundOwners = ownerRepository.searchOwner(searchLine, searchDirection.getTitle());
 
         log.info("ownerService: searchOwner, requesterId={}, searchOwnerDto={}, direction={}, num foundOwners={}",
-                requesterId,searchOwnerDto, direction, foundOwners.size());
+                requesterId,searchOwnerDto, searchDirection, foundOwners.size());
 
         return ownerMapper.map(foundOwners);
     }

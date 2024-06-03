@@ -22,4 +22,6 @@ public interface OwnerRepository extends JpaRepository<Owner, Long> {
             @Param("searchLine") String searchLine,
             @Param("direction") String direction
     );
+
+    Integer deleteOwnerById(Long ownerId);
 }

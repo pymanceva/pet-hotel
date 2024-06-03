@@ -115,13 +115,13 @@ public class OwnerController {
             @RequestBody SearchOwnerDto searchOwnerDto,
             @RequestParam(value = "direction") String directionString
     ) {
-        Direction direction = Direction.fromString(directionString);
-        if (direction == null) {
+        SearchDirection searchDirection = SearchDirection.fromString(directionString);
+        if (searchDirection == null) {
             throw new BadRequestException("RequestParam direction error");
         }
         log.info("OwnerController: requesterId={} GET/searchOwner searchOwnerDto={}, direction={}",
-                requesterId, searchOwnerDto, direction);
+                requesterId, searchOwnerDto, searchDirection);
         utilityService.checkHigherOrdinalRoleAccess(requesterId, Roles.ROLE_ADMIN);
-        return ownerService.searchOwner(requesterId, searchOwnerDto, direction);
+        return ownerService.searchOwner(requesterId, searchOwnerDto, searchDirection);
     }
 }

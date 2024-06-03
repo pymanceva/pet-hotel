@@ -1,12 +1,12 @@
 package ru.modgy.owner.controller;
 
-public enum Direction {
+public enum SearchDirection {
     NAME("name"),
     PHONE("phone");
 
     private final String title;
 
-    Direction(String title) {
+    SearchDirection(String title) {
         this.title = title;
     }
 
@@ -14,8 +14,8 @@ public enum Direction {
         return title;
     }
 
-    public static Direction fromString(String title) {
-        for (var d : Direction.values()) {
+    public static SearchDirection fromString(String title) {
+        for (var d : SearchDirection.values()) {
             if (d.title.equalsIgnoreCase(title)) {
                 return d;
             }

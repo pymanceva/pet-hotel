@@ -26,7 +26,7 @@ public class Owner {
     private String middleName;
     @Column(name = "main_phone_owners", nullable = false)
     private String mainPhone;
-    @Column(name = "optional_phone_owners", nullable = false)
+    @Column(name = "optional_phone_owners")
     private String optionalPhone;
     @Column(name = "other_contacts_owners")
     private String otherContacts;

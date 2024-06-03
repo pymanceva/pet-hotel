@@ -9,7 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.modgy.exception.NotFoundException;
-import ru.modgy.owner.controller.Direction;
+import ru.modgy.owner.controller.SearchDirection;
 import ru.modgy.owner.controller.OwnerController;
 import ru.modgy.owner.dto.*;
 import ru.modgy.owner.service.OwnerService;
@@ -422,15 +422,15 @@ class OwnerControllerIntegrationTest {
     @SneakyThrows
     void searchOwner_whenAllDataOk_thenOk() {
         SearchOwnerDto searchOwnerDto = new SearchOwnerDto("123");
-        Direction direction = Direction.PHONE;
-        when(ownerService.searchOwner(requesterId, searchOwnerDto, direction)).thenReturn(List.of(ownerDto));
+        SearchDirection searchDirection = SearchDirection.PHONE;
+        when(ownerService.searchOwner(requesterId, searchOwnerDto, searchDirection)).thenReturn(List.of(ownerDto));
 
         mockMvc.perform(post("/owners/search")
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(searchOwnerDto))
-                        .param("direction", direction.getTitle()))
+                        .param("direction", searchDirection.getTitle()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(ownerDto.getId()), Long.class))
                 .andExpect(jsonPath("$.[0].lastName", is(ownerDto.getLastName())))
@@ -447,17 +447,17 @@ class OwnerControllerIntegrationTest {
                 .andExpect(jsonPath("$.[0].registrationDate")
                         .value(ownerDto.getRegistrationDate().toString()));
 
-        verify(ownerService).searchOwner(requesterId, searchOwnerDto, direction);
+        verify(ownerService).searchOwner(requesterId, searchOwnerDto, searchDirection);
 
-        direction = Direction.NAME;
-        when(ownerService.searchOwner(requesterId, searchOwnerDto, direction)).thenReturn(List.of(ownerDto));
+        searchDirection = SearchDirection.NAME;
+        when(ownerService.searchOwner(requesterId, searchOwnerDto, searchDirection)).thenReturn(List.of(ownerDto));
 
         mockMvc.perform(post("/owners/search")
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(searchOwnerDto))
-                        .param("direction", direction.getTitle()))
+                        .param("direction", searchDirection.getTitle()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(ownerDto.getId()), Long.class))
                 .andExpect(jsonPath("$.[0].lastName", is(ownerDto.getLastName())))
@@ -474,31 +474,31 @@ class OwnerControllerIntegrationTest {
                 .andExpect(jsonPath("$.[0].registrationDate")
                         .value(ownerDto.getRegistrationDate().toString()));
 
-        verify(ownerService).searchOwner(requesterId, searchOwnerDto, direction);
+        verify(ownerService).searchOwner(requesterId, searchOwnerDto, searchDirection);
     }
 
     @Test
     @SneakyThrows
     void searchOwner_whenWithoutBody_then4xx() {
         SearchOwnerDto searchOwnerDto = new SearchOwnerDto("123");
-        Direction direction = Direction.PHONE;
-        when(ownerService.searchOwner(requesterId, searchOwnerDto, direction)).thenReturn(List.of(ownerDto));
+        SearchDirection searchDirection = SearchDirection.PHONE;
+        when(ownerService.searchOwner(requesterId, searchOwnerDto, searchDirection)).thenReturn(List.of(ownerDto));
 
         mockMvc.perform(post("/owners/search")
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON)
-                        .param("direction", direction.getTitle()))
+                        .param("direction", searchDirection.getTitle()))
                 .andExpect(status().is4xxClientError());
 
-        verify(ownerService, never()).searchOwner(requesterId, searchOwnerDto, direction);
+        verify(ownerService, never()).searchOwner(requesterId, searchOwnerDto, searchDirection);
     }
 
     @Test
     @SneakyThrows
     void searchOwner_whenWithoutDirectionParam_then4xx() {
         SearchOwnerDto searchOwnerDto = new SearchOwnerDto("123");
-        Direction direction = Direction.PHONE;
-        when(ownerService.searchOwner(requesterId, searchOwnerDto, direction)).thenReturn(List.of(ownerDto));
+        SearchDirection searchDirection = SearchDirection.PHONE;
+        when(ownerService.searchOwner(requesterId, searchOwnerDto, searchDirection)).thenReturn(List.of(ownerDto));
 
         mockMvc.perform(post("/owners/search")
                         .header(requesterHeader, requesterId)
@@ -507,7 +507,7 @@ class OwnerControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(searchOwnerDto)))
                 .andExpect(status().is4xxClientError());
 
-        verify(ownerService, never()).searchOwner(requesterId, searchOwnerDto, direction);
+        verify(ownerService, never()).searchOwner(requesterId, searchOwnerDto, searchDirection);
     }
 
 

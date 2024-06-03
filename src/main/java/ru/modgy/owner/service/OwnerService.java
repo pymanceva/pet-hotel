@@ -1,6 +1,6 @@
 package ru.modgy.owner.service;
 
-import ru.modgy.owner.controller.Direction;
+import ru.modgy.owner.controller.SearchDirection;
 import ru.modgy.owner.dto.*;
 
 import java.util.Collection;
@@ -83,8 +83,8 @@ public interface OwnerService {
      *
      * @param requesterId    - id пользователя, направляющего запрос
      * @param searchOwnerDto - искомые данные
-     * @param direction - направление поиска: Direction.name - ФИО, Direction.phone - номер телефона
+     * @param searchDirection - направление поиска: Direction.name - ФИО, Direction.phone - номер телефона
      * @return список найденных клиентов(хозяев питомцев )
      */
-    Collection<OwnerDto> searchOwner(Long requesterId, SearchOwnerDto searchOwnerDto, Direction direction);
+    Collection<OwnerDto> searchOwner(Long requesterId, SearchOwnerDto searchOwnerDto, SearchDirection searchDirection);
 }

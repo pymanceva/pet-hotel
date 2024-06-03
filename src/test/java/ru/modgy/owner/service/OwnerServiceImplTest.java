@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.data.domain.*;
-import ru.modgy.owner.controller.Direction;
+import ru.modgy.owner.controller.SearchDirection;
 import ru.modgy.owner.dto.*;
 import ru.modgy.owner.dto.mapper.OwnerMapper;
 import ru.modgy.owner.model.Owner;
@@ -347,12 +347,12 @@ class OwnerServiceImplTest {
 
     @Test
     void deleteOwnerById() {
-        when(entityService.getOwnerIfExists(ownerId)).thenReturn(owner);
+        when(ownerRepository.deleteOwnerById(ownerId)).thenReturn(1);
 
         ownerService.deleteOwnerById(requesterId, ownerId);
 
-        verify(entityService).getOwnerIfExists(ownerId);
-        verify(ownerRepository).deleteById(longArgumentCaptor.capture());
+        verify(ownerRepository).deleteOwnerById(ownerId);
+        verify(ownerRepository).deleteOwnerById(longArgumentCaptor.capture());
         Long idForDelete = longArgumentCaptor.getValue();
         assertEquals(ownerId, idForDelete);
     }
@@ -390,16 +390,16 @@ class OwnerServiceImplTest {
     @Test
     void searchOwner_whenOwnersFound_thenReturnFoundOwners() {
         SearchOwnerDto searchOwnerDto = new SearchOwnerDto("123");
-        Direction direction = Direction.PHONE;
+        SearchDirection searchDirection = SearchDirection.PHONE;
         List<Owner> foundOwners = List.of(owner);
-        when(ownerRepository.searchOwner(searchOwnerDto.getWanted(), direction.getTitle())).thenReturn(foundOwners);
+        when(ownerRepository.searchOwner(searchOwnerDto.getWanted(), searchDirection.getTitle())).thenReturn(foundOwners);
         when(ownerMapper.map(foundOwners)).thenReturn(List.of(ownerDto));
 
-        Collection<OwnerDto> resultOwnersDto = ownerService.searchOwner(requesterId, searchOwnerDto, direction);
+        Collection<OwnerDto> resultOwnersDto = ownerService.searchOwner(requesterId, searchOwnerDto, searchDirection);
 
         assertAll(
                 () -> assertEquals(List.of(ownerDto), resultOwnersDto),
-                () -> verify(ownerRepository).searchOwner(searchOwnerDto.getWanted(), direction.getTitle()),
+                () -> verify(ownerRepository).searchOwner(searchOwnerDto.getWanted(), searchDirection.getTitle()),
                 () -> verify(ownerMapper).map(foundOwners)
         );
     }
@@ -407,16 +407,16 @@ class OwnerServiceImplTest {
     @Test
     void searchOwner_whenOwnersNotFound_thenReturnEmptyList() {
         SearchOwnerDto searchOwnerDto = new SearchOwnerDto("123");
-        Direction direction = Direction.PHONE;
+        SearchDirection searchDirection = SearchDirection.PHONE;
         List<Owner> foundOwners = Collections.emptyList();
-        when(ownerRepository.searchOwner(searchOwnerDto.getWanted(), direction.getTitle())).thenReturn(foundOwners);
+        when(ownerRepository.searchOwner(searchOwnerDto.getWanted(), searchDirection.getTitle())).thenReturn(foundOwners);
         when(ownerMapper.map(foundOwners)).thenReturn(Collections.emptyList());
 
-        Collection<OwnerDto> resultOwnersDto = ownerService.searchOwner(requesterId, searchOwnerDto, direction);
+        Collection<OwnerDto> resultOwnersDto = ownerService.searchOwner(requesterId, searchOwnerDto, searchDirection);
 
         assertAll(
                 () -> assertEquals(Collections.emptyList(), resultOwnersDto),
-                () -> verify(ownerRepository).searchOwner(searchOwnerDto.getWanted(), direction.getTitle()),
+                () -> verify(ownerRepository).searchOwner(searchOwnerDto.getWanted(), searchDirection.getTitle()),
                 () -> verify(ownerMapper).map(foundOwners)
         );
     }
