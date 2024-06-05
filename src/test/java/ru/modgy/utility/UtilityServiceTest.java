@@ -9,8 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import ru.modgy.exception.AccessDeniedException;
+import ru.modgy.exception.ConflictException;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
+
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -268,5 +271,26 @@ public class UtilityServiceTest {
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckFinancialAndFinancial_thenAccessDenied() {
         assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(financial, Roles.ROLE_FINANCIAL));
+    }
+
+    @Test
+    void checkDatesOfBookingWhenCheckInDateIsBeforeCheckOutDate_thenNoExceptionThrown() {
+        Assertions.assertDoesNotThrow(() -> utilityService.checkDatesOfBooking(
+                LocalDate.of(2024, 1, 1),
+                LocalDate.of(2024, 1, 2)));
+    }
+
+    @Test
+    void checkDatesOfBookingWhenCheckInDateIsEqualCheckOutDate_thenNoExceptionThrown() {
+        Assertions.assertDoesNotThrow(() -> utilityService.checkDatesOfBooking(
+                LocalDate.of(2024, 1, 1),
+                LocalDate.of(2024, 1, 1)));
+    }
+
+    @Test
+    void checkDatesOfBookingWhenCheckInDateIsAfterCheckOutDate_thenConflictException() {
+        assertThrows(ConflictException.class, () -> utilityService.checkDatesOfBooking(
+                LocalDate.of(2024, 1, 2),
+                LocalDate.of(2024, 1, 1)));
     }
 }

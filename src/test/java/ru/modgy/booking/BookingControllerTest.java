@@ -15,12 +15,14 @@ import ru.modgy.booking.dto.UpdateBookingDto;
 import ru.modgy.booking.model.StatusBooking;
 import ru.modgy.booking.model.TypesBooking;
 import ru.modgy.booking.service.BookingService;
+import ru.modgy.exception.ConflictException;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.room.category.dto.CategoryDto;
 import ru.modgy.room.dto.RoomDto;
 import ru.modgy.utility.UtilityService;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,14 +34,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = BookingController.class)
 public class BookingControllerTest {
-    private final String requesterHeader = "X-PetHotel-User-Id";
+    private final String requesterHeader = UtilityService.REQUESTER_ID_HEADER;
     private final UpdateBookingDto updateBookingDto = UpdateBookingDto.builder()
             .isPrepaid(true)
             .status(StatusBooking.STATUS_CANCELLED)
             .build();
-    long requesterId = 1L;
-    long bookingId = 1L;
-    long roomId = 1L;
+    private final long requesterId = 1L;
+    private final long bookingId = 1L;
+    private final long roomId = 1L;
+    private final LocalDate checkIn = LocalDate.of(2024, 1, 1);
+    private final LocalDate checkOut = LocalDate.of(2024, 1, 2);
+
     private final RoomDto roomDto = RoomDto.builder()
             .id(roomId)
             .area(5.0)
@@ -198,5 +203,68 @@ public class BookingControllerTest {
                 .andExpect(status().isNotFound());
 
         verify(bookingService, times(2)).deleteBookingById(requesterId, bookingId);
+    }
+
+    @Test
+    @SneakyThrows
+    void checkRoomAvailableInDates() {
+        mockMvc.perform(get("/bookings/{roomId}/checkRoomAvailable", roomId)
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.ALL_VALUE)
+                        .param("checkInDate", "2024-01-01" )
+                        .param("checkOutDate", "2024-01-02"))
+                .andExpect(status().isOk());
+
+        verify(bookingService).checkRoomAvailableInDates(requesterId, roomId, checkIn, checkOut);
+
+        doThrow(ConflictException.class)
+                .when(bookingService)
+                .checkRoomAvailableInDates(anyLong(), anyLong(), any(LocalDate.class), any(LocalDate.class));
+
+        mockMvc.perform(get("/bookings/{roomId}/checkRoomAvailable", roomId)
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .param("checkInDate", "2024-01-01" )
+                        .param("checkOutDate", "2024-01-02"))
+                .andExpect(status().isConflict());
+
+        verify(bookingService, times(2))
+                .checkRoomAvailableInDates(requesterId, roomId, checkIn, checkOut);
+    }
+
+    @Test
+    @SneakyThrows
+    void findBlockingBookingsForRoomInDates() {
+        when(bookingService.findBlockingBookingsForRoomInDates(anyLong(), anyLong(), any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(List.of(bookingDto));
+
+        mockMvc.perform(get("/bookings/{roomId}/blockingBookingsInDates", roomId)
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.ALL_VALUE)
+                        .param("checkInDate", "2024-01-01" )
+                        .param("checkOutDate", "2024-01-02"))
+                .andExpect(status().isOk());
+
+        verify(bookingService).findBlockingBookingsForRoomInDates(requesterId, roomId, checkIn, checkOut);
+        verify(bookingService, times(1))
+                .findBlockingBookingsForRoomInDates(requesterId, roomId, checkIn, checkOut);
+    }
+
+    @Test
+    @SneakyThrows
+    void findCrossingBookingsForRoomInDates() {
+        when(bookingService.findCrossingBookingsForRoomInDates(anyLong(), anyLong(), any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(List.of(bookingDto));
+
+        mockMvc.perform(get("/bookings/{roomId}/crossingBookingsOfRoomInDates", roomId)
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.ALL_VALUE)
+                        .param("checkInDate", "2024-01-01" )
+                        .param("checkOutDate", "2024-01-02"))
+                .andExpect(status().isOk());
+
+        verify(bookingService).findCrossingBookingsForRoomInDates(requesterId, roomId, checkIn, checkOut);
+        verify(bookingService, times(1))
+                .findCrossingBookingsForRoomInDates(requesterId, roomId, checkIn, checkOut);
     }
 }

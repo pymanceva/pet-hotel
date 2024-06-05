@@ -16,6 +16,7 @@ import ru.modgy.room.dto.mapper.RoomMapper;
 import ru.modgy.room.model.Room;
 import ru.modgy.room.repository.RoomRepository;
 import ru.modgy.utility.EntityService;
+import ru.modgy.utility.UtilityService;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -28,6 +29,7 @@ public class RoomServiceImpl implements RoomService {
     private final RoomMapper roomMapper;
     private final BookingRepository bookingRepository;
     private final EntityService entityService;
+    private final UtilityService utilityService;
 
     @Transactional
     @Override
@@ -89,14 +91,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public Collection<RoomDto> getAllRooms(Long userId, Boolean isVisible) {
         List<Room> allRooms = roomRepository.getAllRooms(isVisible).orElse(Collections.emptyList());
-        List<RoomDto> allRoomsDto = new ArrayList<>();
-        for (Room room : allRooms) {
-            RoomDto roomDto = roomMapper.toRoomDto(room);
-            allRoomsDto.add(roomDto);
-        }
-        log.info("RoomService: getAllRooms, userId={}, list size={}", userId, allRooms.size());
-
-        return allRoomsDto;
+        return roomMapper.toListRoomDto(allRooms);
     }
 
     @Transactional
@@ -147,7 +142,7 @@ public class RoomServiceImpl implements RoomService {
             LocalDate checkInDate,
             LocalDate checkOutDate) {
         List<Room> foundRooms = findAvailableRoomsByCategoryInDates(catId, checkInDate, checkOutDate);
-        log.info("RoomService: findAvailableRoomsByCategoryInDates, " +
+        log.info("RoomService: getAvailableRoomsByCategoryInDates, " +
                 "userId={}, catId={}, checkInDate={}, checkOutDate={}",
                 userId, catId, checkInDate, checkOutDate);
         return roomMapper.toListRoomDto(foundRooms);

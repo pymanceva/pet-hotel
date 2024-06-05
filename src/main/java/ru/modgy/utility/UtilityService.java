@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.modgy.exception.AccessDeniedException;
+import ru.modgy.exception.ConflictException;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
+
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -100,5 +103,12 @@ public class UtilityService {
 
     public boolean checkRequesterRequestsHimself(Long requesterId, Long userId) {
         return userId.equals(requesterId);
+    }
+
+    public void checkDatesOfBooking(LocalDate checkInDate, LocalDate checkOutDate) {
+        if (checkInDate.isAfter(checkOutDate)) {
+            throw new ConflictException(String.format("CheckInDate=%s is after CheckOutDate=%s",
+                    checkInDate, checkOutDate));
+        }
     }
 }

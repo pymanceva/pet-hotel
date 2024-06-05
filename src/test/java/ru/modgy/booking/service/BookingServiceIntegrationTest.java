@@ -2,6 +2,7 @@ package ru.modgy.booking.service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +14,7 @@ import ru.modgy.booking.dto.UpdateBookingDto;
 import ru.modgy.booking.model.Booking;
 import ru.modgy.booking.model.StatusBooking;
 import ru.modgy.booking.model.TypesBooking;
+import ru.modgy.exception.ConflictException;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.pet.dto.PetDto;
 import ru.modgy.pet.model.Pet;
@@ -32,6 +34,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -40,6 +43,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @ActiveProfiles("test")
 public class BookingServiceIntegrationTest {
+    private final LocalDate checkIn = LocalDate.of(2024, 1, 1);
+    private final LocalDate checkOut = LocalDate.of(2024, 1, 2);
     private final User requesterAdmin = User.builder()
             .email("admin@mail.ru")
             .firstName("admin")
@@ -65,8 +70,8 @@ public class BookingServiceIntegrationTest {
             .build();
     private final Booking booking = Booking.builder()
             .type(TypesBooking.TYPE_BOOKING)
-            .checkInDate(LocalDate.now())
-            .checkOutDate(LocalDate.now().plusDays(7))
+            .checkInDate(checkIn)
+            .checkOutDate(checkOut)
             .status(StatusBooking.STATUS_INITIAL)
             .price(0.0)
             .amount(0.0)
@@ -93,15 +98,15 @@ public class BookingServiceIntegrationTest {
     private final NewBookingDto newBookingDto = NewBookingDto.builder()
             .type(TypesBooking.TYPE_BOOKING)
             .roomId(1L)
-            .checkInDate(LocalDate.now())
-            .checkOutDate(LocalDate.now().plusDays(7))
+            .checkInDate(checkIn)
+            .checkOutDate(checkOut)
             .petIds(List.of(1L))
             .build();
     private final BookingDto bookingDto = BookingDto.builder()
             .type(TypesBooking.TYPE_BOOKING)
-            .checkInDate(LocalDate.now())
-            .checkOutDate(LocalDate.now().plusDays(7))
-            .daysOfBooking(8)
+            .checkInDate(checkIn)
+            .checkOutDate(checkOut)
+            .daysOfBooking(2)
             .status(StatusBooking.STATUS_INITIAL)
             .price(0.0)
             .amount(0.0)
@@ -210,5 +215,88 @@ public class BookingServiceIntegrationTest {
         );
 
         assertEquals(error, exception.getMessage());
+    }
+
+    @Test
+    void findCrossingBookingsForRoomInDates() {
+        booking.setCheckInDate(checkIn.plusDays(1));
+        booking.setCheckOutDate(checkOut.plusDays(1));
+        em.persist(requesterAdmin);
+        em.persist(category);
+        em.persist(room);
+        em.persist(pet);
+        em.persist(booking);
+
+        List<BookingDto> result = service.findCrossingBookingsForRoomInDates(
+                requesterAdmin.getId(), room.getId(), checkIn, checkOut);
+
+        assertThat(result, hasSize(1));
+        assertThat(result.get(0).getId(), notNullValue());
+        assertThat(result.get(0).getType(), equalTo(bookingDto.getType()));
+        assertThat(result.get(0).getCheckInDate(), equalTo(bookingDto.getCheckInDate().plusDays(1)));
+        assertThat(result.get(0).getCheckOutDate(), equalTo(bookingDto.getCheckOutDate().plusDays(1)));
+        assertThat(result.get(0).getDaysOfBooking(), equalTo(bookingDto.getDaysOfBooking()));
+        assertThat(result.get(0).getStatus(), equalTo(bookingDto.getStatus()));
+        assertThat(result.get(0).getPrice(), equalTo(bookingDto.getPrice()));
+        assertThat(result.get(0).getAmount(), equalTo(bookingDto.getAmount()));
+        assertThat(result.get(0).getPrepaymentAmount(), equalTo(bookingDto.getPrepaymentAmount()));
+        assertThat(result.get(0).getIsPrepaid(), equalTo(bookingDto.getIsPrepaid()));
+        assertThat(result.get(0).getRoom().getNumber(), equalTo(bookingDto.getRoom().getNumber()));
+        assertThat(result.get(0).getPets().size(), equalTo(1));
+    }
+
+    @Test
+    void findBlockingBookingsForRoomInDates() {
+        em.persist(requesterAdmin);
+        em.persist(category);
+        em.persist(room);
+        em.persist(pet);
+        em.persist(booking);
+
+        List<BookingDto> result = service.findBlockingBookingsForRoomInDates(
+                requesterAdmin.getId(), room.getId(), checkIn, checkOut);
+
+        assertThat(result, hasSize(1));
+        assertThat(result.get(0).getId(), notNullValue());
+        assertThat(result.get(0).getType(), equalTo(bookingDto.getType()));
+        assertThat(result.get(0).getCheckInDate(), equalTo(bookingDto.getCheckInDate()));
+        assertThat(result.get(0).getCheckOutDate(), equalTo(bookingDto.getCheckOutDate()));
+        assertThat(result.get(0).getDaysOfBooking(), equalTo(bookingDto.getDaysOfBooking()));
+        assertThat(result.get(0).getStatus(), equalTo(bookingDto.getStatus()));
+        assertThat(result.get(0).getPrice(), equalTo(bookingDto.getPrice()));
+        assertThat(result.get(0).getAmount(), equalTo(bookingDto.getAmount()));
+        assertThat(result.get(0).getPrepaymentAmount(), equalTo(bookingDto.getPrepaymentAmount()));
+        assertThat(result.get(0).getIsPrepaid(), equalTo(bookingDto.getIsPrepaid()));
+        assertThat(result.get(0).getRoom().getNumber(), equalTo(bookingDto.getRoom().getNumber()));
+        assertThat(result.get(0).getPets().size(), equalTo(1));
+    }
+
+    @Test
+    void checkRoomAvailableInDates_whenRoomNotAvailable() {
+        em.persist(requesterAdmin);
+        em.persist(category);
+        em.persist(room);
+        em.persist(pet);
+        em.persist(booking);
+
+        String error = String.format("Room with id=%d is not available for current dates", room.getId());
+        ConflictException exception = assertThrows(
+                ConflictException.class,
+                () -> service.checkRoomAvailableInDates(requesterAdmin.getId(), room.getId(), checkIn, checkOut)
+        );
+
+        assertEquals(error, exception.getMessage());
+    }
+
+    @Test
+    void checkRoomAvailableInDates_whenRoomAvailable() {
+        em.persist(requesterAdmin);
+        em.persist(category);
+        em.persist(room);
+        em.persist(pet);
+        em.persist(booking);
+
+        Assertions.assertDoesNotThrow(() -> service.checkRoomAvailableInDates(
+                requesterAdmin.getId(), room.getId(), checkIn.plusDays(2), checkOut.plusDays(4)));
     }
 }
