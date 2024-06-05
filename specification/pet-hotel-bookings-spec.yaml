@@ -544,7 +544,7 @@ components:
     checkInDate:
       name: checkInDate
       in: query
-      description: Дата планируемого заезда в формате "dd.MM.yyyy"
+      description: Дата планируемого заезда в формате "dd.MM.yyyy". Должна быть до или равна дате выезда.
       required: true
       schema:
         type: string
@@ -552,7 +552,7 @@ components:
     checkOutDate:
       name: checkOutDate
       in: query
-      description: Дата планируемого выезда в формате "dd.MM.yyyy"
+      description: Дата планируемого выезда в формате "dd.MM.yyyy". Должна быть равна или позже даты заезда.
       required: true
       schema:
         type: string
