@@ -771,7 +771,7 @@ class UserServiceImplTest {
         when(entityService.getUserIfExists(userId)).thenReturn(oldUser);
         when(userMapper.toUser(any(UpdateUserDto.class))).thenReturn(newUser);
         doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccess(any(User.class), any(User.class));
+                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccessForUsers(any(User.class), any(User.class));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.updateUser(requesterId, userId, newUserDto));
@@ -809,7 +809,7 @@ class UserServiceImplTest {
         when(entityService.getUserIfExists(userId)).thenReturn(oldUser);
         when(userMapper.toUser(any(UpdateUserDto.class))).thenReturn(newUser);
         doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccess(any(User.class), any(User.class));
+                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccessForUsers(any(User.class), any(User.class));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.updateUser(requesterId, userId, newUserDto));
@@ -845,7 +845,7 @@ class UserServiceImplTest {
         when(entityService.getUserIfExists(userId)).thenReturn(oldUser);
         when(userMapper.toUser(any(UpdateUserDto.class))).thenReturn(newUser);
         doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccess(any(User.class), any(User.class));
+                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccessForUsers(any(User.class), any(User.class));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.updateUser(requesterId, userId, newUserDto));
@@ -881,7 +881,7 @@ class UserServiceImplTest {
         when(entityService.getUserIfExists(userId)).thenReturn(oldUser);
         when(userMapper.toUser(any(UpdateUserDto.class))).thenReturn(newUser);
         doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccess(any(User.class), any(User.class));
+                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccessForUsers(any(User.class), any(User.class));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.updateUser(requesterId, userId, newUserDto));
@@ -917,7 +917,7 @@ class UserServiceImplTest {
         when(entityService.getUserIfExists(userId)).thenReturn(oldUser);
         when(userMapper.toUser(any(UpdateUserDto.class))).thenReturn(newUser);
         doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccess(any(User.class), any(User.class));
+                requesterRole))).when(utilityService).checkHigherOrdinalRoleAccessForUsers(any(User.class), any(User.class));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.updateUser(requesterId, userId, newUserDto));
@@ -1239,7 +1239,7 @@ class UserServiceImplTest {
         when(entityService.getUserIfExists(requesterId)).thenReturn(requester);
         when(entityService.getUserIfExists(userId)).thenReturn(user);
         doThrow(new AccessDeniedException(String.format("User with role=%s, can't access for this action",
-                user.getRole()))).when(utilityService).checkHigherOrdinalRoleAccess(any(User.class), any(User.class));
+                user.getRole()))).when(utilityService).checkHigherOrdinalRoleAccessForUsers(any(User.class), any(User.class));
 
         assertThrows(AccessDeniedException.class,
                 () -> userService.deleteUserById(requesterId, userId));
