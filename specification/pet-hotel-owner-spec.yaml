@@ -19,7 +19,8 @@ paths:
       tags:
         - owner-controller
       summary: Добавление нового клиента (собственника зверушки)
-      description: Добавление нового клиента может осуществляться только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
+      description: Добавление нового клиента может осуществляться только пользователями с ролью ROLE_BOSS или
+        ROLE_ADMIN.
       operationId: addOwner
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
@@ -96,7 +97,8 @@ paths:
       tags:
         - owner-controller
       summary: Получение списка всех пользователей
-      description: Получение списка всех пользователей может осуществляться только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
+      description: Получение списка всех пользователей может осуществляться только пользователями с ролью ROLE_BOSS
+        или ROLE_ADMIN.
       operationId: getAllOwners
       parameters:
         - $ref: '#/components/parameters/requesterHeader'

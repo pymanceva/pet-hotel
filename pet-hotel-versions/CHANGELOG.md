@@ -46,3 +46,16 @@ API: *<https://github.com/pymanceva/pet-hotel/blob/add-bookings/Specification/pe
 
 **0.0.11: Добавлен UtilityService для получения сущностей всех типов и проверки прав доступа.**
 Карточка задачи: *<https://nkiblyk.kaiten.ru/space/167883/card/27549007?filter=eyJrZXkiOiJhbmQiLCJ2YWx1ZSI6W3sia2V5IjoiYW5kIiwidmFsdWUiOlt7ImNvbXBhcmlzb24iOiJlcSIsImtleSI6InRhZyIsInZhbHVlIjo0OTA5MDF9XX1dfQ>*
+
+**0.0.12: Реализована работа с клиентами(хозяевами постояльцев) отеля:**
+- создание
+- получение списка всех клиентов
+- получение по id
+- редактирование данных клиента
+- получение краткой информации о последних нескольких зарегистрированных клиентах
+- получение краткой информации о клиенте по его id
+- Проверка наличия в базе клиента с указанным номером телефона
+- Поиск клиента по ФИО или номеру основного и дополнительного телефонов
+
+Карточка: *<https://nkiblyk.kaiten.ru/26906268>*  
+Api: *<https://github.com/pymanceva/pet-hotel/blob/efed8fb9bbd026f8cab858a21672a84bdb4e151f/specification/pet-hotel-owner-spec.yaml>*
