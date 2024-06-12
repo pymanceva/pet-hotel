@@ -148,6 +148,20 @@ public class RoomServiceImpl implements RoomService {
         return roomMapper.toListRoomDto(foundRooms);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public boolean checkUniqueRoomNumber(Long userId, String roomNumber) {
+        boolean isUnique = false;
+        int  result = roomRepository.countAllByNumber(roomNumber);
+
+        if (result == 0) {
+            isUnique = true;
+        }
+
+        log.info("RoomService: checkUniqueRoomNumber, userId={}, roomNumber={}", userId, roomNumber);
+        return isUnique;
+    }
+
     private List<Room> findAvailableRoomsByCategoryInDates(Long catId,
                                                            LocalDate checkInDate,
                                                            LocalDate checkOutDate) {

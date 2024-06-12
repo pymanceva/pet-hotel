@@ -210,4 +210,27 @@ class RoomServiceIntegrationTest {
         assertThat(result.get(0).getDescription(), equalTo(roomDto.getDescription()));
         assertTrue(result.get(0).getIsVisible());
     }
+
+    @Test
+    void checkUniqueRoomNumber_whenNumberUnique_thenReturnedTrue() {
+        em.persist(requesterAdmin);
+        em.persist(category);
+        em.persist(room);
+
+        String roomNumber = "1F";
+        boolean result = roomService.checkUniqueRoomNumber(requesterAdmin.getId(), roomNumber);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void checkUniqueRoomNumber_whenNumberNotUnique_thenReturnedFalse() {
+        em.persist(requesterAdmin);
+        em.persist(category);
+        em.persist(room);
+
+        boolean result = roomService.checkUniqueRoomNumber(requesterAdmin.getId(), room.getNumber());
+
+        assertFalse(result);
+    }
 }

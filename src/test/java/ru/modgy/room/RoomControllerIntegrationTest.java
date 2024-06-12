@@ -2,12 +2,14 @@ package ru.modgy.room;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.room.category.dto.CategoryDto;
 import ru.modgy.room.dto.NewRoomDto;
@@ -263,5 +265,25 @@ class RoomControllerIntegrationTest {
         verify(roomService).getAvailableRoomsByCategoryInDates(requesterId, catId, checkIn, checkOut);
         verify(roomService, times(1))
                 .getAvailableRoomsByCategoryInDates(requesterId, catId, checkIn, checkOut);
+    }
+
+    @Test
+    @SneakyThrows
+    void checkUniqueRoomNumber() {
+        when(roomService.checkUniqueRoomNumber(anyLong(), anyString())).thenReturn(true);
+
+        String roomNumber = "1F";
+        MvcResult mvcResult = mockMvc.perform(get("/rooms/checkUniqueNumber")
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .param("roomNumber", roomNumber))
+                .andReturn();
+
+        String expectedResponseBody = "true";
+        String actualResponseBody = mvcResult.getResponse().getContentAsString();
+        Assertions.assertEquals(actualResponseBody, expectedResponseBody);
+
+        verify(roomService, times(1))
+                .checkUniqueRoomNumber(requesterId, roomNumber);
     }
 }
