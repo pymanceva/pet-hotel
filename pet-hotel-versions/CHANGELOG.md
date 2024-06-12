@@ -19,9 +19,9 @@ https://docs.google.com/document/d/1l4dELV7vZi2YMXWBppTEneTQ0VyG9SCHWPlP2seWwZQ/
 - редактирование данных пользователя
 - получение пользователя по id
 - получение списка пользователей
-  - всех активных
-  - всех отключенных
-  - всех независимо от статуса(isActive)
+    - всех активных
+    - всех отключенных
+    - всех независимо от статуса(isActive)
 - изменение статуса(isActive) учётной записи
 
 Карточка: *<https://nkiblyk.kaiten.ru/26310859>*  
@@ -64,3 +64,4 @@ Api: *<https://github.com/pymanceva/pet-hotel/blob/efed8fb9bbd026f8cab858a21672a
 и поиск номеров заданной категории, доступных в указанные даты.**
 Карточки задачи: *<https://nkiblyk.kaiten.ru/space/167883/card/27548967?filter=eyJrZXkiOiJhbmQiLCJ2YWx1ZSI6W3sia2V5IjoiYW5kIiwidmFsdWUiOlt7ImNvbXBhcmlzb24iOiJlcSIsImtleSI6InJlc3BvbnNpYmxlIiwidmFsdWUiOjQ5NDU3MH1dfV19>*
 *<https://nkiblyk.kaiten.ru/space/167883/card/27548993?filter=eyJrZXkiOiJhbmQiLCJ2YWx1ZSI6W3sia2V5IjoiYW5kIiwidmFsdWUiOlt7ImNvbXBhcmlzb24iOiJlcSIsImtleSI6InJlc3BvbnNpYmxlIiwidmFsdWUiOjQ5NDU3MH1dfV19>*
+
