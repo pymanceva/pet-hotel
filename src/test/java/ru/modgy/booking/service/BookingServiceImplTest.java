@@ -42,7 +42,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class BookingServiceImplTest {
+class BookingServiceImplTest {
     private final LocalDate checkIn = LocalDate.of(2024, 1, 1);
     private final LocalDate checkOut = LocalDate.of(2024, 1, 2);
     private final PetDto petDto = PetDto.builder()

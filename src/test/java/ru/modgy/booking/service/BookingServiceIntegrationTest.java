@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest
 @ActiveProfiles("test")
-public class BookingServiceIntegrationTest {
+class BookingServiceIntegrationTest {
     private final LocalDate checkIn = LocalDate.of(2024, 1, 1);
     private final LocalDate checkOut = LocalDate.of(2024, 1, 2);
     private final User requesterAdmin = User.builder()

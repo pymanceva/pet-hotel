@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.repository.query.Param;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.modgy.booking.dto.BookingDto;
@@ -64,8 +65,8 @@ public class BookingController {
     @GetMapping("/{roomId}/crossingBookingsOfRoomInDates")
     public List<BookingDto> findCrossingBookingsForRoomInDates(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                                        @PathVariable("roomId") Long roomId,
-                                                       @Param("checkInDate") LocalDate checkInDate,
-                                                       @Param("checkOutDate") LocalDate checkOutDate) {
+                                                       @Param("checkInDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkInDate,
+                                                       @Param("checkOutDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkOutDate) {
         log.info("BookingController: GET/findBookingsForRoomInDates, requesterId={}, roomId={}", requesterId, roomId);
         utilityService.checkBossAdminAccess(requesterId);
         return bookingService.findCrossingBookingsForRoomInDates(requesterId, roomId, checkInDate, checkOutDate);
@@ -74,8 +75,8 @@ public class BookingController {
     @GetMapping("/{roomId}/checkRoomAvailable")
     public void checkRoomAvailableInDates(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                           @PathVariable("roomId") Long roomId,
-                                          @Param("checkInDate") LocalDate checkInDate,
-                                          @Param("checkOutDate") LocalDate checkOutDate) {
+                                          @Param("checkInDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkInDate,
+                                          @Param("checkOutDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkOutDate) {
         log.info("BookingController: GET/checkRoomAvailableInDates, requesterId={}, roomId={}", requesterId, roomId);
         utilityService.checkBossAdminAccess(requesterId);
         bookingService.checkRoomAvailableInDates(requesterId, roomId, checkInDate, checkOutDate);
@@ -84,8 +85,8 @@ public class BookingController {
     @GetMapping("/{roomId}/blockingBookingsInDates")
     public List<BookingDto> findBlockingBookingsForRoomInDates(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                                                @PathVariable("roomId") Long roomId,
-                                                               @Param("checkInDate") LocalDate checkInDate,
-                                                               @Param("checkOutDate") LocalDate checkOutDate) {
+                                                               @Param("checkInDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkInDate,
+                                                               @Param("checkOutDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkOutDate) {
         log.info("BookingController: GET/findBlockingBookingsForRoomInDates, requesterId={}, roomId={}", requesterId, roomId);
         utilityService.checkBossAdminAccess(requesterId);
         return bookingService.findBlockingBookingsForRoomInDates(requesterId, roomId, checkInDate, checkOutDate);

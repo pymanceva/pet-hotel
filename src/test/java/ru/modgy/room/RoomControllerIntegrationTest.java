@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = RoomController.class)
-public class RoomControllerIntegrationTest {
+class RoomControllerIntegrationTest {
     private final String requesterHeader = "X-PetHotel-User-Id";
     private final long requesterId = 1L;
     private final long roomId = 1L;
@@ -256,8 +256,8 @@ public class RoomControllerIntegrationTest {
         mockMvc.perform(get("/rooms/{catId}/getAvailableRooms", catId)
                         .header(requesterHeader, catId)
                         .accept(MediaType.ALL_VALUE)
-                        .param("checkInDate", "2024-01-01" )
-                        .param("checkOutDate", "2024-01-02"))
+                        .param("checkInDate", "01.01.2024" )
+                        .param("checkOutDate", "02.01.2024"))
                 .andExpect(status().isOk());
 
         verify(roomService).getAvailableRoomsByCategoryInDates(requesterId, catId, checkIn, checkOut);

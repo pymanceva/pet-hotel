@@ -30,19 +30,12 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class CategoryServiceImplTest {
+class CategoryServiceImplTest {
     private final User boss = User.builder()
             .email("boss@pethotel.ru")
             .id(1L)
             .firstName("boss")
             .role(Roles.ROLE_BOSS)
-            .isActive(true)
-            .build();
-    private final User admin = User.builder()
-            .email("admin@pethotel.ru")
-            .id(2L)
-            .firstName("admin")
-            .role(Roles.ROLE_ADMIN)
             .isActive(true)
             .build();
     private final User user = User.builder()

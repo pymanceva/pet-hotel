@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest
 @ActiveProfiles("test")
-public class UtilityServiceTest {
+class UtilityServiceTest {
     private final User boss = User.builder()
             .email("boss@pethotel.ru")
             .id(1L)

@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest
 @ActiveProfiles("test")
-public class RoomServiceIntegrationTest {
+class RoomServiceIntegrationTest {
     final User requesterAdmin = User.builder()
             .lastName("Кружкин")
             .firstName("admin")

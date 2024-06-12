@@ -40,7 +40,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class RoomServiceImplTest {
+class RoomServiceImplTest {
     private final LocalDate checkIn = LocalDate.of(2024, 1, 1);
     private final LocalDate checkOut = LocalDate.of(2024, 1, 2);
     private final User boss = User.builder()

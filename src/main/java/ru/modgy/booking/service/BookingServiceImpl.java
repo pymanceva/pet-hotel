@@ -51,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
         checkRoom(room);
 
         if (newBooking.getStatus() == null) {
-            if (newBooking.getIsPrepaid() | newBooking.getType().equals(TypesBooking.TYPE_CLOSING)) {
+            if (newBooking.getIsPrepaid() || newBooking.getType().equals(TypesBooking.TYPE_CLOSING)) {
                 newBooking.setStatus(StatusBooking.STATUS_CONFIRMED);
             } else {
                 newBooking.setStatus(StatusBooking.STATUS_INITIAL);
@@ -152,7 +152,7 @@ public class BookingServiceImpl implements BookingService {
             newBooking.setPets(pets);
         }
 
-        if (newBooking.getStatus().equals(StatusBooking.STATUS_INITIAL) & newBooking.getIsPrepaid()) {
+        if (newBooking.getStatus().equals(StatusBooking.STATUS_INITIAL) && newBooking.getIsPrepaid()) {
             newBooking.setStatus(StatusBooking.STATUS_CONFIRMED);
         }
 

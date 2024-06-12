@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.repository.query.Param;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.modgy.room.dto.NewRoomDto;
@@ -90,8 +91,8 @@ public class RoomController {
     @GetMapping("/{catId}/getAvailableRooms")
     public List<RoomDto> getAvailableRoomsByCategoryInDates(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                                             @PathVariable("catId") Long catId,
-                                                            @Param("checkInDate") LocalDate checkInDate,
-                                                            @Param("checkOutDate") LocalDate checkOutDate) {
+                                                            @Param("checkInDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkInDate,
+                                                            @Param("checkOutDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkOutDate) {
         log.info("RoomController: GET/getAvailableRoomsByCategoryInDates, " +
                 "requesterId={}, catId={}, checkInDate={}, checkOutDate={}",
                 requesterId, catId, checkInDate, checkOutDate);

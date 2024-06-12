@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.modgy.booking.controller.BookingController;
@@ -33,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = BookingController.class)
-public class BookingControllerTest {
+class BookingControllerTest {
     private final String requesterHeader = UtilityService.REQUESTER_ID_HEADER;
     private final UpdateBookingDto updateBookingDto = UpdateBookingDto.builder()
             .isPrepaid(true)
@@ -211,8 +212,8 @@ public class BookingControllerTest {
         mockMvc.perform(get("/bookings/{roomId}/checkRoomAvailable", roomId)
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.ALL_VALUE)
-                        .param("checkInDate", "2024-01-01" )
-                        .param("checkOutDate", "2024-01-02"))
+                        .param("checkInDate", "01.01.2024" )
+                        .param("checkOutDate", "02.01.2024"))
                 .andExpect(status().isOk());
 
         verify(bookingService).checkRoomAvailableInDates(requesterId, roomId, checkIn, checkOut);
@@ -224,8 +225,8 @@ public class BookingControllerTest {
         mockMvc.perform(get("/bookings/{roomId}/checkRoomAvailable", roomId)
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON)
-                        .param("checkInDate", "2024-01-01" )
-                        .param("checkOutDate", "2024-01-02"))
+                        .param("checkInDate", "01.01.2024" )
+                        .param("checkOutDate", "02.01.2024"))
                 .andExpect(status().isConflict());
 
         verify(bookingService, times(2))
@@ -234,6 +235,7 @@ public class BookingControllerTest {
 
     @Test
     @SneakyThrows
+    @DateTimeFormat(iso= DateTimeFormat.ISO.DATE)
     void findBlockingBookingsForRoomInDates() {
         when(bookingService.findBlockingBookingsForRoomInDates(anyLong(), anyLong(), any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(List.of(bookingDto));
@@ -241,8 +243,8 @@ public class BookingControllerTest {
         mockMvc.perform(get("/bookings/{roomId}/blockingBookingsInDates", roomId)
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.ALL_VALUE)
-                        .param("checkInDate", "2024-01-01" )
-                        .param("checkOutDate", "2024-01-02"))
+                        .param("checkInDate", "01.01.2024" )
+                        .param("checkOutDate", "02.01.2024"))
                 .andExpect(status().isOk());
 
         verify(bookingService).findBlockingBookingsForRoomInDates(requesterId, roomId, checkIn, checkOut);
@@ -259,8 +261,8 @@ public class BookingControllerTest {
         mockMvc.perform(get("/bookings/{roomId}/crossingBookingsOfRoomInDates", roomId)
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.ALL_VALUE)
-                        .param("checkInDate", "2024-01-01" )
-                        .param("checkOutDate", "2024-01-02"))
+                        .param("checkInDate", "01.01.2024" )
+                        .param("checkOutDate", "02.01.2024"))
                 .andExpect(status().isOk());
 
         verify(bookingService).findCrossingBookingsForRoomInDates(requesterId, roomId, checkIn, checkOut);

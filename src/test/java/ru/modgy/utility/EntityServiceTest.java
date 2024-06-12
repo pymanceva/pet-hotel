@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest
 @ActiveProfiles("test")
-public class EntityServiceTest {
+class EntityServiceTest {
     private final User user = User.builder()
             .email("user@pethotel.ru")
             .id(3L)
