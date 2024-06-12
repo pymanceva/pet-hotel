@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.modgy.booking.model.Booking;
+import ru.modgy.booking.repository.BookingRepository;
 import ru.modgy.exception.ConflictException;
 import ru.modgy.exception.NotFoundException;
-import ru.modgy.room.category.dto.CategoryDto;
-import ru.modgy.room.category.dto.mapper.CategoryMapper;
 import ru.modgy.room.category.model.Category;
 import ru.modgy.room.dto.NewRoomDto;
 import ru.modgy.room.dto.RoomDto;
@@ -16,7 +16,9 @@ import ru.modgy.room.dto.mapper.RoomMapper;
 import ru.modgy.room.model.Room;
 import ru.modgy.room.repository.RoomRepository;
 import ru.modgy.utility.EntityService;
+import ru.modgy.utility.UtilityService;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
@@ -25,8 +27,9 @@ import java.util.*;
 public class RoomServiceImpl implements RoomService {
     private final RoomRepository roomRepository;
     private final RoomMapper roomMapper;
-    private final CategoryMapper categoryMapper;
+    private final BookingRepository bookingRepository;
     private final EntityService entityService;
+    private final UtilityService utilityService;
 
     @Transactional
     @Override
@@ -35,9 +38,7 @@ public class RoomServiceImpl implements RoomService {
         Category category = entityService.getCategoryIfExists(newRoomDto.getCategoryId());
         newRoom.setCategory(category);
         Room addedRoom = roomRepository.save(newRoom);
-        CategoryDto categoryDto = categoryMapper.toCategoryDto(category);
         RoomDto addedRoomDto = roomMapper.toRoomDto(addedRoom);
-        addedRoomDto.setCategoryDto(categoryDto);
         log.info("RoomService: addRoom, userId={}, roomDto={}", userId, addedRoom);
         return addedRoomDto;
     }
@@ -47,23 +48,21 @@ public class RoomServiceImpl implements RoomService {
     public RoomDto getRoomById(Long userId, Long roomId) {
         Room room = entityService.getRoomIfExists(roomId);
         RoomDto roomDto = roomMapper.toRoomDto(room);
-        roomDto.setCategoryDto(categoryMapper.toCategoryDto(room.getCategory()));
         log.info("RoomService: getRoomById, userId={}, roomId={}", userId, roomId);
         return roomDto;
     }
 
     @Transactional
     @Override
-    public RoomDto updateRoom(Long userId, Long roomId, UpdateRoomDto roomDto) {
+    public RoomDto updateRoom(Long userId, Long roomId, UpdateRoomDto updateRoomDto) {
         Room oldRoom = entityService.getRoomIfExists(roomId);
-        Room newRoom = roomMapper.toRoom(roomDto);
+        Room newRoom = roomMapper.toRoom(updateRoomDto);
         Category category;
-        if (roomDto.getCategoryId() != null) {
-            category = entityService.getCategoryIfExists(roomDto.getCategoryId());
+        if (updateRoomDto.getCategoryId() != null) {
+            category = entityService.getCategoryIfExists(updateRoomDto.getCategoryId());
         } else {
             category = oldRoom.getCategory();
         }
-        CategoryDto categoryDto = categoryMapper.toCategoryDto(category);
         newRoom.setId(roomId);
         newRoom.setCategory(category);
         newRoom.setIsVisible(oldRoom.getIsVisible());
@@ -82,9 +81,8 @@ public class RoomServiceImpl implements RoomService {
 
         Room updatedRoom = roomRepository.save(newRoom);
         RoomDto updatedRoomDto = roomMapper.toRoomDto(updatedRoom);
-        updatedRoomDto.setCategoryDto(categoryDto);
 
-        log.info("RoomService: updateRoom, userId={}, roomId={}, roomDto={}", userId, roomId, roomDto);
+        log.info("RoomService: updateRoom, userId={}, roomId={}, roomDto={}", userId, roomId, updateRoomDto);
 
         return updatedRoomDto;
     }
@@ -93,15 +91,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public Collection<RoomDto> getAllRooms(Long userId, Boolean isVisible) {
         List<Room> allRooms = roomRepository.getAllRooms(isVisible).orElse(Collections.emptyList());
-        List<RoomDto> allRoomsDto = new ArrayList<>();
-        for (Room room : allRooms) {
-            RoomDto roomDto = roomMapper.toRoomDto(room);
-            roomDto.setCategoryDto(categoryMapper.toCategoryDto(room.getCategory()));
-            allRoomsDto.add(roomDto);
-        }
-        log.info("RoomService: getAllRooms, userId={}, list size={}", userId, allRooms.size());
-
-        return allRoomsDto;
+        return roomMapper.toListRoomDto(allRooms);
     }
 
     @Transactional
@@ -109,15 +99,13 @@ public class RoomServiceImpl implements RoomService {
     public RoomDto hideRoomById(Long userId, Long roomId) {
         Room room = entityService.getRoomIfExists(roomId);
 
-        //пока уловие всегда true, в дальнейшем здесь буду проверять наличие активных бронирований у номера
-        if (true) {
+        List<Booking> futureBookings = bookingRepository.findFutureBookingsForRoom(roomId, LocalDate.now())
+                .orElse(Collections.emptyList());
+        if (futureBookings.isEmpty()) {
             room.setIsVisible(false);
             roomRepository.save(room);
             log.info("RoomService: hideRoomById, userId={}, roomId={}", userId, roomId);
-            RoomDto roomDto = roomMapper.toRoomDto(room);
-            CategoryDto categoryDto = categoryMapper.toCategoryDto(room.getCategory());
-            roomDto.setCategoryDto(categoryDto);
-            return roomDto;
+            return roomMapper.toRoomDto(room);
         } else {
             throw new ConflictException(String.format("room with id=%d has opened bookings", roomId));
         }
@@ -131,10 +119,7 @@ public class RoomServiceImpl implements RoomService {
         room.setIsVisible(true);
         roomRepository.save(room);
         log.info("RoomService: unhideRoomById, userId={}, roomId={}", userId, roomId);
-        RoomDto roomDto = roomMapper.toRoomDto(room);
-        CategoryDto categoryDto = categoryMapper.toCategoryDto(room.getCategory());
-        roomDto.setCategoryDto(categoryDto);
-        return roomDto;
+        return roomMapper.toRoomDto(room);
     }
 
     @Transactional
@@ -147,5 +132,26 @@ public class RoomServiceImpl implements RoomService {
         }
 
         log.info("RoomService: permanentlyDeleteRoomById, userId={}, roomId={}", userId, roomId);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<RoomDto> getAvailableRoomsByCategoryInDates(
+            Long userId,
+            Long catId,
+            LocalDate checkInDate,
+            LocalDate checkOutDate) {
+        List<Room> foundRooms = findAvailableRoomsByCategoryInDates(catId, checkInDate, checkOutDate);
+        log.info("RoomService: getAvailableRoomsByCategoryInDates, " +
+                "userId={}, catId={}, checkInDate={}, checkOutDate={}",
+                userId, catId, checkInDate, checkOutDate);
+        return roomMapper.toListRoomDto(foundRooms);
+    }
+
+    private List<Room> findAvailableRoomsByCategoryInDates(Long catId,
+                                                           LocalDate checkInDate,
+                                                           LocalDate checkOutDate) {
+        return roomRepository.findAvailableRoomsByCategoryInDates(catId, checkInDate, checkOutDate)
+                .orElse(Collections.emptyList());
     }
 }

@@ -16,6 +16,7 @@ import ru.modgy.room.dto.UpdateRoomDto;
 import ru.modgy.room.service.RoomService;
 import ru.modgy.utility.UtilityService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -27,33 +28,36 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = RoomController.class)
-public class RoomControllerIntegrationTest {
+class RoomControllerIntegrationTest {
     private final String requesterHeader = "X-PetHotel-User-Id";
-    long requesterId = 1L;
-    long roomId = 1L;
+    private final long requesterId = 1L;
+    private final long roomId = 1L;
+    private final long catId = 1L;
+    private final LocalDate checkIn = LocalDate.of(2024, 1, 1);
+    private final LocalDate checkOut = LocalDate.of(2024, 1, 2);
     private final RoomDto roomDto = RoomDto.builder()
             .id(roomId)
             .area(5.0)
             .number("standard room")
-            .categoryDto(new CategoryDto(1L, "name", "description"))
+            .categoryDto(new CategoryDto(catId, "name", "description"))
             .isVisible(true)
             .build();
     private final NewRoomDto newRoomDto = NewRoomDto.builder()
             .area(5.0)
             .number("standard room")
-            .categoryId(1L)
+            .categoryId(catId)
             .isVisible(true)
             .build();
     private final UpdateRoomDto updateRoomDto = UpdateRoomDto.builder()
             .area(10.0)
             .number("updated room")
-            .categoryId(1L)
+            .categoryId(catId)
             .build();
     private final RoomDto hiddenRoomDto = RoomDto.builder()
             .id(roomId)
             .area(5.0)
             .number("standard room")
-            .categoryDto(new CategoryDto(1L, "name", "description"))
+            .categoryDto(new CategoryDto(catId, "name", "description"))
             .isVisible(false)
             .build();
     @Autowired
@@ -241,5 +245,23 @@ public class RoomControllerIntegrationTest {
                 .andExpect(status().isNotFound());
 
         verify(roomService, times(2)).permanentlyDeleteRoomById(requesterId, roomId);
+    }
+
+    @Test
+    @SneakyThrows
+    void getAvailableRoomsByCategoryInDates() {
+        when(roomService.getAvailableRoomsByCategoryInDates(anyLong(), anyLong(), any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(List.of(roomDto));
+
+        mockMvc.perform(get("/rooms/{catId}/getAvailableRooms", catId)
+                        .header(requesterHeader, catId)
+                        .accept(MediaType.ALL_VALUE)
+                        .param("checkInDate", "01.01.2024" )
+                        .param("checkOutDate", "02.01.2024"))
+                .andExpect(status().isOk());
+
+        verify(roomService).getAvailableRoomsByCategoryInDates(requesterId, catId, checkIn, checkOut);
+        verify(roomService, times(1))
+                .getAvailableRoomsByCategoryInDates(requesterId, catId, checkIn, checkOut);
     }
 }

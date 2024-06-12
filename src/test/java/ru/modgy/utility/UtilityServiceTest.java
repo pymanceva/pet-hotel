@@ -12,6 +12,12 @@ import ru.modgy.exception.AccessDeniedException;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
 
+import ru.modgy.exception.ConflictException;
+import ru.modgy.user.model.Roles;
+import ru.modgy.user.model.User;
+
+import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -19,7 +25,7 @@ import static org.mockito.Mockito.when;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest
 @ActiveProfiles("test")
-public class UtilityServiceTest {
+class UtilityServiceTest {
     private final User boss = User.builder()
             .email("boss@pethotel.ru")
             .id(1L)

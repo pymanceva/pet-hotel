@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest
 @ActiveProfiles("test")
-public class CategoryServiceIntegrationTest {
+class CategoryServiceIntegrationTest {
     final User requesterAdmin = User.builder()
             .email("admin@mail.ru")
             .firstName("admin")

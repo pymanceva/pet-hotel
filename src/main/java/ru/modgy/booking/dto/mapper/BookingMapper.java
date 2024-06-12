@@ -7,12 +7,14 @@ import ru.modgy.booking.dto.NewBookingDto;
 import ru.modgy.booking.dto.UpdateBookingDto;
 import ru.modgy.booking.model.Booking;
 import ru.modgy.pet.mapper.PetMapper;
+import ru.modgy.room.category.dto.mapper.CategoryMapper;
 import ru.modgy.room.dto.mapper.RoomMapper;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {RoomMapper.class, PetMapper.class})
+@Mapper(componentModel = "spring", uses = {RoomMapper.class, CategoryMapper.class, PetMapper.class})
 public interface BookingMapper {
     @Mapping(target = "daysOfBooking",
             expression = "java(calculateBookingDays(booking.getCheckInDate(), " +
@@ -38,4 +40,6 @@ public interface BookingMapper {
     @Mapping(target = "room", ignore = true)
     @Mapping(target = "pets", ignore = true)
     Booking toBooking(UpdateBookingDto updateBookingDto);
+
+    List<BookingDto> toBookingDto(List<Booking> bookings);
 }

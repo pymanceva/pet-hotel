@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = CategoryController.class)
-public class CategoryControllerIntegrationTest {
+class CategoryControllerIntegrationTest {
     private final String requesterHeader = "X-PetHotel-User-Id";
     long requesterId = 1L;
     long catId = 1L;

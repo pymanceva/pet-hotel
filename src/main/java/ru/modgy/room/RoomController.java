@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.repository.query.Param;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.modgy.room.dto.NewRoomDto;
@@ -12,7 +13,9 @@ import ru.modgy.room.dto.UpdateRoomDto;
 import ru.modgy.room.service.RoomService;
 import ru.modgy.utility.UtilityService;
 
+import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 
 @CrossOrigin
 @Slf4j
@@ -29,6 +32,7 @@ public class RoomController {
                            @RequestBody @Valid NewRoomDto newRoomDto) {
         utilityService.checkBossAdminAccess(requesterId);
         log.info("RoomController: POST/addRoom, requesterId={}, room={}", requesterId, newRoomDto);
+        utilityService.checkBossAdminAccess(requesterId);
         return roomService.addRoom(requesterId, newRoomDto);
     }
 
@@ -37,6 +41,7 @@ public class RoomController {
                                @PathVariable("id") Long roomId) {
         utilityService.checkBossAdminFinancialAccess(requesterId);
         log.info("RoomController: GET/getRoomById, requesterId={}, roomId={}", requesterId, roomId);
+        utilityService.checkBossAdminFinancialAccess(requesterId);
         return roomService.getRoomById(requesterId, roomId);
     }
 
@@ -47,6 +52,7 @@ public class RoomController {
         utilityService.checkBossAdminAccess(requesterId);
         log.info("RoomController: PATCH/updateRoom, requesterId={}, roomId={}, requestBody={}",
                 requesterId, roomId, roomDto);
+        utilityService.checkBossAdminAccess(requesterId);
         return roomService.updateRoom(requesterId, roomId, roomDto);
     }
 
@@ -55,6 +61,7 @@ public class RoomController {
                                            @Param("isVisible") Boolean isVisible) {
         utilityService.checkBossAdminFinancialAccess(requesterId);
         log.info("RoomController: GET/getAllRooms, requesterId={}", requesterId);
+        utilityService.checkBossAdminFinancialAccess(requesterId);
         return roomService.getAllRooms(requesterId, isVisible);
     }
 
@@ -64,6 +71,7 @@ public class RoomController {
         utilityService.checkBossAdminAccess(requesterId);
         log.info("RoomController: PATCH/hideRoomById, requesterId={}, roomId={}",
                 requesterId, roomId);
+        utilityService.checkBossAdminAccess(requesterId);
         return roomService.hideRoomById(requesterId, roomId);
     }
 
@@ -73,6 +81,7 @@ public class RoomController {
         utilityService.checkBossAdminAccess(requesterId);
         log.info("RoomController: PATCH/unhideRoomById, requesterId={}, roomId={}",
                 requesterId, roomId);
+        utilityService.checkBossAdminAccess(requesterId);
         return roomService.unhideRoomById(requesterId, roomId);
     }
 
@@ -82,6 +91,19 @@ public class RoomController {
                                @PathVariable("id") Long roomId) {
         utilityService.checkBossAdminAccess(requesterId);
         log.info("RoomController: DELETE/deleteRoomById, requesterId={}, roomId={}", requesterId, roomId);
+        utilityService.checkBossAdminAccess(requesterId);
         roomService.permanentlyDeleteRoomById(requesterId, roomId);
+    }
+
+    @GetMapping("/{catId}/getAvailableRooms")
+    public List<RoomDto> getAvailableRoomsByCategoryInDates(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
+                                                            @PathVariable("catId") Long catId,
+                                                            @Param("checkInDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkInDate,
+                                                            @Param("checkOutDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkOutDate) {
+        log.info("RoomController: GET/getAvailableRoomsByCategoryInDates, " +
+                "requesterId={}, catId={}, checkInDate={}, checkOutDate={}",
+                requesterId, catId, checkInDate, checkOutDate);
+        utilityService.checkBossAdminAccess(requesterId);
+        return roomService.getAvailableRoomsByCategoryInDates(requesterId, catId, checkInDate, checkOutDate);
     }
 }

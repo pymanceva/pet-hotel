@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import ru.modgy.exception.ConflictException;
 import ru.modgy.utility.EntityService;
 import ru.modgy.booking.dto.BookingDto;
 import ru.modgy.booking.dto.NewBookingDto;
@@ -28,9 +29,11 @@ import ru.modgy.room.dto.RoomDto;
 import ru.modgy.room.model.Room;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
+import ru.modgy.utility.UtilityService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,7 +42,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class BookingServiceImplTest {
+class BookingServiceImplTest {
+    private final LocalDate checkIn = LocalDate.of(2024, 1, 1);
+    private final LocalDate checkOut = LocalDate.of(2024, 1, 2);
     private final PetDto petDto = PetDto.builder()
             .id(1L)
             .type(TypeOfPet.DOG)
@@ -61,13 +66,6 @@ public class BookingServiceImplTest {
             .id(1L)
             .firstName("boss")
             .role(Roles.ROLE_BOSS)
-            .isActive(true)
-            .build();
-    private final User admin = User.builder()
-            .email("admin@pethotel.ru")
-            .id(2L)
-            .firstName("admin")
-            .role(Roles.ROLE_ADMIN)
             .isActive(true)
             .build();
     private final User user = User.builder()
@@ -94,16 +92,16 @@ public class BookingServiceImplTest {
     private final NewBookingDto newBookingDto = NewBookingDto.builder()
             .type(TypesBooking.TYPE_BOOKING)
             .roomId(1L)
-            .checkInDate(LocalDate.now())
-            .checkOutDate(LocalDate.now().plusDays(7))
+            .checkInDate(checkIn)
+            .checkOutDate(checkOut)
             .petIds(List.of(1L))
             .build();
     private final Long bookingId = 1L;
     private final Booking booking = Booking.builder()
             .id(bookingId)
             .type(TypesBooking.TYPE_BOOKING)
-            .checkInDate(LocalDate.now())
-            .checkOutDate(LocalDate.now().plusDays(7))
+            .checkInDate(checkIn)
+            .checkOutDate(checkOut)
             .status(StatusBooking.STATUS_INITIAL)
             .price(0.0)
             .amount(0.0)
@@ -115,8 +113,8 @@ public class BookingServiceImplTest {
     private final BookingDto bookingDto = BookingDto.builder()
             .id(bookingId)
             .type(TypesBooking.TYPE_BOOKING)
-            .checkInDate(LocalDate.now())
-            .checkOutDate(LocalDate.now().plusDays(7))
+            .checkInDate(checkIn)
+            .checkOutDate(checkOut)
             .daysOfBooking(8)
             .status(StatusBooking.STATUS_INITIAL)
             .price(0.0)
@@ -135,9 +133,9 @@ public class BookingServiceImplTest {
     private final BookingDto updatedBookingDto = BookingDto.builder()
             .id(bookingId)
             .type(TypesBooking.TYPE_BOOKING)
-            .checkInDate(LocalDate.now())
-            .checkOutDate(LocalDate.now().plusDays(7))
-            .daysOfBooking(7)
+            .checkInDate(checkIn)
+            .checkOutDate(checkOut)
+            .daysOfBooking(2)
             .status(StatusBooking.STATUS_INITIAL)
             .price(1000.00)
             .amount(7000.00)
@@ -155,8 +153,8 @@ public class BookingServiceImplTest {
     private final Booking updatedBooking = Booking.builder()
             .id(bookingId)
             .type(TypesBooking.TYPE_BOOKING)
-            .checkInDate(LocalDate.now())
-            .checkOutDate(LocalDate.now().plusDays(7))
+            .checkInDate(checkIn)
+            .checkOutDate(checkOut)
             .status(StatusBooking.STATUS_INITIAL)
             .price(1000.00)
             .amount(7000.00)
@@ -171,6 +169,8 @@ public class BookingServiceImplTest {
     private BookingRepository bookingRepository;
     @Mock
     private EntityService entityService;
+    @Mock
+    private UtilityService utilityService;
     @Mock
     private BookingMapper bookingMapper;
 
@@ -200,36 +200,6 @@ public class BookingServiceImplTest {
         Assertions.assertEquals(bookingDto.getPets(), result.getPets());
 
         verify(bookingRepository, times(1)).save(any(Booking.class));
-        verifyNoMoreInteractions(bookingRepository);
-    }
-
-    @Test
-    void addBooking_whenAddBookingByAdmin_thenBookingAdded() {
-        when(entityService.getUserIfExists(anyLong())).thenReturn(admin);
-        when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
-        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
-        when(entityService.getListOfPetsByIds(any())).thenReturn(List.of(pet));
-        when(bookingMapper.toBooking(any(NewBookingDto.class))).thenReturn(booking);
-        when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(bookingDto);
-
-        BookingDto result = bookingService.addBooking(boss.getId(), newBookingDto);
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(bookingDto.getType(), result.getType());
-        Assertions.assertEquals(bookingDto.getCheckInDate(), result.getCheckInDate());
-        Assertions.assertEquals(bookingDto.getCheckOutDate(), result.getCheckOutDate());
-        Assertions.assertEquals(bookingDto.getDaysOfBooking(), result.getDaysOfBooking());
-        Assertions.assertEquals(bookingDto.getStatus(), result.getStatus());
-        Assertions.assertEquals(bookingDto.getPrice(), result.getPrice());
-        Assertions.assertEquals(bookingDto.getAmount(), result.getAmount());
-        Assertions.assertEquals(bookingDto.getPrepaymentAmount(), result.getPrepaymentAmount());
-        Assertions.assertEquals(bookingDto.getIsPrepaid(), result.getIsPrepaid());
-        Assertions.assertEquals(bookingDto.getRoom(), result.getRoom());
-        Assertions.assertEquals(bookingDto.getPets(), result.getPets());
-
-        verify(bookingRepository, times(1)).save(any(Booking.class));
-        verifyNoMoreInteractions(bookingRepository);
     }
 
     @Test
@@ -248,29 +218,6 @@ public class BookingServiceImplTest {
         when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(bookingDto);
 
         BookingDto result = bookingService.getBookingById(boss.getId(), bookingId);
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(bookingDto.getType(), result.getType());
-        Assertions.assertEquals(bookingDto.getCheckInDate(), result.getCheckInDate());
-        Assertions.assertEquals(bookingDto.getCheckOutDate(), result.getCheckOutDate());
-        Assertions.assertEquals(bookingDto.getDaysOfBooking(), result.getDaysOfBooking());
-        Assertions.assertEquals(bookingDto.getStatus(), result.getStatus());
-        Assertions.assertEquals(bookingDto.getPrice(), result.getPrice());
-        Assertions.assertEquals(bookingDto.getAmount(), result.getAmount());
-        Assertions.assertEquals(bookingDto.getPrepaymentAmount(), result.getPrepaymentAmount());
-        Assertions.assertEquals(bookingDto.getIsPrepaid(), result.getIsPrepaid());
-        Assertions.assertEquals(bookingDto.getRoom(), result.getRoom());
-        Assertions.assertEquals(bookingDto.getPets(), result.getPets());
-    }
-
-    @Test
-    void getBookingById_whenGetBookingByAdmin_thenReturnedBooking() {
-        when(entityService.getUserIfExists(anyLong())).thenReturn(admin);
-        when(entityService.getBookingIfExists(anyLong())).thenReturn(booking);
-        when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(bookingDto);
-
-        BookingDto result = bookingService.getBookingById(admin.getId(), bookingId);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
@@ -328,36 +275,6 @@ public class BookingServiceImplTest {
     }
 
     @Test
-    void updateBookingById_whenRequesterAdminAndBookingFound_thenUpdateAllFields() {
-        when(entityService.getUserIfExists(anyLong())).thenReturn(admin);
-        when(entityService.getBookingIfExists(anyLong())).thenReturn(booking);
-        when(bookingMapper.toBooking(any(UpdateBookingDto.class))).thenReturn(newBooking);
-        when(entityService.getRoomIfExists(anyLong())).thenReturn(room);
-        when(entityService.getPetIfExists(anyLong())).thenReturn(pet);
-        when(bookingMapper.toBookingDto(any(Booking.class))).thenReturn(updatedBookingDto);
-        when(bookingRepository.save(any(Booking.class))).thenReturn(updatedBooking);
-
-        BookingDto result = bookingService.updateBooking(boss.getId(), bookingId, updateBookingDto);
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(updatedBookingDto.getType(), result.getType());
-        Assertions.assertEquals(updatedBookingDto.getCheckInDate(), result.getCheckInDate());
-        Assertions.assertEquals(updatedBookingDto.getCheckOutDate(), result.getCheckOutDate());
-        Assertions.assertEquals(updatedBookingDto.getDaysOfBooking(), result.getDaysOfBooking());
-        Assertions.assertEquals(updatedBookingDto.getStatus(), result.getStatus());
-        Assertions.assertEquals(updatedBookingDto.getPrice(), result.getPrice());
-        Assertions.assertEquals(updatedBookingDto.getAmount(), result.getAmount());
-        Assertions.assertEquals(updatedBookingDto.getPrepaymentAmount(), result.getPrepaymentAmount());
-        Assertions.assertEquals(updatedBookingDto.getIsPrepaid(), result.getIsPrepaid());
-        Assertions.assertEquals(updatedBookingDto.getRoom(), result.getRoom());
-        Assertions.assertEquals(updatedBookingDto.getPets(), result.getPets());
-
-        verify(bookingRepository, times(1)).save(any(Booking.class));
-        verifyNoMoreInteractions(bookingRepository);
-    }
-
-    @Test
     void updateBookingById_whenRequesterFoundAndBookingNotFound_thenNotFoundException() {
         when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
         when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
@@ -371,17 +288,6 @@ public class BookingServiceImplTest {
     @Test
     void deleteBookingId_whenRequesterBossAndBookingFound_thenBookingDeleted() {
         when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
-        when(bookingRepository.deleteBookingById(anyLong())).thenReturn(1);
-
-        bookingService.deleteBookingById(boss.getId(), bookingId);
-
-        verify(bookingRepository, times(1)).deleteBookingById(anyLong());
-        verifyNoMoreInteractions(bookingRepository);
-    }
-
-    @Test
-    void deleteBookingId_whenRequesterAdminAndBookingFound_thenBookingDeleted() {
-        when(entityService.getUserIfExists(anyLong())).thenReturn(admin);
         when(bookingRepository.deleteBookingById(anyLong())).thenReturn(1);
 
         bookingService.deleteBookingById(boss.getId(), bookingId);
@@ -405,5 +311,70 @@ public class BookingServiceImplTest {
 
         assertThrows(NotFoundException.class,
                 () -> bookingService.deleteBookingById(boss.getId(), bookingId));
+    }
+
+    @Test
+    void findCrossingBookingsForRoomInDates_whenOneCrossingBooking_thenReturnedListOfBooking() {
+        when(bookingRepository.findCrossingBookingsForRoomInDates(anyLong(), any(), any())).thenReturn(Optional.of(List.of(booking)));
+        when(bookingMapper.toBookingDto(anyList())).thenReturn(List.of(bookingDto));
+
+        List<BookingDto> result = bookingService.findCrossingBookingsForRoomInDates(boss.getId(), room.getId(), checkIn, checkOut);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1L, result.get(0).getId());
+        Assertions.assertEquals(bookingDto.getType(), result.get(0).getType());
+        Assertions.assertEquals(bookingDto.getCheckInDate(), result.get(0).getCheckInDate());
+        Assertions.assertEquals(bookingDto.getCheckOutDate(), result.get(0).getCheckOutDate());
+        Assertions.assertEquals(bookingDto.getDaysOfBooking(), result.get(0).getDaysOfBooking());
+        Assertions.assertEquals(bookingDto.getStatus(), result.get(0).getStatus());
+        Assertions.assertEquals(bookingDto.getPrice(), result.get(0).getPrice());
+        Assertions.assertEquals(bookingDto.getAmount(), result.get(0).getAmount());
+        Assertions.assertEquals(bookingDto.getPrepaymentAmount(), result.get(0).getPrepaymentAmount());
+        Assertions.assertEquals(bookingDto.getIsPrepaid(), result.get(0).getIsPrepaid());
+        Assertions.assertEquals(bookingDto.getRoom(), result.get(0).getRoom());
+        Assertions.assertEquals(bookingDto.getPets(), result.get(0).getPets());
+
+        verify(bookingRepository, times(1)).findCrossingBookingsForRoomInDates(anyLong(), any(), any());
+        verifyNoMoreInteractions(bookingRepository);
+    }
+
+    @Test
+    void findBlockingBookingsForRoomInDates_whenOneBlockingBooking_thenReturnedListOfBooking() {
+        when(bookingRepository.findBookingsForRoomInDates(anyLong(), any(), any())).thenReturn(Optional.of(List.of(booking)));
+        when(bookingMapper.toBookingDto(anyList())).thenReturn(List.of(bookingDto));
+
+        List<BookingDto> result = bookingService.findBlockingBookingsForRoomInDates(boss.getId(), room.getId(), checkIn, checkOut);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1L, result.get(0).getId());
+        Assertions.assertEquals(bookingDto.getType(), result.get(0).getType());
+        Assertions.assertEquals(bookingDto.getCheckInDate(), result.get(0).getCheckInDate());
+        Assertions.assertEquals(bookingDto.getCheckOutDate(), result.get(0).getCheckOutDate());
+        Assertions.assertEquals(bookingDto.getDaysOfBooking(), result.get(0).getDaysOfBooking());
+        Assertions.assertEquals(bookingDto.getStatus(), result.get(0).getStatus());
+        Assertions.assertEquals(bookingDto.getPrice(), result.get(0).getPrice());
+        Assertions.assertEquals(bookingDto.getAmount(), result.get(0).getAmount());
+        Assertions.assertEquals(bookingDto.getPrepaymentAmount(), result.get(0).getPrepaymentAmount());
+        Assertions.assertEquals(bookingDto.getIsPrepaid(), result.get(0).getIsPrepaid());
+        Assertions.assertEquals(bookingDto.getRoom(), result.get(0).getRoom());
+        Assertions.assertEquals(bookingDto.getPets(), result.get(0).getPets());
+
+        verify(bookingRepository, times(1)).findBookingsForRoomInDates(anyLong(), any(), any());
+        verifyNoMoreInteractions(bookingRepository);
+    }
+
+    @Test
+    void checkRoomAvailableInDates_whenOneBlockingBooking_thenConflictException() {
+        when(bookingRepository.findBookingsForRoomInDates(anyLong(), any(), any())).thenReturn(Optional.of(List.of(booking)));
+
+        assertThrows(ConflictException.class,
+                () -> bookingService.checkRoomAvailableInDates(boss.getId(), room.getId(), checkIn, checkOut));
+    }
+
+    @Test
+    void checkRoomAvailableInDates_whenNoBlockingBooking_thenNoConflictException() {
+        when(bookingRepository.findBookingsForRoomInDates(anyLong(), any(), any())).thenReturn(Optional.empty());
+
+        Assertions.assertDoesNotThrow(() -> bookingService.checkRoomAvailableInDates(boss.getId(), room.getId(), checkIn, checkOut));
     }
 }

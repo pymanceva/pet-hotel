@@ -17,6 +17,7 @@ import ru.modgy.room.model.Room;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest
 @ActiveProfiles("test")
-public class RoomServiceIntegrationTest {
+class RoomServiceIntegrationTest {
     final User requesterAdmin = User.builder()
             .lastName("Кружкин")
             .firstName("admin")
@@ -78,14 +79,16 @@ public class RoomServiceIntegrationTest {
             .description("update room description")
             .build();
     private final EntityManager em;
-    private final RoomService service;
+    private final RoomService roomService;
+    private final LocalDate checkIn = LocalDate.of(2024, 1, 1);
+    private final LocalDate checkOut = LocalDate.of(2024, 1, 2);
 
     @Test
     void addRoom() {
         em.persist(requesterAdmin);
         em.persist(category);
         newRoomDto.setCategoryId(category.getId());
-        RoomDto result = service.addRoom(requesterAdmin.getId(), newRoomDto);
+        RoomDto result = roomService.addRoom(requesterAdmin.getId(), newRoomDto);
 
         assertThat(result.getId(), notNullValue());
         assertThat(result.getNumber(), equalTo(roomDto.getNumber()));
@@ -100,7 +103,7 @@ public class RoomServiceIntegrationTest {
         em.persist(requesterAdmin);
         em.persist(category);
         em.persist(room);
-        RoomDto result = service.getRoomById(requesterAdmin.getId(), room.getId());
+        RoomDto result = roomService.getRoomById(requesterAdmin.getId(), room.getId());
 
         assertThat(result.getId(), notNullValue());
         assertThat(result.getNumber(), equalTo(roomDto.getNumber()));
@@ -116,7 +119,7 @@ public class RoomServiceIntegrationTest {
         em.persist(category);
         em.persist(room);
         updateRoomDto.setCategoryId(category.getId());
-        RoomDto result = service.updateRoom(requesterAdmin.getId(), room.getId(), updateRoomDto);
+        RoomDto result = roomService.updateRoom(requesterAdmin.getId(), room.getId(), updateRoomDto);
 
         assertThat(result.getId(), notNullValue());
         assertThat(result.getNumber(), equalTo(updateRoomDto.getNumber()));
@@ -131,7 +134,7 @@ public class RoomServiceIntegrationTest {
         em.persist(category);
         em.persist(room);
 
-        List<RoomDto> result = service.getAllRooms(requesterAdmin.getId(), room.getIsVisible()).stream().toList();
+        List<RoomDto> result = roomService.getAllRooms(requesterAdmin.getId(), room.getIsVisible()).stream().toList();
 
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getId(), notNullValue());
@@ -148,7 +151,7 @@ public class RoomServiceIntegrationTest {
         em.persist(category);
         em.persist(room);
 
-        RoomDto result = service.hideRoomById(requesterAdmin.getId(), room.getId());
+        RoomDto result = roomService.hideRoomById(requesterAdmin.getId(), room.getId());
 
         assertThat(result.getId(), notNullValue());
         assertThat(result.getNumber(), equalTo(roomDto.getNumber()));
@@ -164,7 +167,7 @@ public class RoomServiceIntegrationTest {
         em.persist(category);
         em.persist(hiddenRoom);
 
-        RoomDto result = service.unhideRoomById(requesterAdmin.getId(), hiddenRoom.getId());
+        RoomDto result = roomService.unhideRoomById(requesterAdmin.getId(), hiddenRoom.getId());
 
         assertThat(result.getId(), notNullValue());
         assertThat(result.getNumber(), equalTo(roomDto.getNumber()));
@@ -180,14 +183,31 @@ public class RoomServiceIntegrationTest {
         em.persist(category);
         em.persist(room);
 
-        service.permanentlyDeleteRoomById(requesterAdmin.getId(), room.getId());
+        roomService.permanentlyDeleteRoomById(requesterAdmin.getId(), room.getId());
 
         String error = String.format("Room with id=%d is not found", room.getId());
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> service.getRoomById(requesterAdmin.getId(), room.getId())
+                () -> roomService.getRoomById(requesterAdmin.getId(), room.getId())
         );
 
         assertEquals(error, exception.getMessage());
+    }
+
+    @Test
+    void getAvailableRoomsByCategoryInDates() {
+        em.persist(requesterAdmin);
+        em.persist(category);
+        em.persist(room);
+
+        List<RoomDto> result = roomService.getAvailableRoomsByCategoryInDates(requesterAdmin.getId(), category.getId(), checkIn, checkOut);
+
+        assertThat(result, hasSize(1));
+        assertThat(result.get(0).getId(), notNullValue());
+        assertThat(result.get(0).getNumber(), equalTo(roomDto.getNumber()));
+        assertThat(result.get(0).getArea(), equalTo(roomDto.getArea()));
+        assertThat(result.get(0).getCategoryDto().getName(), equalTo(roomDto.getCategoryDto().getName()));
+        assertThat(result.get(0).getDescription(), equalTo(roomDto.getDescription()));
+        assertTrue(result.get(0).getIsVisible());
     }
 }

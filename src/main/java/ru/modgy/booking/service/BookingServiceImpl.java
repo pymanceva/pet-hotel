@@ -18,8 +18,10 @@ import ru.modgy.exception.NotFoundException;
 import ru.modgy.pet.model.Pet;
 import ru.modgy.room.model.Room;
 import ru.modgy.utility.EntityService;
+import ru.modgy.utility.UtilityService;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,20 +32,26 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final EntityService entityService;
+    private final UtilityService utilityService;
 
     @Transactional
     @Override
     public BookingDto addBooking(Long userId, NewBookingDto newBookingDto) {
-        checkDates(newBookingDto.getCheckInDate(), newBookingDto.getCheckOutDate());
+        utilityService.checkDatesOfBooking(newBookingDto.getCheckInDate(), newBookingDto.getCheckOutDate());
         checkReasonWhenTypeClosing(newBookingDto.getType(), newBookingDto.getReasonOfStop());
+        checkRoomAvailabilityByDates(
+                newBookingDto.getRoomId(),
+                newBookingDto.getCheckInDate(),
+                newBookingDto.getCheckOutDate());
 
         Booking newBooking = bookingMapper.toBooking(newBookingDto);
 
         Room room = entityService.getRoomIfExists(newBookingDto.getRoomId());
         newBooking.setRoom(room);
+        checkRoom(room, "add");
 
         if (newBooking.getStatus() == null) {
-            if (newBooking.getIsPrepaid() | newBooking.getType().equals(TypesBooking.TYPE_CLOSING)) {
+            if (newBooking.getIsPrepaid() || newBooking.getType().equals(TypesBooking.TYPE_CLOSING)) {
                 newBooking.setStatus(StatusBooking.STATUS_CONFIRMED);
             } else {
                 newBooking.setStatus(StatusBooking.STATUS_INITIAL);
@@ -129,7 +137,9 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (updateBookingDto.getRoomId() != null) {
-            newBooking.setRoom(entityService.getRoomIfExists(updateBookingDto.getRoomId()));
+            Room room = entityService.getRoomIfExists(updateBookingDto.getRoomId());
+            checkRoom(room, "update");
+            newBooking.setRoom(room);
         } else {
             newBooking.setRoom(oldBooking.getRoom());
         }
@@ -142,11 +152,11 @@ public class BookingServiceImpl implements BookingService {
             newBooking.setPets(pets);
         }
 
-        if (newBooking.getStatus().equals(StatusBooking.STATUS_INITIAL) & newBooking.getIsPrepaid()) {
+        if (newBooking.getStatus().equals(StatusBooking.STATUS_INITIAL) && newBooking.getIsPrepaid()) {
             newBooking.setStatus(StatusBooking.STATUS_CONFIRMED);
         }
 
-        checkDates(newBooking.getCheckInDate(), newBooking.getCheckOutDate());
+        utilityService.checkDatesOfBooking(newBooking.getCheckInDate(), newBooking.getCheckOutDate());
 
         Booking updatedBooking = bookingRepository.save(newBooking);
         BookingDto updatedBookingDto = bookingMapper.toBookingDto(updatedBooking);
@@ -168,10 +178,59 @@ public class BookingServiceImpl implements BookingService {
         log.info("BookingService: deleteBookingById, userId={}, bookingId={}", userId, bookingId);
     }
 
-    private void checkDates(LocalDate checkInDate, LocalDate checkOutDate) {
-        if (checkInDate.isAfter(checkOutDate)) {
-            throw new ConflictException(String.format("CheckInDate=%s is after CheckOutDate=%s",
-                    checkInDate, checkOutDate));
+    @Transactional(readOnly = true)
+    @Override
+    public List<BookingDto> findCrossingBookingsForRoomInDates(Long userId,
+                                                       Long roomId,
+                                                       LocalDate checkInDate,
+                                                       LocalDate checkOutDate) {
+        utilityService.checkDatesOfBooking(checkInDate, checkOutDate);
+        List<Booking> foundBookings = bookingRepository.findCrossingBookingsForRoomInDates(
+                        roomId, checkInDate, checkOutDate).orElse(Collections.emptyList());
+
+        log.info("BookingService: findCrossingBookingsForRoomInDates, userId={}, roomId={}, checkInDate={}, checkOutDate={}",
+                userId, roomId, checkInDate, checkOutDate);
+        return bookingMapper.toBookingDto(foundBookings);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public void checkRoomAvailableInDates(Long userId,
+                                          Long roomId,
+                                          LocalDate checkInDate,
+                                          LocalDate checkOutDate) {
+        utilityService.checkDatesOfBooking(checkInDate, checkOutDate);
+        log.info("BookingService: checkRoomAvailableInDates, userId={}, roomId={}, checkInDate={}, checkOutDate={}",
+                userId, roomId, checkInDate, checkOutDate);
+        checkRoomAvailabilityByDates(roomId, checkInDate, checkOutDate);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<BookingDto> findBlockingBookingsForRoomInDates(Long userId,
+                                                               Long roomId,
+                                                               LocalDate checkInDate,
+                                                               LocalDate checkOutDate) {
+        utilityService.checkDatesOfBooking(checkInDate, checkOutDate);
+        List<Booking> foundBookings = findBookingsForRoomInDates(roomId, checkInDate, checkOutDate);
+
+        log.info("BookingService: findBlockingBookingsForRoomInDates, userId={}, roomId={}, checkInDate={}, checkOutDate={}",
+                userId, roomId, checkInDate, checkOutDate);
+        return bookingMapper.toBookingDto(foundBookings);
+    }
+
+    private List<Booking> findBookingsForRoomInDates(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
+        return bookingRepository.findBookingsForRoomInDates(
+                        roomId, checkInDate, checkOutDate)
+                .orElse(Collections.emptyList());
+    }
+
+    private void checkRoomAvailabilityByDates(Long roomId,
+                                              LocalDate checkInDate,
+                                              LocalDate checkOutDate) {
+        List<Booking> blockingBookings = findBookingsForRoomInDates(roomId, checkInDate, checkOutDate);
+        if(!blockingBookings.isEmpty()) {
+            throw new ConflictException(String.format("Room with id=%d is not available for current dates", roomId));
         }
     }
 
@@ -195,6 +254,12 @@ public class BookingServiceImpl implements BookingService {
             if (!found) {
                 throw new NotFoundException(String.format("Pet with id=%d is not found", id));
             }
+        }
+    }
+
+    private void checkRoom(Room room, String actionType) {
+        if (!room.getIsVisible()) {
+            throw new ConflictException("Can't " + actionType + " booking for hidden room");
         }
     }
 }

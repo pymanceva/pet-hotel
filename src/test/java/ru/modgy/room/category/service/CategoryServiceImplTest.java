@@ -30,19 +30,12 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class CategoryServiceImplTest {
+class CategoryServiceImplTest {
     private final User boss = User.builder()
             .email("boss@pethotel.ru")
             .id(1L)
             .firstName("boss")
             .role(Roles.ROLE_BOSS)
-            .isActive(true)
-            .build();
-    private final User admin = User.builder()
-            .email("admin@pethotel.ru")
-            .id(2L)
-            .firstName("admin")
-            .role(Roles.ROLE_ADMIN)
             .isActive(true)
             .build();
     private final User user = User.builder()
@@ -96,46 +89,12 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    void addCategory_whenAddCategoryByAdmin_thenCategoryAdded() {
-        when(categoryRepository.save(any(Category.class))).thenReturn(category);
-        when(categoryMapper.toCategory(any(NewCategoryDto.class))).thenReturn(category);
-        when(categoryMapper.toCategoryDto(any(Category.class))).thenReturn(categoryDto);
-
-        CategoryDto result = categoryService.addCategory(admin.getId(), newCategoryDto);
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(categoryDto.getName(), result.getName());
-        Assertions.assertEquals(categoryDto.getDescription(), result.getDescription());
-
-        verify(categoryRepository, times(1)).save(any(Category.class));
-        verifyNoMoreInteractions(categoryRepository);
-    }
-
-    @Test
     void getCategoryById_whenGetCategoryByBoss_thenReturnedCategory() {
         when(entityService.getCategoryIfExists(anyLong())).thenReturn(category);
         when(categoryMapper.toCategory(any(CategoryDto.class))).thenReturn(category);
         when(categoryMapper.toCategoryDto(any(Category.class))).thenReturn(categoryDto);
 
         CategoryDto result = categoryService.getCategoryById(boss.getId(), category.getId());
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(categoryDto.getName(), result.getName());
-        Assertions.assertEquals(categoryDto.getDescription(), result.getDescription());
-
-        verify(entityService, times(1)).getCategoryIfExists(anyLong());
-        verifyNoMoreInteractions(categoryRepository);
-    }
-
-    @Test
-    void getCategoryById_whenGetCategoryByAdmin_thenReturnedCategory() {
-        when(entityService.getCategoryIfExists(anyLong())).thenReturn(category);
-        when(categoryMapper.toCategory(any(CategoryDto.class))).thenReturn(category);
-        when(categoryMapper.toCategoryDto(any(Category.class))).thenReturn(categoryDto);
-
-        CategoryDto result = categoryService.getCategoryById(admin.getId(), category.getId());
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
@@ -181,40 +140,6 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    void updateCategoryById_whenRequesterAdminAndCategoryFound_thenUpdateAllFieldsThanId() {
-        UpdateCategoryDto updateCategoryDto = UpdateCategoryDto.builder()
-                .name("new name")
-                .description("new description")
-                .build();
-
-        CategoryDto updatedCategoryDto = CategoryDto.builder()
-                .id(1L)
-                .name("new name")
-                .description("new description")
-                .build();
-
-        Category newCategory = Category.builder()
-                .id(1L)
-                .name("new name")
-                .description("new description")
-                .build();
-
-        when(entityService.getCategoryIfExists(anyLong())).thenReturn(category);
-        when(categoryRepository.save(any(Category.class))).thenReturn(newCategory);
-        when(categoryMapper.toCategory(any(UpdateCategoryDto.class))).thenReturn(newCategory);
-        when(categoryMapper.toCategoryDto(any(Category.class))).thenReturn(updatedCategoryDto);
-
-        CategoryDto result = categoryService.updateCategoryById(admin.getId(), category.getId(), updateCategoryDto);
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals(newCategory.getName(), result.getName());
-        Assertions.assertEquals(newCategory.getDescription(), result.getDescription());
-
-        verify(categoryRepository, times(1)).save(any(Category.class));
-    }
-
-    @Test
     void getAllCategories_whenGetAllCategoriesByBoss_thenReturnAllCategories() {
         when(categoryRepository.findAll()).thenReturn(List.of(category));
         when(categoryMapper.toCategoryDto(anyList())).thenReturn(List.of(categoryDto));
@@ -233,38 +158,10 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    void getAllCategories_whenGetAllCategoriesByAdmin_thenReturnAllCategories() {
-        when(categoryRepository.findAll()).thenReturn(List.of(category));
-        when(categoryMapper.toCategoryDto(anyList())).thenReturn(List.of(categoryDto));
-
-        Collection<CategoryDto> resultCollection = categoryService.getAllCategories(admin.getId());
-        List<CategoryDto> result = resultCollection.stream().toList();
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(1, result.size());
-        Assertions.assertEquals(1L, result.get(0).getId());
-        Assertions.assertEquals(categoryDto.getName(), result.get(0).getName());
-        Assertions.assertEquals(categoryDto.getDescription(), result.get(0).getDescription());
-
-        verify(categoryRepository, times(1)).findAll();
-        verifyNoMoreInteractions(categoryRepository);
-    }
-
-    @Test
     void deleteCategoryId_whenRequesterBossAndCategoryFound_thenCategoryDeleted() {
         when(categoryRepository.deleteCategoryById(anyLong())).thenReturn(1);
 
         categoryService.deleteCategoryById(boss.getId(), category.getId());
-
-        verify(categoryRepository, times(1)).deleteCategoryById(anyLong());
-        verifyNoMoreInteractions(categoryRepository);
-    }
-
-    @Test
-    void deleteCategoryId_whenRequesterAdminAndCategoryFound_thenCategoryDeleted() {
-        when(categoryRepository.deleteCategoryById(anyLong())).thenReturn(1);
-
-        categoryService.deleteCategoryById(admin.getId(), category.getId());
 
         verify(categoryRepository, times(1)).deleteCategoryById(anyLong());
         verifyNoMoreInteractions(categoryRepository);
