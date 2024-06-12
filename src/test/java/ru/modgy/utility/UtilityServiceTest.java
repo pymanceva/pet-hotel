@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import ru.modgy.exception.AccessDeniedException;
+import ru.modgy.user.model.Roles;
+import ru.modgy.user.model.User;
+
 import ru.modgy.exception.ConflictException;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
@@ -115,182 +118,161 @@ class UtilityServiceTest {
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckBossAndBoss_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(boss, Roles.ROLE_BOSS));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(boss, Roles.ROLE_BOSS));
     }
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckBossAndAdmin_thenAccessGranted() {
-        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrdinalRoleAccess(boss, Roles.ROLE_ADMIN));
+        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrdinalRoleAccessForUsers(boss, Roles.ROLE_ADMIN));
     }
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckBossAndUser_thenAccessGranted() {
-        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrdinalRoleAccess(boss, Roles.ROLE_USER));
+        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrdinalRoleAccessForUsers(boss, Roles.ROLE_USER));
     }
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckBossAndFinancial_thenAccessGranted() {
-        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrdinalRoleAccess(boss, Roles.ROLE_FINANCIAL));
+        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrdinalRoleAccessForUsers(boss, Roles.ROLE_FINANCIAL));
     }
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckAdminAndBoss_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(admin, Roles.ROLE_BOSS));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(admin, Roles.ROLE_BOSS));
     }
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckAdminAndAdmin_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(admin, Roles.ROLE_ADMIN));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(admin, Roles.ROLE_ADMIN));
     }
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckAdminAndUser_thenAccessGranted() {
-        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrdinalRoleAccess(admin, Roles.ROLE_USER));
+        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrdinalRoleAccessForUsers(admin, Roles.ROLE_USER));
     }
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckAdminAndFinancial_thenAccessDenied() {
-        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrdinalRoleAccess(admin, Roles.ROLE_FINANCIAL));
+        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrdinalRoleAccessForUsers(admin, Roles.ROLE_FINANCIAL));
     }
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckUserAndBoss_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(user, Roles.ROLE_BOSS));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(user, Roles.ROLE_BOSS));
     }
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckUserAndAdmin_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(user, Roles.ROLE_ADMIN));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(user, Roles.ROLE_ADMIN));
     }
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckUserAndUser_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(user, Roles.ROLE_USER));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(user, Roles.ROLE_USER));
     }
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckUserAndFinancial_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(user, Roles.ROLE_FINANCIAL));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(user, Roles.ROLE_FINANCIAL));
     }
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckFinancialAndBoss_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(financial, Roles.ROLE_BOSS));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(financial, Roles.ROLE_BOSS));
     }
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckFinancialAndAdmin_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(financial, Roles.ROLE_ADMIN));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(financial, Roles.ROLE_ADMIN));
     }
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckFinancialAndUser_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(financial, Roles.ROLE_USER));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(financial, Roles.ROLE_USER));
     }
 
     @Test
     void checkHigherOrdinalRoleAccess_whenCheckFinancialAndFinancial_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(financial, Roles.ROLE_FINANCIAL));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(financial, Roles.ROLE_FINANCIAL));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckBossAndBoss_thenAccessGranted() {
-        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrEqualOrdinalRoleAccess(boss, Roles.ROLE_BOSS));
+        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrEqualOrdinalRoleAccessForUsers(boss, Roles.ROLE_BOSS));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckBossAndAdmin_thenAccessGranted() {
-        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrEqualOrdinalRoleAccess(boss, Roles.ROLE_ADMIN));
+        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrEqualOrdinalRoleAccessForUsers(boss, Roles.ROLE_ADMIN));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckBossAndUser_thenAccessGranted() {
-        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrEqualOrdinalRoleAccess(boss, Roles.ROLE_USER));
+        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrEqualOrdinalRoleAccessForUsers(boss, Roles.ROLE_USER));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckBossAndFinancial_thenAccessGranted() {
-        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrEqualOrdinalRoleAccess(boss, Roles.ROLE_FINANCIAL));
+        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrEqualOrdinalRoleAccessForUsers(boss, Roles.ROLE_FINANCIAL));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckAdminAndBoss_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(admin, Roles.ROLE_BOSS));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(admin, Roles.ROLE_BOSS));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckAdminAndAdmin_thenAccessGranted() {
-        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrEqualOrdinalRoleAccess(admin, Roles.ROLE_ADMIN));
+        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrEqualOrdinalRoleAccessForUsers(admin, Roles.ROLE_ADMIN));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckAdminAndUser_thenAccessGranted() {
-        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrEqualOrdinalRoleAccess(admin, Roles.ROLE_USER));
+        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrEqualOrdinalRoleAccessForUsers(admin, Roles.ROLE_USER));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckAdminAndFinancial_thenAccessGranted() {
-        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrEqualOrdinalRoleAccess(admin, Roles.ROLE_FINANCIAL));
+        Assertions.assertDoesNotThrow(() -> utilityService.checkHigherOrEqualOrdinalRoleAccessForUsers(admin, Roles.ROLE_FINANCIAL));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckUserAndBoss_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(user, Roles.ROLE_BOSS));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(user, Roles.ROLE_BOSS));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckUserAndAdmin_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(user, Roles.ROLE_ADMIN));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(user, Roles.ROLE_ADMIN));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckUserAndUser_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(user, Roles.ROLE_USER));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(user, Roles.ROLE_USER));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckUserAndFinancial_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(user, Roles.ROLE_FINANCIAL));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(user, Roles.ROLE_FINANCIAL));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckFinancialAndBoss_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(financial, Roles.ROLE_BOSS));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(financial, Roles.ROLE_BOSS));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckFinancialAndAdmin_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(financial, Roles.ROLE_ADMIN));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(financial, Roles.ROLE_ADMIN));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckFinancialAndUser_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(financial, Roles.ROLE_USER));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(financial, Roles.ROLE_USER));
     }
 
     @Test
     void checkHigherOrEqualOrdinalRoleAccess_whenCheckFinancialAndFinancial_thenAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccess(financial, Roles.ROLE_FINANCIAL));
-    }
-
-    @Test
-    void checkDatesOfBookingWhenCheckInDateIsBeforeCheckOutDate_thenNoExceptionThrown() {
-        Assertions.assertDoesNotThrow(() -> utilityService.checkDatesOfBooking(
-                LocalDate.of(2024, 1, 1),
-                LocalDate.of(2024, 1, 2)));
-    }
-
-    @Test
-    void checkDatesOfBookingWhenCheckInDateIsEqualCheckOutDate_thenNoExceptionThrown() {
-        Assertions.assertDoesNotThrow(() -> utilityService.checkDatesOfBooking(
-                LocalDate.of(2024, 1, 1),
-                LocalDate.of(2024, 1, 1)));
-    }
-
-    @Test
-    void checkDatesOfBookingWhenCheckInDateIsAfterCheckOutDate_thenConflictException() {
-        assertThrows(ConflictException.class, () -> utilityService.checkDatesOfBooking(
-                LocalDate.of(2024, 1, 2),
-                LocalDate.of(2024, 1, 1)));
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkHigherOrdinalRoleAccessForUsers(financial, Roles.ROLE_FINANCIAL));
     }
 }

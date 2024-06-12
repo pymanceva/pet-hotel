@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
         if (updateBySelf) {
             oldUser = requester;
         } else {
-            utilityService.checkHigherOrdinalRoleAccess(requester, newUser);
+            utilityService.checkHigherOrdinalRoleAccessForUsers(requester, newUser);
             oldUser = entityService.getUserIfExists(userId);
         }
 

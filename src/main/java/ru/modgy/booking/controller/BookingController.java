@@ -57,6 +57,7 @@ public class BookingController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBookingById(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                   @PathVariable("id") Long bookingId) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("BookingController: DELETE/deleteBookingById, requesterId={}, bookingId={}", requesterId, bookingId);
         utilityService.checkBossAdminAccess(requesterId);
         bookingService.deleteBookingById(requesterId, bookingId);

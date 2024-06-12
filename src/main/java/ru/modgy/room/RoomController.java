@@ -30,6 +30,7 @@ public class RoomController {
     @ResponseStatus(HttpStatus.CREATED)
     public RoomDto addRoom(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                            @RequestBody @Valid NewRoomDto newRoomDto) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("RoomController: POST/addRoom, requesterId={}, room={}", requesterId, newRoomDto);
         utilityService.checkBossAdminAccess(requesterId);
         return roomService.addRoom(requesterId, newRoomDto);
@@ -38,6 +39,7 @@ public class RoomController {
     @GetMapping("/{id}")
     public RoomDto getRoomById(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                @PathVariable("id") Long roomId) {
+        utilityService.checkBossAdminFinancialAccess(requesterId);
         log.info("RoomController: GET/getRoomById, requesterId={}, roomId={}", requesterId, roomId);
         utilityService.checkBossAdminFinancialAccess(requesterId);
         return roomService.getRoomById(requesterId, roomId);
@@ -47,6 +49,7 @@ public class RoomController {
     public RoomDto updateRoom(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                               @RequestBody @Valid UpdateRoomDto roomDto,
                               @PathVariable("id") Long roomId) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("RoomController: PATCH/updateRoom, requesterId={}, roomId={}, requestBody={}",
                 requesterId, roomId, roomDto);
         utilityService.checkBossAdminAccess(requesterId);
@@ -56,6 +59,7 @@ public class RoomController {
     @GetMapping
     public Collection<RoomDto> getAllRooms(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                            @Param("isVisible") Boolean isVisible) {
+        utilityService.checkBossAdminFinancialAccess(requesterId);
         log.info("RoomController: GET/getAllRooms, requesterId={}", requesterId);
         utilityService.checkBossAdminFinancialAccess(requesterId);
         return roomService.getAllRooms(requesterId, isVisible);
@@ -64,6 +68,7 @@ public class RoomController {
     @PatchMapping("/{id}/hide")
     public RoomDto hideRoomById(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                 @PathVariable("id") Long roomId) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("RoomController: PATCH/hideRoomById, requesterId={}, roomId={}",
                 requesterId, roomId);
         utilityService.checkBossAdminAccess(requesterId);
@@ -73,6 +78,7 @@ public class RoomController {
     @PatchMapping("/{id}/unhide")
     public RoomDto unhideRoomById(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                   @PathVariable("id") Long roomId) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("RoomController: PATCH/unhideRoomById, requesterId={}, roomId={}",
                 requesterId, roomId);
         utilityService.checkBossAdminAccess(requesterId);
@@ -83,6 +89,7 @@ public class RoomController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteRoomById(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                @PathVariable("id") Long roomId) {
+        utilityService.checkBossAdminAccess(requesterId);
         log.info("RoomController: DELETE/deleteRoomById, requesterId={}, roomId={}", requesterId, roomId);
         utilityService.checkBossAdminAccess(requesterId);
         roomService.permanentlyDeleteRoomById(requesterId, roomId);

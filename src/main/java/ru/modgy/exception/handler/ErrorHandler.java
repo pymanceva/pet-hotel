@@ -12,17 +12,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.modgy.exception.AccessDeniedException;
-import ru.modgy.exception.ConflictException;
-import ru.modgy.exception.InvalidDateRangeException;
-import ru.modgy.exception.NotFoundException;
+import ru.modgy.exception.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
 
@@ -58,10 +54,22 @@ public class ErrorHandler {
         );
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Error errorMethodArgumentNotValidException(final MethodArgumentNotValidException ex) {
         log.error("EH: MethodArgumentNotValidException: {}", ex.getMessage(), ex);
+        return new Error(
+                new ArrayList<>(),
+                ex.getMessage(),
+                "Incorrectly made request",
+                HttpStatus.BAD_REQUEST,
+                now());
+    }
+
+    @ExceptionHandler(jakarta.validation.ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Error errorConstraintViolationExceptionJakarta(final jakarta.validation.ConstraintViolationException ex) {
+        log.error("EH: errorConstraintViolationExceptionJakarta: {}", ex.getMessage(), ex);
         return new Error(
                 new ArrayList<>(),
                 ex.getMessage(),
@@ -76,7 +84,7 @@ public class ErrorHandler {
         log.error("EH: MethodArgumentTypeMismatchException: {}", ex.getMessage(), ex);
         return new Error(
                 new ArrayList<>(),
-                String.format(ex.getMessage() + ". Param:" + ex.getName() + " Value=" + ex.getValue()),
+                String.format("%s. Param: %s Value=%s", ex.getMessage(), ex.getName(), ex.getValue()),
                 "Incorrectly made request",
                 HttpStatus.BAD_REQUEST,
                 now());
@@ -106,7 +114,7 @@ public class ErrorHandler {
                 now());
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
+    @ExceptionHandler({ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public Error errorConstraintViolationException(final ConstraintViolationException ex) {
         log.error("EH: ConstraintViolationException: {}", ex.getMessage(), ex);
@@ -166,6 +174,18 @@ public class ErrorHandler {
                 now());
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Error handleBadRequestException(final BadRequestException ex) {
+        log.error("EH: BadRequestException: {}", ex.getMessage());
+        return new Error(
+                new ArrayList<>(),
+                ex.getMessage(),
+                "For the requested operation the conditions are not met.",
+                HttpStatus.BAD_REQUEST,
+                now());
+    }
+
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Error errorThrowableException(final Throwable ex) {
@@ -173,7 +193,7 @@ public class ErrorHandler {
         return new Error(
                 Arrays.stream(ex.getStackTrace())
                         .map(StackTraceElement::toString)
-                        .collect(Collectors.toList()),
+                        .toList(),
                 ex.getMessage(),
                 "Internal Server Error.",
                 HttpStatus.I_AM_A_TEAPOT,

@@ -8,7 +8,7 @@
 		<version>3.1.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>ru.dogudacha</groupId>
+	<groupId>ru.modgy</groupId>
 	<artifactId>Modgy</artifactId>
 	<version>0.0.12-SNAPSHOT</version>
 	<name>Modgy</name>
