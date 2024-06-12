@@ -48,7 +48,7 @@ public class BookingServiceImpl implements BookingService {
 
         Room room = entityService.getRoomIfExists(newBookingDto.getRoomId());
         newBooking.setRoom(room);
-        checkRoom(room);
+        checkRoom(room, "add");
 
         if (newBooking.getStatus() == null) {
             if (newBooking.getIsPrepaid() || newBooking.getType().equals(TypesBooking.TYPE_CLOSING)) {
@@ -138,7 +138,7 @@ public class BookingServiceImpl implements BookingService {
 
         if (updateBookingDto.getRoomId() != null) {
             Room room = entityService.getRoomIfExists(updateBookingDto.getRoomId());
-            checkRoom(room);
+            checkRoom(room, "update");
             newBooking.setRoom(room);
         } else {
             newBooking.setRoom(oldBooking.getRoom());
@@ -257,9 +257,9 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    private void checkRoom(Room room) {
+    private void checkRoom(Room room, String actionType) {
         if (!room.getIsVisible()) {
-            throw new ConflictException("Can't add booking for hidden room");
+            throw new ConflictException("Can't " + actionType + " booking for hidden room");
         }
     }
 }
