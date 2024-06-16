@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>ru.modgy</groupId>
 	<artifactId>Modgy</artifactId>
-	<version>0.0.14-SNAPSHOT</version>
+	<version>0.0.15-SNAPSHOT</version>
 	<name>Modgy</name>
 	<description>Booking app for pets hotel</description>
 	<properties>
