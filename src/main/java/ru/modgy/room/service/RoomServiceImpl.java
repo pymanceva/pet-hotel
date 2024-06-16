@@ -16,7 +16,6 @@ import ru.modgy.room.dto.mapper.RoomMapper;
 import ru.modgy.room.model.Room;
 import ru.modgy.room.repository.RoomRepository;
 import ru.modgy.utility.EntityService;
-import ru.modgy.utility.UtilityService;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -29,7 +28,6 @@ public class RoomServiceImpl implements RoomService {
     private final RoomMapper roomMapper;
     private final BookingRepository bookingRepository;
     private final EntityService entityService;
-    private final UtilityService utilityService;
 
     @Transactional
     @Override
@@ -146,6 +144,20 @@ public class RoomServiceImpl implements RoomService {
                 "userId={}, catId={}, checkInDate={}, checkOutDate={}",
                 userId, catId, checkInDate, checkOutDate);
         return roomMapper.toListRoomDto(foundRooms);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public boolean checkUniqueRoomNumber(Long userId, String roomNumber) {
+        boolean isUnique = false;
+        int  result = roomRepository.countAllByNumber(roomNumber);
+
+        if (result == 0) {
+            isUnique = true;
+        }
+
+        log.info("RoomService: checkUniqueRoomNumber, userId={}, roomNumber={}, result={}", userId, roomNumber, isUnique);
+        return isUnique;
     }
 
     private List<Room> findAvailableRoomsByCategoryInDates(Long catId,

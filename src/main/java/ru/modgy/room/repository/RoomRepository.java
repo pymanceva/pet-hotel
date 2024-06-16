@@ -26,4 +26,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
                                                     @Param("checkOutDate") LocalDate checkOutDate);
 
     Integer deleteRoomById(Long id);
+
+    int countAllByNumber(String number);
 }

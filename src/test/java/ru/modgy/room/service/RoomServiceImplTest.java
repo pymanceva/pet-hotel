@@ -43,6 +43,7 @@ import static org.mockito.Mockito.*;
 class RoomServiceImplTest {
     private final LocalDate checkIn = LocalDate.of(2024, 1, 1);
     private final LocalDate checkOut = LocalDate.of(2024, 1, 2);
+    private final String roomNumber = "1F";
     private final User boss = User.builder()
             .email("boss@pethotel.ru")
             .id(1L)
@@ -420,6 +421,30 @@ class RoomServiceImplTest {
         Assertions.assertEquals(0, result.size());
 
         verify(roomRepository, times(1)).findAvailableRoomsByCategoryInDates(anyLong(), any(), any());
+        verifyNoMoreInteractions(roomRepository);
+    }
+
+    @Test
+    void checkUniqueRoomNumber_whenNumberUnique_thenReturnedTrue() {
+        when(roomRepository.countAllByNumber(anyString())).thenReturn(0);
+
+        boolean result = roomService.checkUniqueRoomNumber(boss.getId(), roomNumber);
+
+        Assertions.assertTrue(result);
+
+        verify(roomRepository, times(1)).countAllByNumber(anyString());
+        verifyNoMoreInteractions(roomRepository);
+    }
+
+    @Test
+    void checkUniqueRoomNumber_whenNumberNotUnique_thenReturnedFalse() {
+        when(roomRepository.countAllByNumber(anyString())).thenReturn(1);
+
+        boolean result = roomService.checkUniqueRoomNumber(boss.getId(), roomNumber);
+
+        Assertions.assertFalse(result);
+
+        verify(roomRepository, times(1)).countAllByNumber(anyString());
         verifyNoMoreInteractions(roomRepository);
     }
 }

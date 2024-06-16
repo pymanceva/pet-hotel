@@ -3,7 +3,6 @@ package ru.modgy.room;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +57,7 @@ public class RoomController {
 
     @GetMapping
     public Collection<RoomDto> getAllRooms(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
-                                           @Param("isVisible") Boolean isVisible) {
+                                           @RequestParam("isVisible") Boolean isVisible) {
         utilityService.checkBossAdminFinancialAccess(requesterId);
         log.info("RoomController: GET/getAllRooms, requesterId={}", requesterId);
         utilityService.checkBossAdminFinancialAccess(requesterId);
@@ -98,12 +97,20 @@ public class RoomController {
     @GetMapping("/{catId}/getAvailableRooms")
     public List<RoomDto> getAvailableRoomsByCategoryInDates(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                                             @PathVariable("catId") Long catId,
-                                                            @Param("checkInDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkInDate,
-                                                            @Param("checkOutDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkOutDate) {
+                                                            @RequestParam("checkInDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkInDate,
+                                                            @RequestParam("checkOutDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkOutDate) {
         log.info("RoomController: GET/getAvailableRoomsByCategoryInDates, " +
                 "requesterId={}, catId={}, checkInDate={}, checkOutDate={}",
                 requesterId, catId, checkInDate, checkOutDate);
         utilityService.checkBossAdminAccess(requesterId);
         return roomService.getAvailableRoomsByCategoryInDates(requesterId, catId, checkInDate, checkOutDate);
+    }
+
+    @GetMapping("/checkUniqueNumber")
+    public boolean checkUniqueRoomNumber(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
+                                         @RequestParam String roomNumber) {
+        log.info("RoomController: GET/checkUniqueRoomNumber, requesterId={}, roomNumber={}", requesterId, roomNumber);
+        utilityService.checkBossAdminAccess(requesterId);
+        return roomService.checkUniqueRoomNumber(requesterId, roomNumber);
     }
 }

@@ -82,4 +82,14 @@ public interface RoomService {
      * @return список найденных номеров
      */
     List<RoomDto> getAvailableRoomsByCategoryInDates(Long userId, Long catId, LocalDate checkInDate, LocalDate checkOutDate);
+
+    /**
+     * Проверка номера комнаты на уникальность.
+     *
+     * @param userId - id пользователя, направляющего запрос
+     * @param roomNumber - номер, который проверяется на уникальность в БД
+     * @return true - если такой номер уникален,
+     * false - если номер не уникален и в БД имеется запись о комнате с таким же номером.
+     */
+    boolean checkUniqueRoomNumber(Long userId, String roomNumber);
 }
