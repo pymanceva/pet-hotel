@@ -42,6 +42,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: BAD_REQUEST
                 reason: Incorrectly made request.
                 message: "Error: Field mainPhone must not be blank."
@@ -53,6 +54,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
                 message: "User with role=ROLE_FINANCIAL, can't access for this action"
@@ -64,6 +66,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: NOT_FOUND
                 reason: The required object was not found.
                 message: "User with id=5 is not found"
@@ -75,6 +78,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: CONFLICT
                 reason: integrity constraint has been violated.
                 message: "Attempt to insert duplicate key row in object owner with unique index owner_main_phone."
@@ -86,6 +90,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: INTERNAL_SERVER_ERROR
                 reason: Internal Server Error.
                 message: []
@@ -117,6 +122,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: BAD_REQUEST
                 reason: Incorrectly made request.
                 message: ""
@@ -128,6 +134,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
                 message: "User with role=ROLE_FINANCIAL, can't access for this action"
@@ -139,6 +146,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: NOT_FOUND
                 reason: The required object was not found.
                 message: "Owner with id=42 is not found"
@@ -150,6 +158,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: INTERNAL_SERVER_ERROR
                 reason: Internal Server Error.
                 message: []
@@ -180,6 +189,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: BAD_REQUEST
                 reason: Incorrectly made request.
                 message: ""
@@ -191,6 +201,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
                 message: "User with role=ROLE_FINANCIAL, can't access for this action"
@@ -202,6 +213,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: NOT_FOUND
                 reason: The required object was not found.
                 message: "Owner with id=42 is not found"
@@ -213,6 +225,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: INTERNAL_SERVER_ERROR
                 reason: Internal Server Error.
                 message: []
@@ -239,6 +252,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: BAD_REQUEST
                 reason: Incorrectly made request.
                 message: ""
@@ -250,6 +264,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
                 message: "User with role=ROLE_FINANCIAL, can't access for this action"
@@ -261,6 +276,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: NOT_FOUND
                 reason: The required object was not found.
                 message: "Owner with id=42 is not found"
@@ -272,6 +288,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: INTERNAL_SERVER_ERROR
                 reason: Internal Server Error.
                 message: []
@@ -306,6 +323,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: BAD_REQUEST
                 reason: Incorrectly made request.
                 message: ""
@@ -317,6 +335,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
                 message: "User with role=ROLE_FINANCIAL, can't access for this action"
@@ -328,6 +347,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: NOT_FOUND
                 reason: The required object was not found.
                 message: "Owner with id=42 is not found"
@@ -339,6 +359,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: CONFLICT
                 reason: integrity constraint has been violated.
                 message: "Attempt to insert duplicate key row in object owner with unique index owner_main_phone."
@@ -350,6 +371,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: INTERNAL_SERVER_ERROR
                 reason: Internal Server Error.
                 message: []
@@ -388,6 +410,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
                 message: "User with role=ROLE_FINANCIAL, can't access for this action"
@@ -399,6 +422,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: INTERNAL_SERVER_ERROR
                 reason: Internal Server Error.
                 message: []
@@ -429,6 +453,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
                 message: "User with role=ROLE_FINANCIAL, can't access for this action"
@@ -440,6 +465,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: NOT_FOUND
                 reason: The required object was not found.
                 message: "Owner with id=42 is not found"
@@ -451,6 +477,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: INTERNAL_SERVER_ERROR
                 reason: Internal Server Error.
                 message: []
@@ -486,6 +513,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: BAD_REQUEST
                 reason: Incorrectly made request.
                 message: ""
@@ -497,6 +525,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
                 message: "User with role=FINANCIAL, can't access for this action"
@@ -508,6 +537,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: INTERNAL_SERVER_ERROR
                 reason: Internal Server Error.
                 message: [ ]
@@ -553,6 +583,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: BAD_REQUEST
                 reason: Incorrectly made request.
                 message: ""
@@ -564,6 +595,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: FORBIDDEN
                 reason: Operation is denied for this user.
                 message: "User with role=FINANCIAL, can't access for this action"
@@ -575,6 +607,7 @@ paths:
           content:
             application/json:
               example:
+                errors: []
                 status: INTERNAL_SERVER_ERROR
                 reason: Internal Server Error.
                 message: [ ]
