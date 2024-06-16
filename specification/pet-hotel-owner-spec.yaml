@@ -96,8 +96,8 @@ paths:
     get:
       tags:
         - owner-controller
-      summary: Получение списка всех пользователей
-      description: Получение списка всех пользователей может осуществляться только пользователями с ролью ROLE_BOSS
+      summary: Получение списка всех клиентов
+      description: Получение списка всех клиентов может осуществляться только пользователями с ролью ROLE_BOSS
         или ROLE_ADMIN.
       operationId: getAllOwners
       parameters:
@@ -161,9 +161,9 @@ paths:
     get:
       tags:
         - owner-controller
-      summary: Получение пользователя по id
+      summary: Получение клиента по id
       description: >-
-        Получение пользователя по id может осуществляться только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
+        Получение клиента по id может осуществляться только пользователями с ролью ROLE_BOSS или ROLE_ADMIN.
       operationId: getOwnerById
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
@@ -223,9 +223,9 @@ paths:
     delete:
       tags:
           - owner-controller
-      summary: Удаление пользователя по id
+      summary: Удаление клиента по id
       description: >-
-        Удаление пользователя по id не может осуществляться пользователями - данный эндпоинт является служебным.
+        Удаление клиента по id не может осуществляться пользователями - данный эндпоинт является служебным.
       operationId: deleteOwnerById
       parameters:
           - $ref: '#/components/parameters/requesterHeader'
@@ -368,7 +368,7 @@ paths:
         - $ref: '#/components/parameters/requesterHeader'
         - name: num
           in: query
-          description: число запрашиваемых пользователей
+          description: число запрашиваемых клиентов
           required: false
           schema:
             type: integer
@@ -655,7 +655,7 @@ components:
           maxLength: 150
           example: Гендальф, +79217775533
         comment:
-          description: Заметки о пользователе
+          description: Заметки о клиенте
           type: string
           example: Старый пират, друг Флинта. Жаден. Ради денег готов на всё. Характер мерзкий. Не женат.
         source:
@@ -704,11 +704,11 @@ components:
           type: integer
           format: int64
           example: 103
-        lastname:
+        lastName:
           description: Фамилия клиента
           type: string
           example: Сумкин
-        firstname:
+        firstName:
           description: Имя клиента
           type: string
           example: Фёдор
@@ -737,7 +737,7 @@ components:
           type: string
           example: Гендальф, +79217775533
         comment:
-          description: Заметки о пользователе
+          description: Заметки о клиенте
           type: string
           example: Очень, очень хороший мальчик. Вежлив, правдив, скромен, добр. Слушает маму,
             каждое утро делает зарядку. Характер очень мягкий.
@@ -758,7 +758,7 @@ components:
 
     UpdateOwnerDto:
       title: UpdateOwnerDto
-      description: DTO для обновления данных пользователя
+      description: DTO для обновления данных клиента
       type: object
       properties:
         lastName:
@@ -807,7 +807,7 @@ components:
           maxLength: 150
           example: Гендальф, +79217775533
         comment:
-          description: Заметки о пользователе
+          description: Заметки о клиенте
           type: string
           example: Старый пират, друг Флинта. Жаден. Ради денег готов на всё. Характер мерзкий. Не женат.
         source:
