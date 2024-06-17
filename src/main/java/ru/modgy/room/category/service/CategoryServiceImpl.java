@@ -94,7 +94,7 @@ public class CategoryServiceImpl implements CategoryService {
             isUnique = true;
         }
 
-        log.info("CategoryService: checkUniqueCategoryName, userId={}, categoryName={}, result={}", userId, categoryName, isUnique);
+        log.info("CategoryService: checkUniqueCategoryName, userId={}, categoryName={}, isUnique={}", userId, categoryName, isUnique);
         return isUnique;
     }
 }
