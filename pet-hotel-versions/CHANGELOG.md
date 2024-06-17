@@ -68,3 +68,6 @@ Api: *<https://github.com/pymanceva/pet-hotel/blob/efed8fb9bbd026f8cab858a21672a
 **0.0.14: Добавлена проверка уникальности номера комнаты.**
 Карточка задачи: *<https://nkiblyk.kaiten.ru/space/167883/card/32611738?filter=eyJrZXkiOiJhbmQiLCJ2YWx1ZSI6W3sia2V5IjoiYW5kIiwidmFsdWUiOlt7ImNvbXBhcmlzb24iOiJlcSIsImtleSI6InRhZyIsInZhbHVlIjo0OTA5MDF9LHsia2V5IjoibWVtYmVyIiwiY29tcGFyaXNvbiI6ImVxIiwidmFsdWUiOjQ5NDU3MH1dfV19>*
 
+**0.0.15: Добавлена проверка уникальности наименования категории.**
+Карточка задачи: *<https://nkiblyk.kaiten.ru/space/167883/card/34808737?filter=eyJrZXkiOiJhbmQiLCJ2YWx1ZSI6W3sia2V5IjoiYW5kIiwidmFsdWUiOlt7ImNvbXBhcmlzb24iOiJlcSIsImtleSI6InRhZyIsInZhbHVlIjo0OTA5MDF9LHsia2V5IjoibWVtYmVyIiwiY29tcGFyaXNvbiI6ImVxIiwidmFsdWUiOjQ5NDU3MH1dfV19>*
+

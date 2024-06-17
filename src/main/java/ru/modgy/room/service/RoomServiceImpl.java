@@ -156,7 +156,7 @@ public class RoomServiceImpl implements RoomService {
             isUnique = true;
         }
 
-        log.info("RoomService: checkUniqueRoomNumber, userId={}, roomNumber={}, result={}", userId, roomNumber, isUnique);
+        log.info("RoomService: checkUniqueRoomNumber, userId={}, roomNumber={}, isUnique={}", userId, roomNumber, isUnique);
         return isUnique;
     }
 

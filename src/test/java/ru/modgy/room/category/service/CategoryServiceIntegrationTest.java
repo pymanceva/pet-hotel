@@ -21,8 +21,8 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -113,5 +113,26 @@ class CategoryServiceIntegrationTest {
         );
 
         assertEquals(error, exception.getMessage());
+    }
+
+    @Test
+    void checkUniqueCategoryName_whenNameUnique_thenReturnedTrue() {
+        em.persist(requesterAdmin);
+        em.persist(category);
+
+        String categoryName = "Test category";
+        boolean result = service.checkUniqueCategoryName(requesterAdmin.getId(), categoryName);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void checkUniqueCategoryName_whenNameNotUnique_thenReturnedFalse() {
+        em.persist(requesterAdmin);
+        em.persist(category);
+
+        boolean result = service.checkUniqueCategoryName(requesterAdmin.getId(), category.getName());
+
+        assertFalse(result);
     }
 }

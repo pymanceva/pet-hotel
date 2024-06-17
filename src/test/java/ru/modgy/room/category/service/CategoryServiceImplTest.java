@@ -184,4 +184,28 @@ class CategoryServiceImplTest {
         assertThrows(NotFoundException.class,
                 () -> categoryService.deleteCategoryById(boss.getId(), category.getId()));
     }
+
+    @Test
+    void checkUniqueCategoryName_whenNameUnique_thenReturnedTrue() {
+        when(categoryRepository.countAllByName(anyString())).thenReturn(0);
+
+        boolean result = categoryService.checkUniqueCategoryName(boss.getId(), category.getName());
+
+        Assertions.assertTrue(result);
+
+        verify(categoryRepository, times(1)).countAllByName(anyString());
+        verifyNoMoreInteractions(categoryRepository);
+    }
+
+    @Test
+    void checkUniqueCategoryName_whenNameNotUnique_thenReturnedFalse() {
+        when(categoryRepository.countAllByName(anyString())).thenReturn(1);
+
+        boolean result = categoryService.checkUniqueCategoryName(boss.getId(), category.getName());
+
+        Assertions.assertFalse(result);
+
+        verify(categoryRepository, times(1)).countAllByName(anyString());
+        verifyNoMoreInteractions(categoryRepository);
+    }
 }

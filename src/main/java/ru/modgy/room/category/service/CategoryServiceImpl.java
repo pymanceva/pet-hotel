@@ -83,4 +83,18 @@ public class CategoryServiceImpl implements CategoryService {
 
         log.info("CategoryService: deleteCategoryById, userId={}, catId={}", userId, catId);
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public boolean checkUniqueCategoryName(Long userId, String categoryName) {
+        boolean isUnique = false;
+        int  result = categoryRepository.countAllByName(categoryName);
+
+        if (result == 0) {
+            isUnique = true;
+        }
+
+        log.info("CategoryService: checkUniqueCategoryName, userId={}, categoryName={}, isUnique={}", userId, categoryName, isUnique);
+        return isUnique;
+    }
 }

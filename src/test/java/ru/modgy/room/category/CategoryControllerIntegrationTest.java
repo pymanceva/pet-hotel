@@ -2,12 +2,14 @@ package ru.modgy.room.category;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import ru.modgy.exception.NotFoundException;
 import ru.modgy.room.category.dto.CategoryDto;
 import ru.modgy.room.category.dto.NewCategoryDto;
@@ -162,5 +164,25 @@ class CategoryControllerIntegrationTest {
                 .andExpect(status().isNotFound());
 
         verify(categoryService, times(2)).deleteCategoryById(requesterId, catId);
+    }
+
+    @Test
+    @SneakyThrows
+    void checkUniqueCategoryName() {
+        when(categoryService.checkUniqueCategoryName(anyLong(), anyString())).thenReturn(true);
+
+        String categoryName = "Dog room";
+        MvcResult mvcResult = mockMvc.perform(get("/categories/checkUniqueName")
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .param("categoryName", categoryName))
+                .andReturn();
+
+        String expectedResponseBody = "true";
+        String actualResponseBody = mvcResult.getResponse().getContentAsString();
+        Assertions.assertEquals(actualResponseBody, expectedResponseBody);
+
+        verify(categoryService, times(1))
+                .checkUniqueCategoryName(requesterId, categoryName);
     }
 }

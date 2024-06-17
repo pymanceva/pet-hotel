@@ -64,4 +64,12 @@ public class CategoryController {
         log.info("CategoryController: DELETE/deleteCategoryById, requesterId={}, catId={}", requesterId, catId);
         categoryService.deleteCategoryById(requesterId, catId);
     }
+
+    @GetMapping("/checkUniqueName")
+    public boolean checkUniqueCategoryName(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
+                                         @RequestParam String categoryName) {
+        log.info("CategoryController: GET/checkUniqueCategoryName, requesterId={}, categoryName={}", requesterId, categoryName);
+        utilityService.checkBossAdminAccess(requesterId);
+        return categoryService.checkUniqueCategoryName(requesterId, categoryName);
+    }
 }
