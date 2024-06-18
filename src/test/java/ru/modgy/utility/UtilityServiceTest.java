@@ -12,12 +12,6 @@ import ru.modgy.exception.AccessDeniedException;
 import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
 
-import ru.modgy.exception.ConflictException;
-import ru.modgy.user.model.Roles;
-import ru.modgy.user.model.User;
-
-import java.time.LocalDate;
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -114,6 +108,34 @@ class UtilityServiceTest {
         when(entityService.getUserIfExists(anyLong())).thenReturn(financial);
 
         Assertions.assertDoesNotThrow(() -> utilityService.checkBossAdminFinancialAccess(financial.getId()));
+    }
+
+    @Test
+    void checkBossAccess_whenCheckBoss_thenAccessGranted() {
+        when(entityService.getUserIfExists(anyLong())).thenReturn(boss);
+
+        Assertions.assertDoesNotThrow(() -> utilityService.checkBossAccess(boss.getId()));
+    }
+
+    @Test
+    void checkBossAccess_whenCheckAdmin_thenAccessDenied() {
+        when(entityService.getUserIfExists(anyLong())).thenReturn(admin);
+
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkBossAccess(admin.getId()));
+    }
+
+    @Test
+    void checkBossAccess_whenCheckUser_thenAccessDenied() {
+        when(entityService.getUserIfExists(anyLong())).thenReturn(user);
+
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkBossAccess(user.getId()));
+    }
+
+    @Test
+    void checkBossAccess_whenCheckFinancial_thenAccessDenied() {
+        when(entityService.getUserIfExists(anyLong())).thenReturn(financial);
+
+        assertThrows(AccessDeniedException.class, () -> utilityService.checkBossAccess(financial.getId()));
     }
 
     @Test

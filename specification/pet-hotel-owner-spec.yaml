@@ -2,7 +2,7 @@ openapi: '3.0.1'
 info:
   title: 'Modgy: Owners Specification'
   description: Modgy owners
-  version: 'v3'
+  version: 'v4'
 
 servers:
     - url: http://localhost:8080
@@ -238,7 +238,7 @@ paths:
           - owner-controller
       summary: Удаление клиента по id
       description: >-
-        Удаление клиента по id не может осуществляться пользователями - данный эндпоинт является служебным.
+        Удаление клиента по id может осуществляться только пользователями с ролью ROLE_BOSS.
       operationId: deleteOwnerById
       parameters:
           - $ref: '#/components/parameters/requesterHeader'

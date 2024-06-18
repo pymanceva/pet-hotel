@@ -95,6 +95,7 @@ public class OwnerController {
             @PathVariable("id") Long id
     ) {
         log.info("OwnerController: requesterId={} DELETE/deleteOwnerById id= {}", requesterId, id);
+        utilityService.checkBossAccess(requesterId);
         ownerService.deleteOwnerById(requesterId, id);
     }
 

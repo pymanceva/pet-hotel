@@ -8,8 +8,6 @@ import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
 
 import ru.modgy.exception.ConflictException;
-import ru.modgy.user.model.Roles;
-import ru.modgy.user.model.User;
 
 import java.time.LocalDate;
 
@@ -42,6 +40,18 @@ public class UtilityService {
     public void checkBossAdminFinancialAccess(Long userId) {
         User user = entityService.getUserIfExists(userId);
         checkBossAdminFinancialAccess(user);
+    }
+
+    public void checkBossAccess(User user) {
+        if (user.getRole() != Roles.ROLE_BOSS) {
+            throw new AccessDeniedException(String.format("User with role=%s, can't access for this action",
+                    user.getRole()));
+        }
+    }
+
+    public void checkBossAccess(Long userId) {
+        User user = entityService.getUserIfExists(userId);
+        checkBossAccess(user);
     }
 
     public void checkHigherOrdinalRoleAccess(User requester, Roles role) {
