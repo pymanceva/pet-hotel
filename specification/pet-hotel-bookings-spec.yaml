@@ -95,7 +95,7 @@ paths:
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
-  /bookings/{id}:
+  /bookings/{bookingId}:
     get:
       tags:
         - booking-controller
@@ -377,7 +377,7 @@ paths:
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
-  /bookings/{roomId}/checkUpdateRoomAvailable:
+  /bookings/{roomId}/{bookingId}/checkUpdateRoomAvailable:
     get:
       tags:
         - booking-controller
@@ -387,6 +387,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
         - $ref: '#/components/parameters/roomId'
+        - $ref: '#/components/parameters/bookingId'
         - $ref: '#/components/parameters/checkInDate'
         - $ref: '#/components/parameters/checkOutDate'
       responses:
@@ -601,7 +602,7 @@ components:
         type: integer
         format: int64
     bookingId:
-      name: id
+      name: bookingId
       description: ID бронирования
       in: path
       required: true
