@@ -84,6 +84,17 @@ public class BookingController {
         bookingService.checkRoomAvailableInDates(requesterId, roomId, checkInDate, checkOutDate);
     }
 
+    @GetMapping("/{roomId}/{bookingId}/checkUpdateRoomAvailable")
+    public void checkUpdateBookingRoomAvailableInDates(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
+                                                       @PathVariable("roomId") Long roomId,
+                                                       @PathVariable("bookingId") Long bookingId,
+                                                       @RequestParam("checkInDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkInDate,
+                                                       @RequestParam("checkOutDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkOutDate) {
+        log.info("BookingController: GET/checkUpdateRoomAvailableInDates, requesterId={}, roomId={}, bookingId={}", requesterId, roomId, bookingId);
+        utilityService.checkBossAdminAccess(requesterId);
+        bookingService.checkUpdateBookingRoomAvailableInDates(requesterId, roomId, bookingId, checkInDate, checkOutDate);
+    }
+
     @GetMapping("/{roomId}/blockingBookingsInDates")
     public List<BookingDto> findBlockingBookingsForRoomInDates(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                                                @PathVariable("roomId") Long roomId,

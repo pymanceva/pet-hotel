@@ -299,4 +299,34 @@ class BookingServiceIntegrationTest {
         Assertions.assertDoesNotThrow(() -> service.checkRoomAvailableInDates(
                 requesterAdmin.getId(), room.getId(), checkIn.plusDays(2), checkOut.plusDays(4)));
     }
+
+    @Test
+    void checkUpdateRoomAvailableInDates_whenRoomNotAvailable() {
+        Booking blockingBooking = Booking.builder()
+                .type(TypesBooking.TYPE_BOOKING)
+                .checkInDate(checkIn)
+                .checkOutDate(checkOut)
+                .status(StatusBooking.STATUS_INITIAL)
+                .price(0.0)
+                .amount(0.0)
+                .prepaymentAmount(0.0)
+                .isPrepaid(false)
+                .room(room)
+                .pets(List.of(pet))
+                .build();
+        em.persist(requesterAdmin);
+        em.persist(category);
+        em.persist(room);
+        em.persist(pet);
+        em.persist(booking);
+        em.persist(blockingBooking);
+
+        String error = String.format("Room with id=%d is not available for current dates", room.getId());
+        ConflictException exception = assertThrows(
+                ConflictException.class,
+                () -> service.checkUpdateBookingRoomAvailableInDates(requesterAdmin.getId(), room.getId(), booking.getId(), checkIn, checkOut)
+        );
+
+        assertEquals(error, exception.getMessage());
+    }
 }
