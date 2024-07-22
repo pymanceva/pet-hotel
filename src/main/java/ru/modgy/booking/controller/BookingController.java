@@ -64,7 +64,7 @@ public class BookingController {
         bookingService.deleteBookingById(requesterId, bookingId);
     }
 
-    @GetMapping("/{roomId}/crossingBookingsOfRoomInDates")
+    @GetMapping("/rooms/{roomId}/crossingBookingsOfRoomInDates")
     public List<BookingDto> findCrossingBookingsForRoomInDates(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                                        @PathVariable("roomId") Long roomId,
                                                        @RequestParam("checkInDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkInDate,
@@ -74,7 +74,7 @@ public class BookingController {
         return bookingService.findCrossingBookingsForRoomInDates(requesterId, roomId, checkInDate, checkOutDate);
     }
 
-    @GetMapping("/{roomId}/checkRoomAvailable")
+    @GetMapping("/rooms/{roomId}/checkRoomAvailable")
     public void checkRoomAvailableInDates(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                           @PathVariable("roomId") Long roomId,
                                           @RequestParam("checkInDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkInDate,
@@ -84,7 +84,7 @@ public class BookingController {
         bookingService.checkRoomAvailableInDates(requesterId, roomId, checkInDate, checkOutDate);
     }
 
-    @GetMapping("/{roomId}/{bookingId}/checkUpdateRoomAvailable")
+    @GetMapping("/{bookingId}/rooms/{roomId}/checkUpdateRoomAvailable")
     public void checkUpdateBookingRoomAvailableInDates(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                                        @PathVariable("roomId") Long roomId,
                                                        @PathVariable("bookingId") Long bookingId,
@@ -95,7 +95,7 @@ public class BookingController {
         bookingService.checkUpdateBookingRoomAvailableInDates(requesterId, roomId, bookingId, checkInDate, checkOutDate);
     }
 
-    @GetMapping("/{roomId}/blockingBookingsInDates")
+    @GetMapping("/rooms/{roomId}/blockingBookingsInDates")
     public List<BookingDto> findBlockingBookingsForRoomInDates(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
                                                                @PathVariable("roomId") Long roomId,
                                                                @RequestParam("checkInDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate checkInDate,

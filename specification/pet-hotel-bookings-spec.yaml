@@ -302,7 +302,7 @@ paths:
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
-  /bookings/{roomId}/checkRoomAvailable:
+  /bookings/rooms/{roomId}/checkRoomAvailable:
     get:
       tags:
         - booking-controller
@@ -377,7 +377,7 @@ paths:
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
-  /bookings/{roomId}/{bookingId}/checkUpdateRoomAvailable:
+  /bookings/{bookingId}/rooms/{roomId}/checkUpdateRoomAvailable:
     get:
       tags:
         - booking-controller
@@ -453,7 +453,7 @@ paths:
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
-  /bookings/{roomId}/crossingBookingsOfRoomInDates:
+  /bookings/rooms/{roomId}/crossingBookingsOfRoomInDates:
     get:
       tags:
         - booking-controller
@@ -522,7 +522,7 @@ paths:
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
-  /bookings/{roomId}/blockingBookingsInDates:
+  /bookings/rooms/{roomId}/blockingBookingsInDates:
     get:
       tags:
         - booking-controller
