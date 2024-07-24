@@ -5,6 +5,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -15,10 +16,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import ru.modgy.exception.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static java.time.LocalDateTime.now;
 
@@ -26,11 +24,15 @@ import static java.time.LocalDateTime.now;
 @RestControllerAdvice
 public class ErrorHandler {
 
+    public static final String INCORRECTLY_MADE_REQUEST =
+            "Запрос составлен неверно";
+    public static final String FOR_THE_REQUESTED_OPERATION_THE_CONDITIONS_ARE_NOT_MET =
+            "Невыполнимые условия для запрошенной операции";
+
     @ExceptionHandler(MissingRequestHeaderException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Error handleMissingRequestHeaderException(final MissingRequestHeaderException ex) {
         log.error("EH: MissingRequestHeaderException: {}", ex.getMessage(), ex);
-
         return new Error(
                 new ArrayList<>(),
                 ex.getMessage(),
@@ -44,7 +46,6 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Error handleAccessDeniedException(final AccessDeniedException ex) {
         log.error("EH: AccessDeniedException: {}", ex.getMessage(), ex);
-
         return new Error(
                 new ArrayList<>(),
                 ex.getMessage(),
@@ -57,13 +58,15 @@ public class ErrorHandler {
     @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Error errorMethodArgumentNotValidException(final MethodArgumentNotValidException ex) {
-        log.error("EH: MethodArgumentNotValidException: {}", ex.getMessage(), ex);
-        return new Error(
+        FieldError fieldError = ex.getBindingResult().getFieldError();
+        Error error = new Error(
                 new ArrayList<>(),
-                ex.getMessage(),
-                "Incorrectly made request",
+                Objects.requireNonNull(fieldError).getDefaultMessage(),
+                "Ошибка запроса",
                 HttpStatus.BAD_REQUEST,
                 now());
+        log.error("EH: MethodArgumentNotValidException: {}, ex : {}, error : {}", ex.getMessage(), ex, error);
+        return error;
     }
 
     @ExceptionHandler(jakarta.validation.ConstraintViolationException.class)
@@ -73,7 +76,7 @@ public class ErrorHandler {
         return new Error(
                 new ArrayList<>(),
                 ex.getMessage(),
-                "Incorrectly made request",
+                INCORRECTLY_MADE_REQUEST,
                 HttpStatus.BAD_REQUEST,
                 now());
     }
@@ -105,13 +108,16 @@ public class ErrorHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public Error errorDataIntegrityViolationException(final DataIntegrityViolationException ex) {
-        log.error("EH: DataIntegrityViolationException: {}", ex.getMessage(), ex);
-        return new Error(
+        ConstraintViolationException cause = (ConstraintViolationException) ex.getCause();
+        String message = ExceptionMessages.dictionary.get(cause.getConstraintName());
+        Error error = new Error(
                 new ArrayList<>(),
-                Objects.requireNonNull(ex.getRootCause()).getMessage(),
-                "Integrity constraint has been violated.",
+                message,
+                "Нарушение целостности данных БД.",
                 HttpStatus.CONFLICT,
                 now());
+        log.error("EH: DataIntegrityViolationException: {}, ex: {}, error: {}", ex.getMessage(), ex, error);
+        return error;
     }
 
     @ExceptionHandler({ConstraintViolationException.class})
@@ -119,7 +125,7 @@ public class ErrorHandler {
     public Error errorConstraintViolationException(final ConstraintViolationException ex) {
         log.error("EH: ConstraintViolationException: {}", ex.getMessage(), ex);
         return new Error(
-                new ArrayList<>(),
+                Collections.emptyList(),
                 ex.getMessage(),
                 "Integrity constraint has been violated.",
                 HttpStatus.CONFLICT,
@@ -145,7 +151,7 @@ public class ErrorHandler {
         return new Error(
                 new ArrayList<>(),
                 ex.getMessage(),
-                "For the requested operation the conditions are not met.",
+                FOR_THE_REQUESTED_OPERATION_THE_CONDITIONS_ARE_NOT_MET,
                 HttpStatus.BAD_REQUEST,
                 now());
     }

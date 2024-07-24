@@ -15,7 +15,7 @@ public class CheckOwnerDto {
     @NotBlank(message = "Номер телефона не помешал бы")
     @Pattern(regexp = "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$",
             message = """
-                    Field: mainPhoneNumber. Error: wrong phone format. Right examples:
+                    Неверный формат номера телефона. Правильные примеры:
                     89261234567
                     79261234567
                     +7 926 123 45 67
@@ -32,5 +32,5 @@ public class CheckOwnerDto {
                     8 927 12 555 12
                     8 927 123 8 123
                     """)
-    private String phone;
+    private String mainPhone;
 }

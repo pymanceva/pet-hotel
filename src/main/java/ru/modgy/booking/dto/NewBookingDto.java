@@ -34,19 +34,19 @@ public class NewBookingDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime checkOutTime;
     private ReasonOfStopBooking reasonOfStop;
-    @Size(max = 150)
+    @Size(max = 150, message = "Причина отмены. Длинна текста не более {value} символов.")
     private String reasonOfCancel;
-    @Min(0)
-    @Max(999999)
+    @Min(value = 0, message = "Цена не может быть меньше {value}.")
+    @Max(value = 999999, message = "Цена не может больше больше {value}.")
     private Double price;
-    @Min(0)
-    @Max(999999)
+    @Min(value = 0, message = "Стоимость не может быть меньше {value}.")
+    @Max(value = 999999, message = "Стоимость не может больше больше {value}.")
     private Double amount;
-    @Min(0)
-    @Max(999999)
+    @Min(value = 0, message = "Сумма предоплаты не может быть меньше {value}.")
+    @Max(value = 999999, message = "Сумма предоплаты не может больше больше {value}.")
     private Double prepaymentAmount;
     private Boolean isPrepaid;
-    @Size(max = 150)
+    @Size(max = 150, message = "Комментарии не более {max} символов.")
     private String comment;
     private String fileUrl;
     @NotNull

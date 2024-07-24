@@ -11,18 +11,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NewOwnerDto {
-//    @NotBlank(message = "Field: lastName. Error: must not be blank.")
-    @Size(min = 2, max = 30, message = "validation lastName size error")
+    @Size(min = 2, max = 30, message = "Длинна фамилии должна быть между {min} и {max}.")
     private String lastName;
-    @NotBlank(message = "Field: firstName. Error: must not be blank.")
-    @Size(min = 2, max = 15, message = "validation firstName size error")
+    @NotBlank(message = "Имя не может быть пустым.")
+    @Size(min = 2, max = 15, message = "Длинна имени должна быть между {min} и {max}.")
     private String firstName;
-    @Size(min = 2, max = 15, message = "validation middleName size error")
+    @Size(min = 2, max = 15, message = "Длинна отчества должна быть между {min} и {max}.")
     private String middleName;
-    @NotBlank(message = "Field: mainPhone. Error: must not be blank.")
+    @NotBlank(message = "Основной номер телефона не может быть пустым.")
     @Pattern(regexp = "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$",
             message = """
-                    Field: mainPhoneNumber. Error: wrong phone format. Right examples:
+                    Неверный формат основного номера телефона. Правильные примеры:
                     89261234567
                     79261234567
                     +7 926 123 45 67
@@ -42,7 +41,7 @@ public class NewOwnerDto {
     private String mainPhone;
     @Pattern(regexp = "^(8|\\+7)\\d{10}",
             message = """
-                    Field: mainPhoneNumber. Error: wrong phone format. Right examples:
+                    Неверный формат дополнительного номера телефона. Правильные примеры:
                     89261234567
                     +79261234567
                     """)
