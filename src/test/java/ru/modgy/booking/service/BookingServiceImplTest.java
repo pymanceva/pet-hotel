@@ -377,4 +377,32 @@ class BookingServiceImplTest {
 
         Assertions.assertDoesNotThrow(() -> bookingService.checkRoomAvailableInDates(boss.getId(), room.getId(), checkIn, checkOut));
     }
+
+    @Test
+    void checkUpdateBookingRoomAvailableInDates_whenOneUpdatingBookingAndNoBlocking_thenNoConflictException() {
+        when(bookingRepository.findBookingsForRoomInDates(anyLong(), any(), any())).thenReturn(Optional.of(List.of(booking)));
+
+        Assertions.assertDoesNotThrow(() -> bookingService.checkUpdateBookingRoomAvailableInDates(boss.getId(), room.getId(), bookingId, checkIn, checkOut));
+    }
+
+    @Test
+    void checkUpdateBookingRoomAvailableInDates_whenOneBlockingBooking_thenConflictException() {
+        Booking blockingBooking = Booking.builder()
+                .id(2L)
+                .type(TypesBooking.TYPE_BOOKING)
+                .checkInDate(checkIn)
+                .checkOutDate(checkOut)
+                .status(StatusBooking.STATUS_INITIAL)
+                .price(0.0)
+                .amount(0.0)
+                .prepaymentAmount(0.0)
+                .isPrepaid(false)
+                .room(room)
+                .pets(List.of(pet))
+                .build();
+        when(bookingRepository.findBookingsForRoomInDates(anyLong(), any(), any())).thenReturn(Optional.of(List.of(booking, blockingBooking)));
+
+        assertThrows(ConflictException.class,
+                () -> bookingService.checkRoomAvailableInDates(boss.getId(), room.getId(), checkIn, checkOut));
+    }
 }

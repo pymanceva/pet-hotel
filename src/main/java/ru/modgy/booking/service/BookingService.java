@@ -58,14 +58,29 @@ public interface BookingService {
     List<BookingDto> findCrossingBookingsForRoomInDates(Long userId, Long roomId, LocalDate checkInDate, LocalDate checkOutDate);
 
     /**
-     * Проверка доступности номера для бронирования в выбранные даты
+     * Проверка доступности номера для создания нового бронирования в выбранные даты
      *
      * @param userId       - id пользователя, направляющего запрос
      * @param roomId       - id номера, бронирования которого проверяются
      * @param checkInDate  - дата заезда, с которой начинается временной интервал для проверки доступности номера
      * @param checkOutDate - дата выезда, на которой заканчивается временной интервал для проверки доступности номера
+     *
+     * Если номер недоступен к брони в указанные даты - возвращается исключение ConflictException.
      */
     void checkRoomAvailableInDates(Long userId, Long roomId, LocalDate checkInDate, LocalDate checkOutDate);
+
+    /**
+     * Проверка доступности номера для редактирования бронирования в выбранные даты
+     *
+     * @param userId       - id пользователя, направляющего запрос
+     * @param roomId       - id номера, бронирования которого проверяются
+     * @param bookingId    - id бронирования, которое в процессе редактирования
+     * @param checkInDate  - дата заезда, с которой начинается временной интервал для проверки доступности номера
+     * @param checkOutDate - дата выезда, на которой заканчивается временной интервал для проверки доступности номера
+     *
+     * Если номер недоступен к брони в указанные даты - возвращается исключение ConflictException.
+     */
+    void checkUpdateBookingRoomAvailableInDates(Long userId, Long roomId, Long bookingId, LocalDate checkInDate, LocalDate checkOutDate);
 
     /**
      * Поиск блокирующих бронирований, накладывающихся на выбранные даты, которые не позволяют добавить новое бронирование

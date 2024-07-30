@@ -185,6 +185,7 @@ public class BookingServiceImpl implements BookingService {
                                                        LocalDate checkInDate,
                                                        LocalDate checkOutDate) {
         utilityService.checkDatesOfBooking(checkInDate, checkOutDate);
+        entityService.getRoomIfExists(roomId);
         List<Booking> foundBookings = bookingRepository.findCrossingBookingsForRoomInDates(
                         roomId, checkInDate, checkOutDate).orElse(Collections.emptyList());
 
@@ -200,9 +201,25 @@ public class BookingServiceImpl implements BookingService {
                                           LocalDate checkInDate,
                                           LocalDate checkOutDate) {
         utilityService.checkDatesOfBooking(checkInDate, checkOutDate);
+        entityService.getRoomIfExists(roomId);
         log.info("BookingService: checkRoomAvailableInDates, userId={}, roomId={}, checkInDate={}, checkOutDate={}",
                 userId, roomId, checkInDate, checkOutDate);
         checkRoomAvailabilityByDates(roomId, checkInDate, checkOutDate);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public void checkUpdateBookingRoomAvailableInDates(Long userId,
+                                                       Long roomId,
+                                                       Long bookingId,
+                                                       LocalDate checkInDate,
+                                                       LocalDate checkOutDate) {
+        utilityService.checkDatesOfBooking(checkInDate, checkOutDate);
+        entityService.getBookingIfExists(bookingId);
+        entityService.getRoomIfExists(roomId);
+        log.info("BookingService: checkUpdateRoomAvailableInDates, userId={}, roomId={}, checkInDate={}, checkOutDate={}",
+                userId, roomId, checkInDate, checkOutDate);
+        checkUpdateBookingRoomAvailableInDates(roomId, bookingId, checkInDate, checkOutDate);
     }
 
     @Transactional(readOnly = true)
@@ -212,6 +229,7 @@ public class BookingServiceImpl implements BookingService {
                                                                LocalDate checkInDate,
                                                                LocalDate checkOutDate) {
         utilityService.checkDatesOfBooking(checkInDate, checkOutDate);
+        entityService.getRoomIfExists(roomId);
         List<Booking> foundBookings = findBookingsForRoomInDates(roomId, checkInDate, checkOutDate);
 
         log.info("BookingService: findBlockingBookingsForRoomInDates, userId={}, roomId={}, checkInDate={}, checkOutDate={}",
@@ -230,6 +248,20 @@ public class BookingServiceImpl implements BookingService {
                                               LocalDate checkOutDate) {
         List<Booking> blockingBookings = findBookingsForRoomInDates(roomId, checkInDate, checkOutDate);
         if(!blockingBookings.isEmpty()) {
+            throw new ConflictException(String.format("Room with id=%d is not available for current dates", roomId));
+        }
+    }
+
+    private void checkUpdateBookingRoomAvailableInDates(Long roomId,
+                                                        Long bookingId,
+                                                        LocalDate checkInDate,
+                                                        LocalDate checkOutDate) {
+        List<Booking> filteredBookings = findBookingsForRoomInDates(roomId, checkInDate, checkOutDate)
+                .stream()
+                .filter(booking -> !booking.getId().equals(bookingId))
+                .toList();
+
+        if(!filteredBookings.isEmpty()) {
             throw new ConflictException(String.format("Room with id=%d is not available for current dates", roomId));
         }
     }

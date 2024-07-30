@@ -235,6 +235,33 @@ class BookingControllerTest {
 
     @Test
     @SneakyThrows
+    void checkUpdateBookingRoomAvailableInDates() {
+        mockMvc.perform(get("/bookings/{roomId}/{bookingId}/checkUpdateRoomAvailable", roomId, bookingId)
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.ALL_VALUE)
+                        .param("checkInDate", "01.01.2024" )
+                        .param("checkOutDate", "02.01.2024"))
+                .andExpect(status().isOk());
+
+        verify(bookingService).checkUpdateBookingRoomAvailableInDates(requesterId, roomId, bookingId, checkIn, checkOut);
+
+        doThrow(ConflictException.class)
+                .when(bookingService)
+                .checkUpdateBookingRoomAvailableInDates(anyLong(), anyLong(), anyLong(), any(LocalDate.class), any(LocalDate.class));
+
+        mockMvc.perform(get("/bookings/{roomId}/{bookingId}/checkUpdateRoomAvailable", roomId, bookingId)
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.ALL_VALUE)
+                        .param("checkInDate", "01.01.2024" )
+                        .param("checkOutDate", "02.01.2024"))
+                .andExpect(status().isConflict());
+
+        verify(bookingService, times(2))
+                .checkUpdateBookingRoomAvailableInDates(requesterId, roomId, bookingId, checkIn, checkOut);
+    }
+
+    @Test
+    @SneakyThrows
     @DateTimeFormat(iso= DateTimeFormat.ISO.DATE)
     void findBlockingBookingsForRoomInDates() {
         when(bookingService.findBlockingBookingsForRoomInDates(anyLong(), anyLong(), any(LocalDate.class), any(LocalDate.class)))
