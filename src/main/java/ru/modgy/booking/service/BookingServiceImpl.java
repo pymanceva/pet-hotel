@@ -181,12 +181,12 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     @Override
     public List<BookingDto> findCrossingBookingsForRoomInDates(Long userId,
-                                                       Long roomId,
-                                                       LocalDate checkInDate,
-                                                       LocalDate checkOutDate) {
+                                                               Long roomId,
+                                                               LocalDate checkInDate,
+                                                               LocalDate checkOutDate) {
         utilityService.checkDatesOfBooking(checkInDate, checkOutDate);
         List<Booking> foundBookings = bookingRepository.findCrossingBookingsForRoomInDates(
-                        roomId, checkInDate, checkOutDate).orElse(Collections.emptyList());
+                roomId, checkInDate, checkOutDate).orElse(Collections.emptyList());
 
         log.info("BookingService: findCrossingBookingsForRoomInDates, userId={}, roomId={}, checkInDate={}, checkOutDate={}",
                 userId, roomId, checkInDate, checkOutDate);
@@ -229,7 +229,7 @@ public class BookingServiceImpl implements BookingService {
                                               LocalDate checkInDate,
                                               LocalDate checkOutDate) {
         List<Booking> blockingBookings = findBookingsForRoomInDates(roomId, checkInDate, checkOutDate);
-        if(!blockingBookings.isEmpty()) {
+        if (!blockingBookings.isEmpty()) {
             throw new ConflictException(String.format("Room with id=%d is not available for current dates", roomId));
         }
     }

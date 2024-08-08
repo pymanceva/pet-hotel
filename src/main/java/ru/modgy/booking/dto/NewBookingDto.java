@@ -34,7 +34,7 @@ public class NewBookingDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime checkOutTime;
     private ReasonOfStopBooking reasonOfStop;
-    @Size(max = 150, message = "Причина отмены. Длинна текста не более {value} символов.")
+    @Size(max = 150, message = "Причина отмены. Длина текста не более {value} символов.")
     private String reasonOfCancel;
     @Min(value = 0, message = "Цена не может быть меньше {value}.")
     @Max(value = 999999, message = "Цена не может больше больше {value}.")

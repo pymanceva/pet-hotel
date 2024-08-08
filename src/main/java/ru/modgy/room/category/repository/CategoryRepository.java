@@ -5,5 +5,6 @@ import ru.modgy.room.category.model.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     int deleteCategoryById(Long id);
+
     int countAllByName(String name);
 }

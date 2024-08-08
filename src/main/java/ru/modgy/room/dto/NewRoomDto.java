@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class NewRoomDto {
     @Size(min = 1, max = 100)
-    @NotBlank(message = "Поле: number. Error: must not be blank.")
+    @NotBlank(message = "Поле: номер. Ошибка: не должно быть пустым.")
     private String number;
     @Min(value = 0, message = "Поле: площадь. Ошибка: должно быть не меньше {value}.")
     private Double area;
