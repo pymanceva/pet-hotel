@@ -329,4 +329,31 @@ class BookingServiceIntegrationTest {
 
         assertEquals(error, exception.getMessage());
     }
+
+    @Test
+    void findAllBookingsInDates() {
+        em.persist(requesterAdmin);
+        em.persist(category);
+        em.persist(room);
+        em.persist(pet);
+        em.persist(booking);
+
+        List<BookingDto> result = service.findAllBookingsInDates(
+                requesterAdmin.getId(), checkIn, checkOut);
+
+        assertThat(result, hasSize(1));
+        assertThat(result.get(0).getId(), notNullValue());
+        assertThat(result.get(0).getType(), equalTo(bookingDto.getType()));
+        assertThat(result.get(0).getCheckInDate(), equalTo(bookingDto.getCheckInDate()));
+        assertThat(result.get(0).getCheckOutDate(), equalTo(bookingDto.getCheckOutDate()));
+        assertThat(result.get(0).getDaysOfBooking(), equalTo(bookingDto.getDaysOfBooking()));
+        assertThat(result.get(0).getStatus(), equalTo(bookingDto.getStatus()));
+        assertThat(result.get(0).getPrice(), equalTo(bookingDto.getPrice()));
+        assertThat(result.get(0).getAmount(), equalTo(bookingDto.getAmount()));
+        assertThat(result.get(0).getPrepaymentAmount(), equalTo(bookingDto.getPrepaymentAmount()));
+        assertThat(result.get(0).getIsPrepaid(), equalTo(bookingDto.getIsPrepaid()));
+        assertThat(result.get(0).getRoom().getNumber(), equalTo(bookingDto.getRoom().getNumber()));
+        assertThat(result.get(0).getPets().size(), equalTo(1));
+    }
+
 }

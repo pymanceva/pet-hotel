@@ -104,4 +104,13 @@ public class BookingController {
         utilityService.checkBossAdminAccess(requesterId);
         return bookingService.findBlockingBookingsForRoomInDates(requesterId, roomId, checkInDate, checkOutDate);
     }
+
+    @GetMapping("/inDates")
+    public List<BookingDto> findAllBookingsInDates(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
+                                                   @RequestParam("startDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate startDate,
+                                                   @RequestParam("endDate") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate endDate) {
+        log.info("BookingController: GET/findAllBookingsInDates, requesterId={}", requesterId);
+        utilityService.checkBossAdminAccess(requesterId);
+        return bookingService.findAllBookingsInDates(requesterId, startDate, endDate);
+    }
 }
