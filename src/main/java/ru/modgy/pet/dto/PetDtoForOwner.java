@@ -17,14 +17,12 @@ import java.util.Comparator;
 @ToString
 public class PetDtoForOwner {
     private long id;
-    private long ownerId;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private TypeOfPet type; // вид животного
     private String name;
     private String breed; // порода
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private LocalDate birthDate;
-    private String age;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Sex sex;
     private String color;
