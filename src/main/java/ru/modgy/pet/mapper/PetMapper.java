@@ -5,9 +5,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import ru.modgy.pet.dto.NewPetDto;
 import ru.modgy.pet.dto.PetDto;
+import ru.modgy.pet.dto.PetDtoForOwner;
 import ru.modgy.pet.dto.UpdatePetDto;
 import ru.modgy.pet.model.Pet;
-import ru.modgy.user.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Collection;
 import java.util.Set;
 
-@Mapper(componentModel = "spring", uses = {UserRepository.class})
+@Mapper(componentModel = "spring")
 public interface PetMapper {
 
-    //todo    @Mapping(source = "pet.owner", target = "owner")
+    @Mapping(target = "ownerShortDto", ignore = true)
     @Mapping(source = "pet.birthDate", target = "age", qualifiedByName = "calculateAge")
     PetDto toPetDto(Pet pet);
 
@@ -42,7 +42,6 @@ public interface PetMapper {
         return null;
     }
 
-    //todo    @Mapping(source = "newPetDto.ownerId", target = "owner", qualifiedBy = IdToUser.class)
     @Mapping(target = "id", ignore = true)
     Pet toPet(NewPetDto newPetDto);
 
@@ -52,4 +51,6 @@ public interface PetMapper {
     Set<Pet> toPet(Collection<PetDto> pets);
 
     List<PetDto> toListPetDto(List<Pet> pets);
+
+    List<PetDtoForOwner> toListPetDtoForOwner(List<Pet> pets);
 }

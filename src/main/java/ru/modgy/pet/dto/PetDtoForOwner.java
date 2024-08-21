@@ -2,7 +2,6 @@ package ru.modgy.pet.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
-import ru.modgy.owner.dto.OwnerShortDto;
 import ru.modgy.pet.model.Sex;
 import ru.modgy.pet.model.TypeOfPet;
 
@@ -16,9 +15,9 @@ import java.util.Comparator;
 @NoArgsConstructor
 @Builder
 @ToString
-public class PetDto {
+public class PetDtoForOwner {
     private long id;
-    private OwnerShortDto ownerShortDto;
+    private long ownerId;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private TypeOfPet type; // вид животного
     private String name;
@@ -83,18 +82,18 @@ public class PetDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
     private LocalDateTime registrationDate;
 
-    public static final Comparator<PetDto> PET_COMPARATOR =
-            Comparator.comparing((PetDto::getName))
-                    .thenComparing((PetDto::getType))
-                    .thenComparing((PetDto::getBreed))
-                    .thenComparing((PetDto::getRegistrationDate));
+    public static final Comparator<PetDtoForOwner> PET_COMPARATOR =
+            Comparator.comparing((PetDtoForOwner::getName))
+                    .thenComparing((PetDtoForOwner::getType))
+                    .thenComparing((PetDtoForOwner::getBreed))
+                    .thenComparing((PetDtoForOwner::getRegistrationDate));
 
 
-    public static Comparator<PetDto> getComparator() {
+    public static Comparator<PetDtoForOwner> getComparator() {
         return PET_COMPARATOR;
     }
 
-    public int compareTo(PetDto other) {
+    public int compareTo(PetDtoForOwner other) {
         return this.name.compareTo(other.name);
     }
 
