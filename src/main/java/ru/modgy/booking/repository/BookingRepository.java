@@ -41,10 +41,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("SELECT b FROM Booking b WHERE "+
             "b.status <> 'STATUS_CANCELLED' " +
-            "AND ((b.checkInDate <= :startDate AND b.checkOutDate <= :startDate) OR " +
+            "AND ((b.checkInDate <= :startDate AND b.checkOutDate >= :startDate) OR " +
             "(b.checkInDate <= :endDate AND b.checkOutDate >= :endDate) OR " +
-            "(b.checkInDate >= :startDate AND b.checkOutDate >= :endDate) OR " +
-            "(b.checkInDate <= :startDate AND b.checkOutDate >= :endDate))")
+            "(b.checkInDate >= :startDate AND b.checkOutDate <= :endDate))")
     Optional<List<Booking>> findAllBookingsInDates(@Param("startDate") LocalDate startDate,
                                                    @Param("endDate") LocalDate endDate);
 }
