@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: 'PetHotel: Bookings Specification'
   description: Документация раздела по работе с бронированиями
-  version: v4
+  version: v5
 servers:
   - url: http://localhost:8080
     description: Generated server url
@@ -287,6 +287,74 @@ paths:
                 status: CONFLICT
                 reason: For the requested operation the conditions are not met.
                 message: 'Room with id=1 already has booking for these dates'
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error. Все прочие неотлавливаемые исключения.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error
+                message: [ ]
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+  /bookings/inDates:
+    get:
+      tags:
+        - booking-controller
+      operationId: findAllBookingsInDates
+      description: Получение всех бронирований в указанные даты, кроме статуса "отменено" Доступно пользователям ROLE_BOSS и ROLE_ADMIN.
+      summary: Получить все неотмененные бронирования в указанные даты
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - $ref: '#/components/parameters/startDate'
+        - $ref: '#/components/parameters/EndDate'
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookingDto'
+        '400':
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: 'Required request header X-PetHotel-User-Id for method parameter type Long is not present'
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Запрос составлен некорректно.Например, переданы невалидные данные.
+        '403':
+          description: У пользователя с данной ролью нет прав на совершение данного действия.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Объект не найден - в БД отсутствует пользователь с id.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=1 is not found"
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
@@ -629,6 +697,22 @@ components:
       name: checkOutDate
       in: query
       description: Дата планируемого выезда в формате "dd.MM.yyyy". Должна быть равна или позже даты заезда.
+      required: true
+      schema:
+        type: string
+        format: date
+    startDate:
+      name: startDate
+      in: query
+      description: Дата начала периода в формате "dd.MM.yyyy". Должна быть до или равна дате окончания периода.
+      required: true
+      schema:
+        type: string
+        format: date
+    endDate:
+      name: endDate
+      in: query
+      description: Дата окончания периода в формате "dd.MM.yyyy". Должна быть равна или позже даты начала периода.
       required: true
       schema:
         type: string

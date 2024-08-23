@@ -92,4 +92,14 @@ public interface BookingService {
      * @return список блокирующих бронирований
      */
     List<BookingDto> findBlockingBookingsForRoomInDates(Long userId, Long roomId, LocalDate checkInDate, LocalDate checkOutDate);
+
+    /**
+     * Поиск всех имеющихся бронирований в заданные даты, кроме отмененных.
+     *
+     * @param userId    - id пользователя, направляющего запрос
+     * @param startDate - дата начала периода, за который отбираются бронирования
+     * @param endDate   - дата окончания периода, за который отбираются бронирования
+     * @return список бронирований в указанные даты с любым статусом, кроме "отменено"
+     */
+    List<BookingDto> findAllBookingsInDates(Long userId, LocalDate startDate, LocalDate endDate);
 }
