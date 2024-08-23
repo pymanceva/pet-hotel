@@ -405,4 +405,29 @@ class BookingServiceImplTest {
         assertThrows(ConflictException.class,
                 () -> bookingService.checkRoomAvailableInDates(boss.getId(), room.getId(), checkIn, checkOut));
     }
+
+    @Test
+    void findAllBookingsInDates_whenOneBooking_thenReturnedListOfBooking() {
+        when(bookingRepository.findAllBookingsInDates(any(), any())).thenReturn(Optional.of(List.of(booking)));
+        when(bookingMapper.toBookingDto(anyList())).thenReturn(List.of(bookingDto));
+
+        List<BookingDto> result = bookingService.findAllBookingsInDates(boss.getId(), checkIn, checkOut);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1L, result.get(0).getId());
+        Assertions.assertEquals(bookingDto.getType(), result.get(0).getType());
+        Assertions.assertEquals(bookingDto.getCheckInDate(), result.get(0).getCheckInDate());
+        Assertions.assertEquals(bookingDto.getCheckOutDate(), result.get(0).getCheckOutDate());
+        Assertions.assertEquals(bookingDto.getDaysOfBooking(), result.get(0).getDaysOfBooking());
+        Assertions.assertEquals(bookingDto.getStatus(), result.get(0).getStatus());
+        Assertions.assertEquals(bookingDto.getPrice(), result.get(0).getPrice());
+        Assertions.assertEquals(bookingDto.getAmount(), result.get(0).getAmount());
+        Assertions.assertEquals(bookingDto.getPrepaymentAmount(), result.get(0).getPrepaymentAmount());
+        Assertions.assertEquals(bookingDto.getIsPrepaid(), result.get(0).getIsPrepaid());
+        Assertions.assertEquals(bookingDto.getRoom(), result.get(0).getRoom());
+        Assertions.assertEquals(bookingDto.getPets(), result.get(0).getPets());
+
+        verify(bookingRepository, times(1)).findAllBookingsInDates(any(), any());
+        verifyNoMoreInteractions(bookingRepository);
+    }
 }

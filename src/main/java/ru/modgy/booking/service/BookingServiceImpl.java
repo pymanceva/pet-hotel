@@ -257,6 +257,15 @@ public class BookingServiceImpl implements BookingService {
         return bookingDtoList;
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public List<BookingDto> findAllBookingsInDates(Long userId, LocalDate startDate, LocalDate endDate) {
+        utilityService.checkDatesOfBooking(startDate, endDate);
+        List<Booking> foundBookings = bookingRepository.findAllBookingsInDates(startDate, endDate)
+                .orElse(Collections.emptyList());
+        return bookingMapper.toBookingDto(foundBookings);
+    }
+
     private List<Booking> findBookingsForRoomInDates(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
         return bookingRepository.findBookingsForRoomInDates(
                         roomId, checkInDate, checkOutDate)
