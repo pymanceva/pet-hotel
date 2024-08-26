@@ -11,7 +11,8 @@ import java.util.Optional;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
     @Query("SELECT r FROM Room r " +
-            "WHERE (r.isVisible = :isVisible)")
+            "WHERE (r.isVisible = :isVisible) " +
+            "ORDER BY r.category.name, r.number")
     Optional<List<Room>> getAllRooms(@Param("isVisible") Boolean isVisible);
 
     @Query("SELECT r FROM Room r WHERE r.category.id = :categoryId AND " +
