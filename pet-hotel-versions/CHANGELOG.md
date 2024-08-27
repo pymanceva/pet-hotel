@@ -75,3 +75,6 @@ Api: *<https://github.com/pymanceva/pet-hotel/blob/efed8fb9bbd026f8cab858a21672a
 
 **0.0.17: Добавлена выдача всех неотмененных бронирований в заданные даты.**
 Карточка задачи: *<https://nkiblyk.kaiten.ru/space/167883/card/24742955?filter=eyJrZXkiOiJhbmQiLCJ2YWx1ZSI6W3sia2V5IjoiYW5kIiwidmFsdWUiOlt7ImNvbXBhcmlzb24iOiJlcSIsImtleSI6InRhZyIsInZhbHVlIjo0OTA5MDF9XX1dfQ>*
+
+**0.0.18: Добавлена сортировка категорий по наименованию и номеров по категории и номеру.**
+Карточка задачи: *<https://nkiblyk.kaiten.ru/space/167883/card/36132320?filter=eyJrZXkiOiJhbmQiLCJ2YWx1ZSI6W3sia2V5IjoiYW5kIiwidmFsdWUiOlt7ImNvbXBhcmlzb24iOiJlcSIsImtleSI6InRhZyIsInZhbHVlIjo0OTA5MDF9XX1dfQ>*

@@ -17,7 +17,7 @@ paths:
         - room-controller
       operationId: getAllRooms
       summary: Получение списка всех номеров
-      description: Получение списка всех номеров. Доступно только пользователями с ролью ROLE_BOSS, ROLE_ADMIN, ROLE_FINANCIAL.
+      description: Получение списка всех номеров, отсортированных по наименованию категории и по номеру комнаты. Доступно только пользователями с ролью ROLE_BOSS, ROLE_ADMIN, ROLE_FINANCIAL.
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
         - name: isVisible
