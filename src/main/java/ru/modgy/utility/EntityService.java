@@ -52,6 +52,7 @@ public class EntityService {
     }
 
     public Pet getPetIfExists(Long petId) {
+//        return petRepository.findById(petId).orElseThrow(() ->
         return petRepository.findById(petId).orElseThrow(() ->
                 new NotFoundException(String.format("Pet with id=%d is not found", petId)));
     }

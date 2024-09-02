@@ -140,6 +140,13 @@ CREATE TABLE IF NOT EXISTS bookings
     CONSTRAINT check_out_later_than_in CHECK (check_out_date_bookings >= check_in_date_bookings)
 );
 
+INSERT INTO public.bookings (id_bookings, type_bookings, check_in_date_bookings, check_out_date_bookings,
+                             check_in_time_bookings, check_out_time_bookings, status_bookings, reason_of_stop_bookings,
+                             reason_of_cancel_bookings, price_bookings, amount_bookings, prepayment_amount_bookings,
+                             made_prepayment_bookings, comment_bookings, file_bookings, room_id_bookings)
+VALUES (1, 'TYPE_BOOKING', '2024-09-02', '2024-09-09', '11:43:31', '11:43:34', 'STATUS_CONFIRMED', null, null, 0, 0, 0,
+        false, null, null, 1);
+
 CREATE TABLE IF NOT EXISTS pets_in_bookings
 (
     id_bookings BIGINT,
@@ -148,6 +155,9 @@ CREATE TABLE IF NOT EXISTS pets_in_bookings
     CONSTRAINT fk_id_bookings FOREIGN KEY (id_bookings) REFERENCES bookings (id_bookings),
     CONSTRAINT fk_id_pets FOREIGN KEY (id_pets) REFERENCES pets (id_pets)
 );
+
+INSERT INTO public.pets_in_bookings (id_bookings, id_pets)
+VALUES (1, 1);
 
 CREATE TABLE IF NOT EXISTS owners
 (
