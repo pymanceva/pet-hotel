@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import ru.modgy.exception.NotFoundException;
+import ru.modgy.owner.model.Owner;
 import ru.modgy.pet.dto.NewPetDto;
 import ru.modgy.pet.dto.PetDto;
 import ru.modgy.pet.dto.UpdatePetDto;
@@ -18,6 +19,7 @@ import ru.modgy.user.model.Roles;
 import ru.modgy.user.model.User;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,6 +37,22 @@ public class PetServiceIntegrationTest {
     private static final LocalDate BIRTH_DATE = LocalDate.now().minusYears(1);
     private static final LocalDate VET_VISIT_DATE = LocalDate.now().minusMonths(1);
     private static final LocalDate HEAT_DATE = LocalDate.now().plusMonths(1);
+    private final LocalDateTime registrationDate = LocalDateTime.now();
+
+    private final Owner owner = Owner.builder()
+            .firstName("Ivan")
+            .lastName("Ivanov")
+            .middleName("Ivanovich")
+            .mainPhone("89000000000")
+            .optionalPhone("89000000001")
+            .otherContacts("other contacts")
+            .actualAddress("actual address")
+            .trustedMan("trusted man")
+            .source("source")
+            .comment("comment")
+            .rating(5)
+            .registrationDate(registrationDate)
+            .build();
 
     final User requesterAdmin = User.builder()
             .lastName("Кружкин")
@@ -106,6 +124,7 @@ public class PetServiceIntegrationTest {
 
     final Pet pet = Pet.builder()
             .type(TypeOfPet.DOG)
+            .owner(owner)
             .name("Шарик")
             .breed("Spaniel")
             .birthDate(BIRTH_DATE)
@@ -283,6 +302,8 @@ public class PetServiceIntegrationTest {
     void createPet() {
         System.out.println(requesterAdmin.toString());
         em.persist(requesterAdmin);
+        em.persist(owner);
+        newPetDto.setOwnerId(owner.getId());
         PetDto actualPet = service.addPet(requesterAdmin.getId(), newPetDto);
 
         assertThat(actualPet.getId(), notNullValue());
@@ -346,6 +367,7 @@ public class PetServiceIntegrationTest {
     @Test
     void updatePet() {
         em.persist(requesterAdmin);
+        em.persist(owner);
         em.persist(pet);
         PetDto actualPet = service.updatePet(requesterAdmin.getId(), pet.getId(), updatePetDto);
 
@@ -410,6 +432,7 @@ public class PetServiceIntegrationTest {
     @Test
     void getPetById() {
         em.persist(requesterAdmin);
+        em.persist(owner);
         em.persist(pet);
 
         PetDto actualPet = service.getPetById(requesterAdmin.getId(), pet.getId());
@@ -475,6 +498,7 @@ public class PetServiceIntegrationTest {
     @Test
     void deletePetById() {
         em.persist(requesterAdmin);
+        em.persist(owner);
         em.persist(pet);
 
         service.deletePetById(requesterAdmin.getId(), pet.getId());

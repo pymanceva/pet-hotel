@@ -13,6 +13,8 @@ import ru.modgy.owner.controller.SearchDirection;
 import ru.modgy.owner.controller.OwnerController;
 import ru.modgy.owner.dto.*;
 import ru.modgy.owner.service.OwnerService;
+import ru.modgy.pet.dto.PetDtoForOwner;
+import ru.modgy.pet.model.Pet;
 import ru.modgy.utility.UtilityService;
 
 import java.time.LocalDateTime;
@@ -56,11 +58,13 @@ class OwnerControllerIntegrationTest {
     final String comment = "Норм парень";
     final int rating = 1;
     final LocalDateTime registrationDate = now().truncatedTo(ChronoUnit.SECONDS);
+    final List<Pet> pets = List.of();
+    final List<PetDtoForOwner> petsDto = List.of();
 
     NewOwnerDto newOwnerDto = new NewOwnerDto(ownerLastName, ownerFirstName, ownerMiddleName, mainPhone, optionalPhone,
             otherContacts, actualAddress, trustedMan, source, comment, rating);
     OwnerDto ownerDto = new OwnerDto(ownerId, ownerLastName, ownerFirstName, ownerMiddleName, mainPhone, optionalPhone,
-            otherContacts, actualAddress, trustedMan, source, comment, rating, registrationDate);
+            otherContacts, actualAddress, trustedMan, source, comment, rating, registrationDate, petsDto);
 
     OwnerShortDto ownerShortDto = new OwnerShortDto(ownerId, ownerLastName, ownerFirstName, ownerMiddleName, mainPhone,
             optionalPhone, registrationDate);

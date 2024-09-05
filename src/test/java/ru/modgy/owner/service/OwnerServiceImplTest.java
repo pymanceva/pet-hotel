@@ -15,14 +15,13 @@ import ru.modgy.owner.dto.*;
 import ru.modgy.owner.dto.mapper.OwnerMapper;
 import ru.modgy.owner.model.Owner;
 import ru.modgy.owner.repository.OwnerRepository;
+import ru.modgy.pet.dto.PetDtoForOwner;
+import ru.modgy.pet.model.Pet;
 import ru.modgy.utility.EntityService;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static java.time.LocalDateTime.now;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -57,13 +56,15 @@ class OwnerServiceImplTest {
     final String comment = "Норм парень";
     final int rating = 1;
     final LocalDateTime registrationDate = now().truncatedTo(ChronoUnit.SECONDS);
+    final List<Pet> pets = List.of();
+    final List<PetDtoForOwner> petsDto = List.of();
 
     Owner owner = new Owner(ownerId, ownerLastName, ownerFirstName, ownerMiddleName, mainPhone, optionalPhone,
-            otherContacts, actualAddress, trustedMan, source, comment, rating, registrationDate);
+            otherContacts, actualAddress, trustedMan, source, comment, rating, registrationDate, pets);
     NewOwnerDto newOwnerDto = new NewOwnerDto(ownerLastName, ownerFirstName, ownerMiddleName, mainPhone, optionalPhone,
             otherContacts, actualAddress, trustedMan, source, comment, rating);
     OwnerDto ownerDto = new OwnerDto(ownerId, ownerLastName, ownerFirstName, ownerMiddleName, mainPhone, optionalPhone,
-            otherContacts, actualAddress, trustedMan, source, comment, rating, registrationDate);
+            otherContacts, actualAddress, trustedMan, source, comment, rating, registrationDate, petsDto);
 
     OwnerShortDto ownerShortDto = new OwnerShortDto(ownerId, ownerLastName, ownerFirstName, ownerMiddleName, mainPhone,
             optionalPhone, registrationDate);
@@ -95,15 +96,15 @@ class OwnerServiceImplTest {
         Owner owner1 = new Owner(ownerId + 1, "1" + ownerLastName, "1" + ownerFirstName,
                 "1" + ownerMiddleName, "1" + mainPhone, "1" + optionalPhone,
                 "1" + otherContacts, "1" + actualAddress, "1" + trustedMan,
-                "1" + source, "1" + comment, 1 + rating, registrationDate.plusHours(1));
+                "1" + source, "1" + comment, 1 + rating, registrationDate.plusHours(1), pets);
         Owner owner2 = new Owner(ownerId + 2, "2" + ownerLastName, "2" + ownerFirstName,
                 "2" + ownerMiddleName, "2" + mainPhone, "2" + optionalPhone,
                 "2" + otherContacts, "2" + actualAddress, "2" + trustedMan,
-                "2" + source, "2" + comment, 2 + rating, registrationDate.plusHours(2));
+                "2" + source, "2" + comment, 2 + rating, registrationDate.plusHours(2), pets);
         Owner owner3 = new Owner(ownerId + 3, "3" + ownerLastName, "3" + ownerFirstName,
                 "3" + ownerMiddleName, "3" + mainPhone, "3" + optionalPhone,
                 "3" + otherContacts, "3" + actualAddress, "3" + trustedMan,
-                "3" + source, "3" + comment, 3 + rating, registrationDate.plusHours(3));
+                "3" + source, "3" + comment, 3 + rating, registrationDate.plusHours(3), pets);
 
         Page<Owner> ownerList = new PageImpl<>(List.of(owner1, owner2, owner3));
 
@@ -171,19 +172,19 @@ class OwnerServiceImplTest {
         Owner newOwner = new Owner(null, null, newOwnerDto.getFirstName(), newOwnerDto.getMiddleName(),
                 newOwnerDto.getMainPhone(), newOwnerDto.getOptionalPhone(), newOwnerDto.getOtherContacts(),
                 newOwnerDto.getActualAddress(), newOwnerDto.getTrustedMan(), newOwnerDto.getSource(),
-                newOwnerDto.getComment(), newOwnerDto.getRating(), null);
+                newOwnerDto.getComment(), newOwnerDto.getRating(), null, pets);
 
         Owner ownerAfter = new Owner(oldOwner.getId(), oldOwner.getFirstName(),
                 newOwner.getLastName(), newOwner.getMiddleName(), newOwner.getMainPhone(), newOwner.getOptionalPhone(),
                 newOwner.getOtherContacts(), newOwner.getActualAddress(), newOwner.getTrustedMan(),
                 newOwner.getSource(), newOwner.getComment(), newOwner.getRating(),
-                oldOwner.getRegistrationDate());
+                oldOwner.getRegistrationDate(), pets);
 
         OwnerDto ownerDtoAfter = new OwnerDto(ownerAfter.getId(), ownerAfter.getFirstName(), ownerAfter.getLastName(),
                 ownerAfter.getMiddleName(), ownerAfter.getMainPhone(), ownerAfter.getOptionalPhone(),
                 ownerAfter.getOtherContacts(), ownerAfter.getActualAddress(), ownerAfter.getTrustedMan(),
                 ownerAfter.getSource(), ownerAfter.getComment(), ownerAfter.getRating(),
-                ownerAfter.getRegistrationDate());
+                ownerAfter.getRegistrationDate(), petsDto);
 
         when(entityService.getOwnerIfExists(ownerId)).thenReturn(oldOwner);
         when(ownerMapper.toOwner(newOwnerDto)).thenReturn(newOwner);
@@ -241,19 +242,19 @@ class OwnerServiceImplTest {
         Owner newOwner = new Owner(null, newOwnerDto.getLastName(), newOwnerDto.getFirstName(),
                 newOwnerDto.getMiddleName(), newOwnerDto.getMainPhone(), newOwnerDto.getOptionalPhone(),
                 newOwnerDto.getOtherContacts(), newOwnerDto.getActualAddress(), newOwnerDto.getTrustedMan(),
-                newOwnerDto.getSource(), newOwnerDto.getComment(), newOwnerDto.getRating(), null);
+                newOwnerDto.getSource(), newOwnerDto.getComment(), newOwnerDto.getRating(), null, pets);
 
         Owner ownerAfter = new Owner(oldOwner.getId(), oldOwner.getFirstName(),
                 newOwner.getLastName(), newOwner.getMiddleName(), newOwner.getMainPhone(), newOwner.getOptionalPhone(),
                 newOwner.getOtherContacts(), newOwner.getActualAddress(), newOwner.getTrustedMan(),
                 newOwner.getSource(), newOwner.getComment(), newOwner.getRating(),
-                oldOwner.getRegistrationDate());
+                oldOwner.getRegistrationDate(), pets);
 
         OwnerDto ownerDtoAfter = new OwnerDto(ownerAfter.getId(), ownerAfter.getFirstName(), ownerAfter.getLastName(),
                 ownerAfter.getMiddleName(), ownerAfter.getMainPhone(), ownerAfter.getOptionalPhone(),
                 ownerAfter.getOtherContacts(), ownerAfter.getActualAddress(), ownerAfter.getTrustedMan(),
                 ownerAfter.getSource(), ownerAfter.getComment(), ownerAfter.getRating(),
-                ownerAfter.getRegistrationDate());
+                ownerAfter.getRegistrationDate(), petsDto);
 
         when(entityService.getOwnerIfExists(ownerId)).thenReturn(oldOwner);
         when(ownerMapper.toOwner(newOwnerDto)).thenReturn(newOwner);
@@ -306,30 +307,30 @@ class OwnerServiceImplTest {
         Owner owner1 = new Owner(ownerId + 1, "1" + ownerLastName, "1" + ownerFirstName,
                 "1" + ownerMiddleName, "1" + mainPhone, "1" + optionalPhone,
                 "1" + otherContacts, "1" + actualAddress, "1" + trustedMan,
-                "1" + source, "1" + comment, 1 + rating, registrationDate.plusHours(1));
+                "1" + source, "1" + comment, 1 + rating, registrationDate.plusHours(1), pets);
         Owner owner2 = new Owner(ownerId + 2, "2" + ownerLastName, "2" + ownerFirstName,
                 "2" + ownerMiddleName, "2" + mainPhone, "2" + optionalPhone,
                 "2" + otherContacts, "2" + actualAddress, "2" + trustedMan,
-                "2" + source, "2" + comment, 2 + rating, registrationDate.plusHours(2));
+                "2" + source, "2" + comment, 2 + rating, registrationDate.plusHours(2), pets);
         Owner owner3 = new Owner(ownerId + 3, "3" + ownerLastName, "3" + ownerFirstName,
                 "3" + ownerMiddleName, "3" + mainPhone, "3" + optionalPhone,
                 "3" + otherContacts, "3" + actualAddress, "3" + trustedMan,
-                "3" + source, "3" + comment, 3 + rating, registrationDate.plusHours(3));
+                "3" + source, "3" + comment, 3 + rating, registrationDate.plusHours(3), pets);
 
         List<Owner> ownerList = List.of(owner1, owner2, owner3);
 
         OwnerDto ownerDto1 = new OwnerDto(owner1.getId(), owner1.getLastName(), owner1.getFirstName(),
                 owner1.getMiddleName(), owner1.getMainPhone(), owner1.getOptionalPhone(), owner1.getOtherContacts(),
                 owner1.getActualAddress(), owner1.getTrustedMan(), owner1.getSource(), owner1.getComment(),
-                owner1.getRating(), owner1.getRegistrationDate());
+                owner1.getRating(), owner1.getRegistrationDate(), petsDto);
         OwnerDto ownerDto2 = new OwnerDto(owner2.getId(), owner2.getLastName(), owner2.getFirstName(),
                 owner2.getMiddleName(), owner2.getMainPhone(), owner2.getOptionalPhone(), owner2.getOtherContacts(),
                 owner2.getActualAddress(), owner2.getTrustedMan(), owner2.getSource(), owner2.getComment(),
-                owner2.getRating(), owner2.getRegistrationDate());
+                owner2.getRating(), owner2.getRegistrationDate(), petsDto);
         OwnerDto ownerDto3 = new OwnerDto(owner3.getId(), owner3.getLastName(), owner3.getFirstName(),
                 owner3.getMiddleName(), owner3.getMainPhone(), owner3.getOptionalPhone(), owner3.getOtherContacts(),
                 owner3.getActualAddress(), owner3.getTrustedMan(), owner3.getSource(), owner3.getComment(),
-                owner3.getRating(), owner3.getRegistrationDate());
+                owner3.getRating(), owner3.getRegistrationDate(), petsDto);
 
         List<OwnerDto> ownerDtoList = List.of(ownerDto1, ownerDto2, ownerDto3);
 
