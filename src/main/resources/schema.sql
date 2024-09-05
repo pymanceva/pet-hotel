@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS categories
     CONSTRAINT UQ_CATEGORY_NAME UNIQUE(name_categories)
 );
 
-INSERT INTO categories (name_categories, description_categories) VALUES ('Номер для собак', 'Номер для собак, антивандальная отделка, оснащен лежаками, мисками');
+INSERT INTO categories (name_categories) VALUES ('Room');
 
 CREATE TABLE IF NOT EXISTS rooms
 (

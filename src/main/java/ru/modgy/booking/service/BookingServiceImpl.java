@@ -263,7 +263,12 @@ public class BookingServiceImpl implements BookingService {
         utilityService.checkDatesOfBooking(startDate, endDate);
         List<Booking> foundBookings = bookingRepository.findAllBookingsInDates(startDate, endDate)
                 .orElse(Collections.emptyList());
-        return bookingMapper.toBookingDto(foundBookings);
+
+        List<BookingDto> bookingDtoList = addOwnerShortDtoInPetDtoList(foundBookings);
+
+        log.info("BookingService: findAllBookingsInDates, userId={}, startDate={}, endDate={}",
+                userId, startDate, endDate);
+        return bookingDtoList;
     }
 
     private List<Booking> findBookingsForRoomInDates(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {

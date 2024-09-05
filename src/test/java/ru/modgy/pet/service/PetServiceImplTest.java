@@ -8,6 +8,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import ru.modgy.exception.NotFoundException;
+import ru.modgy.owner.dto.OwnerShortDto;
+import ru.modgy.owner.dto.mapper.OwnerMapper;
+import ru.modgy.owner.model.Owner;
 import ru.modgy.pet.dto.NewPetDto;
 import ru.modgy.pet.dto.PetDto;
 import ru.modgy.pet.dto.UpdatePetDto;
@@ -21,6 +24,7 @@ import ru.modgy.user.model.User;
 import ru.modgy.utility.EntityService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -35,6 +39,7 @@ public class PetServiceImplTest {
     private static final LocalDate BIRTH_DATE = LocalDate.now().minusYears(1);
     private static final LocalDate VET_VISIT_DATE = LocalDate.now().minusMonths(1);
     private static final LocalDate HEAT_DATE = LocalDate.now().plusMonths(1);
+    private final LocalDateTime registrationDate = LocalDateTime.now();
 
     @InjectMocks
     private PetServiceImpl petService;
@@ -47,6 +52,34 @@ public class PetServiceImplTest {
 
     @Mock
     private EntityService entityService;
+
+    @Mock
+    private OwnerMapper ownerMapper;
+
+    private final Owner owner = Owner.builder()
+            .id(1L)
+            .firstName("Ivan")
+            .lastName("Ivanov")
+            .middleName("Ivanovich")
+            .mainPhone("89000000000")
+            .optionalPhone("89000000001")
+            .otherContacts("other contacts")
+            .actualAddress("actual address")
+            .trustedMan("trusted man")
+            .source("source")
+            .comment("comment")
+            .rating(5)
+            .registrationDate(registrationDate)
+            .build();
+
+    private final OwnerShortDto ownerShortDto = OwnerShortDto.builder()
+            .id(1L)
+            .firstName("Ivan")
+            .lastName("Ivanov")
+            .middleName("Ivanovich")
+            .mainPhone("89000000000")
+            .optionalPhone("89000000001")
+            .build();
 
     final User requesterBoss = User.builder()
             .email("boss@mail.ru")
@@ -188,6 +221,7 @@ public class PetServiceImplTest {
 
     final Pet pet = Pet.builder()
             .id(1L)
+            .owner(owner)
             .type(TypeOfPet.DOG)
             .name("Шарик")
             .breed("Spaniel")
@@ -427,6 +461,7 @@ public class PetServiceImplTest {
         when(mockPetMapper.toPet(newPetDto)).thenReturn(pet);
         when(mockPetRepository.save(any())).thenReturn(pet);
         when(mockPetMapper.toPetDto(pet)).thenReturn(petDto);
+        when(ownerMapper.toOwnerShortDto(any(Owner.class))).thenReturn(ownerShortDto);
 
         PetDto actualPetDto = petService.addPet(requesterAdmin.getId(), newPetDto);
 
@@ -690,7 +725,6 @@ public class PetServiceImplTest {
         when(mockPetRepository.save(any())).thenReturn(updatePet);
         when(mockPetMapper.toPetDto(updatePet)).thenReturn(updatedPetDto);
         when(mockPetMapper.toPet(updatePetDto)).thenReturn(updatePet);
-
 
         PetDto actualPetDto = petService.updatePet(requesterBoss.getId(), pet.getId(), updatePetDto);
 
