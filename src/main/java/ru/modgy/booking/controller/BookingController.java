@@ -113,4 +113,12 @@ public class BookingController {
         utilityService.checkBossAdminAccess(requesterId);
         return bookingService.findAllBookingsInDates(requesterId, startDate, endDate);
     }
+
+    @GetMapping("/allByPet/pets/{petId}")
+    public List<BookingDto> findAllBookingsByPet(@RequestHeader(UtilityService.REQUESTER_ID_HEADER) Long requesterId,
+                                                 @PathVariable("petId") Long petId) {
+        log.info("BookingController: GET/findAllBookingsByPet, requesterId={}, petId={}", requesterId, petId);
+        utilityService.checkBossAdminAccess(requesterId);
+        return bookingService.findAllBookingsByPet(requesterId, petId);
+    }
 }
