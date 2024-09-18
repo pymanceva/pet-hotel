@@ -208,8 +208,9 @@ class BookingControllerTest {
 
     @Test
     @SneakyThrows
+    @DateTimeFormat(iso= DateTimeFormat.ISO.DATE)
     void checkRoomAvailableInDates() {
-        mockMvc.perform(get("/bookings/{roomId}/checkRoomAvailable", roomId)
+        mockMvc.perform(get("/bookings/rooms/{roomId}/checkRoomAvailable", roomId)
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.ALL_VALUE)
                         .param("checkInDate", "01.01.2024" )
@@ -222,7 +223,7 @@ class BookingControllerTest {
                 .when(bookingService)
                 .checkRoomAvailableInDates(anyLong(), anyLong(), any(LocalDate.class), any(LocalDate.class));
 
-        mockMvc.perform(get("/bookings/{roomId}/checkRoomAvailable", roomId)
+        mockMvc.perform(get("/bookings/rooms/{roomId}/checkRoomAvailable", roomId)
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.APPLICATION_JSON)
                         .param("checkInDate", "01.01.2024" )
@@ -236,11 +237,40 @@ class BookingControllerTest {
     @Test
     @SneakyThrows
     @DateTimeFormat(iso= DateTimeFormat.ISO.DATE)
+    void checkUpdateBookingRoomAvailableInDates() {
+        mockMvc.perform(get("/bookings/{roomId}/rooms/{bookingId}/checkUpdateRoomAvailable", roomId, bookingId)
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.ALL_VALUE)
+                        .param("checkInDate", "01.01.2024" )
+                        .param("checkOutDate", "02.01.2024"))
+                .andExpect(status().isOk());
+
+        verify(bookingService).checkUpdateBookingRoomAvailableInDates(requesterId, roomId, bookingId, checkIn, checkOut);
+
+
+        doThrow(ConflictException.class)
+                .when(bookingService)
+                .checkUpdateBookingRoomAvailableInDates(anyLong(), anyLong(), anyLong(), any(LocalDate.class), any(LocalDate.class));
+
+        mockMvc.perform(get("/bookings/{roomId}/rooms/{bookingId}/checkUpdateRoomAvailable", roomId, bookingId)
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.ALL_VALUE)
+                        .param("checkInDate", "01.01.2024" )
+                        .param("checkOutDate", "02.01.2024"))
+                .andExpect(status().isConflict());
+
+        verify(bookingService, times(2))
+                .checkUpdateBookingRoomAvailableInDates(requesterId, roomId, bookingId, checkIn, checkOut);
+    }
+
+    @Test
+    @SneakyThrows
+    @DateTimeFormat(iso= DateTimeFormat.ISO.DATE)
     void findBlockingBookingsForRoomInDates() {
         when(bookingService.findBlockingBookingsForRoomInDates(anyLong(), anyLong(), any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(List.of(bookingDto));
 
-        mockMvc.perform(get("/bookings/{roomId}/blockingBookingsInDates", roomId)
+        mockMvc.perform(get("/bookings/rooms/{roomId}/blockingBookingsInDates", roomId)
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.ALL_VALUE)
                         .param("checkInDate", "01.01.2024" )
@@ -254,11 +284,12 @@ class BookingControllerTest {
 
     @Test
     @SneakyThrows
+    @DateTimeFormat(iso= DateTimeFormat.ISO.DATE)
     void findCrossingBookingsForRoomInDates() {
         when(bookingService.findCrossingBookingsForRoomInDates(anyLong(), anyLong(), any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(List.of(bookingDto));
 
-        mockMvc.perform(get("/bookings/{roomId}/crossingBookingsOfRoomInDates", roomId)
+        mockMvc.perform(get("/bookings/rooms/{roomId}/crossingBookingsOfRoomInDates", roomId)
                         .header(requesterHeader, requesterId)
                         .accept(MediaType.ALL_VALUE)
                         .param("checkInDate", "01.01.2024" )
@@ -268,5 +299,24 @@ class BookingControllerTest {
         verify(bookingService).findCrossingBookingsForRoomInDates(requesterId, roomId, checkIn, checkOut);
         verify(bookingService, times(1))
                 .findCrossingBookingsForRoomInDates(requesterId, roomId, checkIn, checkOut);
+    }
+
+    @Test
+    @SneakyThrows
+    @DateTimeFormat(iso= DateTimeFormat.ISO.DATE)
+    void findAllBookingsInDates() {
+        when(bookingService.findAllBookingsInDates(anyLong(), any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(List.of(bookingDto));
+
+        mockMvc.perform(get("/bookings/inDates")
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.ALL_VALUE)
+                        .param("startDate", "01.01.2024" )
+                        .param("endDate", "02.01.2024"))
+                .andExpect(status().isOk());
+
+        verify(bookingService).findAllBookingsInDates(requesterId, checkIn, checkOut);
+        verify(bookingService, times(1))
+                .findAllBookingsInDates(requesterId, checkIn, checkOut);
     }
 }

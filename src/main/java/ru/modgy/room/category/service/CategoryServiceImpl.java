@@ -14,6 +14,7 @@ import ru.modgy.room.category.repository.CategoryRepository;
 import ru.modgy.utility.EntityService;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -67,7 +68,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     @Override
     public Collection<CategoryDto> getAllCategories(Long userId) {
-        List<Category> allCategories = categoryRepository.findAll();
+        List<Category> allCategories = categoryRepository.findAllOrderByNameAsc().orElse(Collections.emptyList());
         log.info("CategoryService: getAllCategories, userId={}, list size={}", userId, allCategories.size());
         return categoryMapper.toCategoryDto(allCategories);
     }

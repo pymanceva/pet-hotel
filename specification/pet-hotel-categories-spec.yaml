@@ -18,7 +18,7 @@ paths:
       tags:
         - category-controller
       operationId: getAllCategories
-      description: Получение списка всех категорий номеров. Доступно только для пользователей с ролью BOSS или ADMIN.
+      description: Получение списка всех категорий номеров, отсортированных по названию категории. Доступно только для пользователей с ролью BOSS или ADMIN.
       summary: Получить список всех категорий номеров
       parameters:
         - $ref: '#/components/parameters/requesterHeader'

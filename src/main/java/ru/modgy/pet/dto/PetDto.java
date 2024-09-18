@@ -2,6 +2,7 @@ package ru.modgy.pet.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+import ru.modgy.owner.dto.OwnerShortDto;
 import ru.modgy.pet.model.Sex;
 import ru.modgy.pet.model.TypeOfPet;
 
@@ -17,7 +18,7 @@ import java.util.Comparator;
 @ToString
 public class PetDto {
     private long id;
-//todo    private long ownerId;
+    private OwnerShortDto ownerShortDto;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private TypeOfPet type; // вид животного
     private String name;

@@ -8,12 +8,13 @@ import ru.modgy.owner.dto.OwnerDto;
 import ru.modgy.owner.dto.OwnerShortDto;
 import ru.modgy.owner.dto.UpdateOwnerDto;
 import ru.modgy.owner.model.Owner;
+import ru.modgy.pet.mapper.PetMapper;
 import ru.modgy.utility.PhoneFormatMapper;
 
 import java.util.Collection;
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = PhoneFormatMapper.class)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {PhoneFormatMapper.class, PetMapper.class})
 public interface OwnerMapper {
     @Mapping(source = "mainPhone", target = "mainPhone", qualifiedByName = "formatPhoneNumber")
     @Mapping(source = "optionalPhone", target = "optionalPhone", qualifiedByName = "formatPhoneNumber")
@@ -24,6 +25,7 @@ public interface OwnerMapper {
     @Mapping(target = "id", ignore = true)
     Owner toOwner(UpdateOwnerDto updateOwnerDto);
 
+    @Mapping(source = "pets", target = "petsDto")
     OwnerDto toOwnerDto(Owner owner);
 
     OwnerShortDto toOwnerShortDto(Owner owner);

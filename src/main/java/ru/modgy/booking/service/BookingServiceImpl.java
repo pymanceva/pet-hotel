@@ -15,15 +15,17 @@ import ru.modgy.booking.model.TypesBooking;
 import ru.modgy.booking.repository.BookingRepository;
 import ru.modgy.exception.ConflictException;
 import ru.modgy.exception.NotFoundException;
+import ru.modgy.owner.dto.mapper.OwnerMapper;
+import ru.modgy.owner.model.Owner;
+import ru.modgy.pet.dto.PetDto;
 import ru.modgy.pet.model.Pet;
 import ru.modgy.room.model.Room;
 import ru.modgy.utility.EntityService;
 import ru.modgy.utility.UtilityService;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,6 +33,7 @@ import java.util.Objects;
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
+    private final OwnerMapper ownerMapper;
     private final EntityService entityService;
     private final UtilityService utilityService;
 
@@ -63,17 +66,22 @@ public class BookingServiceImpl implements BookingService {
         newBooking.setPets(pets);
 
         Booking addedBooking = bookingRepository.save(newBooking);
-        log.info("BookingService: addBooking, userId={}, bookingDto={}", userId, addedBooking);
 
-        return bookingMapper.toBookingDto(addedBooking);
+        BookingDto bookingDto = bookingMapper.toBookingDto(addedBooking);
+        List<PetDto> petDtoList = addPetsDtoListForOwner(pets, bookingDto);
+
+        bookingDto.setPets(petDtoList);
+        log.info("BookingService: addBooking, userId={}, bookingDto={}", userId, addedBooking);
+        return bookingDto;
     }
 
     @Transactional(readOnly = true)
     @Override
     public BookingDto getBookingById(Long userId, Long bookingId) {
         Booking booking = entityService.getBookingIfExists(bookingId);
+        BookingDto bookingDto = addOwnerShortDtoInPetDto(booking);
         log.info("BookingService: getBookingById, userId={}, bookingId={}", userId, bookingId);
-        return bookingMapper.toBookingDto(booking);
+        return bookingDto;
     }
 
     @Transactional
@@ -159,10 +167,18 @@ public class BookingServiceImpl implements BookingService {
         utilityService.checkDatesOfBooking(newBooking.getCheckInDate(), newBooking.getCheckOutDate());
 
         Booking updatedBooking = bookingRepository.save(newBooking);
+
+        List<Long> petsIds = updatedBooking.getPets().stream().map(Pet::getId).toList();
+        List<Pet> pets = entityService.getListOfPetsByIds(petsIds);
+        checkPetsInBooking(pets, petsIds);
+        updatedBooking.setPets(pets);
+
         BookingDto updatedBookingDto = bookingMapper.toBookingDto(updatedBooking);
+        List<PetDto> petDtoList = addPetsDtoListForOwner(pets, updatedBookingDto);
+
+        updatedBookingDto.setPets(petDtoList);
         log.info("BookingService: updateBooking, userId={}, bookingId={}, updateBookingDto={}",
                 userId, bookingId, updateBookingDto);
-
         return updatedBookingDto;
     }
 
@@ -185,12 +201,15 @@ public class BookingServiceImpl implements BookingService {
                                                                LocalDate checkInDate,
                                                                LocalDate checkOutDate) {
         utilityService.checkDatesOfBooking(checkInDate, checkOutDate);
+        entityService.getRoomIfExists(roomId);
         List<Booking> foundBookings = bookingRepository.findCrossingBookingsForRoomInDates(
                 roomId, checkInDate, checkOutDate).orElse(Collections.emptyList());
 
+        List<BookingDto> bookingDtoList = addOwnerShortDtoInPetDtoList(foundBookings);
+
         log.info("BookingService: findCrossingBookingsForRoomInDates, userId={}, roomId={}, checkInDate={}, checkOutDate={}",
                 userId, roomId, checkInDate, checkOutDate);
-        return bookingMapper.toBookingDto(foundBookings);
+        return bookingDtoList;
     }
 
     @Transactional(readOnly = true)
@@ -200,9 +219,25 @@ public class BookingServiceImpl implements BookingService {
                                           LocalDate checkInDate,
                                           LocalDate checkOutDate) {
         utilityService.checkDatesOfBooking(checkInDate, checkOutDate);
+        entityService.getRoomIfExists(roomId);
         log.info("BookingService: checkRoomAvailableInDates, userId={}, roomId={}, checkInDate={}, checkOutDate={}",
                 userId, roomId, checkInDate, checkOutDate);
         checkRoomAvailabilityByDates(roomId, checkInDate, checkOutDate);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public void checkUpdateBookingRoomAvailableInDates(Long userId,
+                                                       Long roomId,
+                                                       Long bookingId,
+                                                       LocalDate checkInDate,
+                                                       LocalDate checkOutDate) {
+        utilityService.checkDatesOfBooking(checkInDate, checkOutDate);
+        entityService.getBookingIfExists(bookingId);
+        entityService.getRoomIfExists(roomId);
+        log.info("BookingService: checkUpdateRoomAvailableInDates, userId={}, roomId={}, checkInDate={}, checkOutDate={}",
+                userId, roomId, checkInDate, checkOutDate);
+        checkUpdateBookingRoomAvailableInDates(roomId, bookingId, checkInDate, checkOutDate);
     }
 
     @Transactional(readOnly = true)
@@ -212,11 +247,28 @@ public class BookingServiceImpl implements BookingService {
                                                                LocalDate checkInDate,
                                                                LocalDate checkOutDate) {
         utilityService.checkDatesOfBooking(checkInDate, checkOutDate);
+        entityService.getRoomIfExists(roomId);
         List<Booking> foundBookings = findBookingsForRoomInDates(roomId, checkInDate, checkOutDate);
+
+        List<BookingDto> bookingDtoList = addOwnerShortDtoInPetDtoList(foundBookings);
 
         log.info("BookingService: findBlockingBookingsForRoomInDates, userId={}, roomId={}, checkInDate={}, checkOutDate={}",
                 userId, roomId, checkInDate, checkOutDate);
-        return bookingMapper.toBookingDto(foundBookings);
+        return bookingDtoList;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<BookingDto> findAllBookingsInDates(Long userId, LocalDate startDate, LocalDate endDate) {
+        utilityService.checkDatesOfBooking(startDate, endDate);
+        List<Booking> foundBookings = bookingRepository.findAllBookingsInDates(startDate, endDate)
+                .orElse(Collections.emptyList());
+
+        List<BookingDto> bookingDtoList = addOwnerShortDtoInPetDtoList(foundBookings);
+
+        log.info("BookingService: findAllBookingsInDates, userId={}, startDate={}, endDate={}",
+                userId, startDate, endDate);
+        return bookingDtoList;
     }
 
     private List<Booking> findBookingsForRoomInDates(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
@@ -230,6 +282,20 @@ public class BookingServiceImpl implements BookingService {
                                               LocalDate checkOutDate) {
         List<Booking> blockingBookings = findBookingsForRoomInDates(roomId, checkInDate, checkOutDate);
         if (!blockingBookings.isEmpty()) {
+            throw new ConflictException(String.format("Room with id=%d is not available for current dates", roomId));
+        }
+    }
+
+    private void checkUpdateBookingRoomAvailableInDates(Long roomId,
+                                                        Long bookingId,
+                                                        LocalDate checkInDate,
+                                                        LocalDate checkOutDate) {
+        List<Booking> filteredBookings = findBookingsForRoomInDates(roomId, checkInDate, checkOutDate)
+                .stream()
+                .filter(booking -> !booking.getId().equals(bookingId))
+                .toList();
+
+        if (!filteredBookings.isEmpty()) {
             throw new ConflictException(String.format("Room with id=%d is not available for current dates", roomId));
         }
     }
@@ -261,5 +327,42 @@ public class BookingServiceImpl implements BookingService {
         if (!room.getIsVisible()) {
             throw new ConflictException("Can't " + actionType + " booking for hidden room");
         }
+    }
+
+    private BookingDto addOwnerShortDtoInPetDto(Booking booking) {
+        List<Long> petsIds = booking.getPets().stream().map(Pet::getId).toList();
+        List<Pet> pets = entityService.getListOfPetsByIds(petsIds);
+        checkPetsInBooking(pets, petsIds);
+
+        Map<Long, Owner> owners = pets.stream()
+                .collect(Collectors.toMap(Pet::getId, Pet::getOwner));
+
+        BookingDto bookingDto = bookingMapper.toBookingDto(booking);
+        List<PetDto> petsDto = bookingDto.getPets();
+        for (PetDto petDto : petsDto) {
+            petDto.setOwnerShortDto(ownerMapper.toOwnerShortDto(owners.get(petDto.getId())));
+        }
+        bookingDto.setPets(petsDto);
+        return bookingDto;
+    }
+
+    private List<BookingDto> addOwnerShortDtoInPetDtoList(List<Booking> bookings) {
+        List<BookingDto> bookingDtoList = new ArrayList<>();
+        for (Booking booking : bookings) {
+            BookingDto bookingDto = addOwnerShortDtoInPetDto(booking);
+            bookingDtoList.add(bookingDto);
+        }
+        return bookingDtoList;
+    }
+
+    private List<PetDto> addPetsDtoListForOwner(List<Pet> pets, BookingDto bookingDto) {
+        Map<Long, Owner> owners = pets.stream()
+                .collect(Collectors.toMap(Pet::getId, Pet::getOwner));
+
+        List<PetDto> petsDto = bookingDto.getPets();
+        for (PetDto petDto : petsDto) {
+            petDto.setOwnerShortDto(ownerMapper.toOwnerShortDto(owners.get(petDto.getId())));
+        }
+        return petsDto;
     }
 }

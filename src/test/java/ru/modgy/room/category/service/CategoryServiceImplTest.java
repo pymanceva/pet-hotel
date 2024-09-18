@@ -22,6 +22,7 @@ import ru.modgy.utility.UtilityService;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -141,7 +142,7 @@ class CategoryServiceImplTest {
 
     @Test
     void getAllCategories_whenGetAllCategoriesByBoss_thenReturnAllCategories() {
-        when(categoryRepository.findAll()).thenReturn(List.of(category));
+        when(categoryRepository.findAllOrderByNameAsc()).thenReturn(Optional.of(List.of(category)));
         when(categoryMapper.toCategoryDto(anyList())).thenReturn(List.of(categoryDto));
 
         Collection<CategoryDto> resultCollection = categoryService.getAllCategories(boss.getId());
@@ -153,7 +154,7 @@ class CategoryServiceImplTest {
         Assertions.assertEquals(categoryDto.getName(), result.get(0).getName());
         Assertions.assertEquals(categoryDto.getDescription(), result.get(0).getDescription());
 
-        verify(categoryRepository, times(1)).findAll();
+        verify(categoryRepository, times(1)).findAllOrderByNameAsc();
         verifyNoMoreInteractions(categoryRepository);
     }
 

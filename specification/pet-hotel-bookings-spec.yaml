@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: 'PetHotel: Bookings Specification'
   description: Документация раздела по работе с бронированиями
-  version: v3
+  version: v5
 servers:
   - url: http://localhost:8080
     description: Generated server url
@@ -95,7 +95,7 @@ paths:
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
-  /bookings/{id}:
+  /bookings/{bookingId}:
     get:
       tags:
         - booking-controller
@@ -302,13 +302,81 @@ paths:
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
-  /bookings/{roomId}/checkRoomAvailable:
+  /bookings/inDates:
+    get:
+      tags:
+        - booking-controller
+      operationId: findAllBookingsInDates
+      description: Получение всех бронирований в указанные даты, кроме статуса "отменено" Доступно пользователям ROLE_BOSS и ROLE_ADMIN.
+      summary: Получить все неотмененные бронирования в указанные даты
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - $ref: '#/components/parameters/startDate'
+        - $ref: '#/components/parameters/EndDate'
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookingDto'
+        '400':
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: 'Required request header X-PetHotel-User-Id for method parameter type Long is not present'
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Запрос составлен некорректно.Например, переданы невалидные данные.
+        '403':
+          description: У пользователя с данной ролью нет прав на совершение данного действия.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Объект не найден - в БД отсутствует пользователь с id.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=1 is not found"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error. Все прочие неотлавливаемые исключения.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error
+                message: [ ]
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+  /bookings/rooms/{roomId}/checkRoomAvailable:
     get:
       tags:
         - booking-controller
       operationId: checkRoomAvailableInDates
-      description: Проверка бронирований, блокирующих использование номера в заданные даты. При наличии блокирующих бронирований возвращает ConflictException. Доступно пользователям ROLE_BOSS и ROLE_ADMIN.
-      summary: Проверить доступность номера для бронирования в заданные даты
+      description: Проверка бронирований, блокирующих использование номера в заданные даты. Используется при создании нового бронирования, либо при редактировании существующего бронирования со сменой номера. При наличии блокирующих бронирований возвращает ConflictException. Доступно пользователям ROLE_BOSS и ROLE_ADMIN.
+      summary: Проверить доступность номера для бронирования в заданные даты при создании нового бронирования
       parameters:
         - $ref: '#/components/parameters/requesterHeader'
         - $ref: '#/components/parameters/roomId'
@@ -377,7 +445,83 @@ paths:
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
-  /bookings/{roomId}/crossingBookingsOfRoomInDates:
+  /bookings/{bookingId}/rooms/{roomId}/checkUpdateRoomAvailable:
+    get:
+      tags:
+        - booking-controller
+      operationId: checkUpdateBookingRoomAvailableInDates
+      description: Проверка бронирований, блокирующих использование номера в заданные даты. Используется при редактировании дат в существующем бронировании без смены номера.При наличии блокирующих бронирований возвращает ConflictException. Доступно пользователям ROLE_BOSS и ROLE_ADMIN.
+      summary: Проверить доступность номера для бронирования в заданные даты при редактировании бронирования
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - $ref: '#/components/parameters/roomId'
+        - $ref: '#/components/parameters/bookingId'
+        - $ref: '#/components/parameters/checkInDate'
+        - $ref: '#/components/parameters/checkOutDate'
+      responses:
+        '200':
+          description: OK
+        '400':
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: 'Required request header X-PetHotel-User-Id for method parameter type Long is not present'
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Запрос составлен некорректно.Например, переданы невалидные данные.
+        '403':
+          description: У пользователя с данной ролью нет прав на совершение данного действия.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Объект не найден - в БД отсутствует пользователь с id, переданном в header либо бронирование с указанным ID.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=1 is not found"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: У данного номера есть бронирования, блокирующие его использование в указанные даты.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: CONFLICT
+                reason: For the requested operation the conditions are not met.
+                message: 'Room with id=1 is not available for current dates'
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error. Все прочие неотлавливаемые исключения.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error
+                message: [ ]
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+  /bookings/rooms/{roomId}/crossingBookingsOfRoomInDates:
     get:
       tags:
         - booking-controller
@@ -446,7 +590,7 @@ paths:
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
-  /bookings/{roomId}/blockingBookingsInDates:
+  /bookings/rooms/{roomId}/blockingBookingsInDates:
     get:
       tags:
         - booking-controller
@@ -526,7 +670,7 @@ components:
         type: integer
         format: int64
     bookingId:
-      name: id
+      name: bookingId
       description: ID бронирования
       in: path
       required: true
@@ -553,6 +697,22 @@ components:
       name: checkOutDate
       in: query
       description: Дата планируемого выезда в формате "dd.MM.yyyy". Должна быть равна или позже даты заезда.
+      required: true
+      schema:
+        type: string
+        format: date
+    startDate:
+      name: startDate
+      in: query
+      description: Дата начала периода в формате "dd.MM.yyyy". Должна быть до или равна дате окончания периода.
+      required: true
+      schema:
+        type: string
+        format: date
+    endDate:
+      name: endDate
+      in: query
+      description: Дата окончания периода в формате "dd.MM.yyyy". Должна быть равна или позже даты начала периода.
       required: true
       schema:
         type: string
