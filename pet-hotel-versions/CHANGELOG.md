@@ -81,3 +81,6 @@ Api: *<https://github.com/pymanceva/pet-hotel/blob/efed8fb9bbd026f8cab858a21672a
 
 **0.0.19: Клиенты и питомцы соединены.**
 Карточка задачи: *<https://nkiblyk.kaiten.ru/space/167883/card/34857595>*
+
+**0.0.20: Согласовать ошибку от Бэка для кейса "Пользователь с таким email уже существует в системе"**
+Карточка задачи: *<https://nkiblyk.kaiten.ru/32186763>*

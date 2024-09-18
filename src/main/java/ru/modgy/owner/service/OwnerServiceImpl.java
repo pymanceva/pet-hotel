@@ -18,7 +18,8 @@ import ru.modgy.utility.EntityService;
 import ru.modgy.utility.PhoneFormatMapper;
 import ru.modgy.utility.UpdateField;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 import static java.time.LocalDateTime.now;
 
@@ -117,7 +118,7 @@ public class OwnerServiceImpl implements OwnerService {
     @Transactional(readOnly = true)
     @Override
     public OwnerDto checkOwnerPhoneNumber(Long requesterId, CheckOwnerDto checkOwnerDto) {
-        String phoneNumber = PhoneFormatMapper.formatPhoneNumber(checkOwnerDto.getPhone());
+        String phoneNumber = PhoneFormatMapper.formatPhoneNumber(checkOwnerDto.getMainPhone());
         Owner owner = ownerRepository.findByMainPhoneOrOptionalPhone(phoneNumber, phoneNumber).orElseGet(Owner::new);
         log.info("ownerService: checkOwnerPhoneNumber, requesterId={}, checkOwnerDto={}, phoneNumber={}, owner={}",
                 requesterId, checkOwnerDto, phoneNumber, owner);
