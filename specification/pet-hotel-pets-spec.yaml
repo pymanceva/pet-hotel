@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: OpenAPI definition
-  version: v0
+  version: v1
 servers:
   - url: http://localhost:8080
     description: Generated server url
@@ -1493,20 +1493,34 @@ components:
           description: Дополнительные комментарии, особенности поведения
           example: Любит, чтоб чесали животик
     OwnerShortDto:
-      description: Краткое Дто клиента
+      title: OwnerShortDto
       type: object
       properties:
-        name:
-          maxLength: 30
-          minLength: 1
+        lastName:
+          description: Фамилия клиента
           type: string
-          description: ФИО хозяина питомца
-          example: Иванов И.И.
-        rating:
-          type: integer
-          description: Рейтинг клиента (От 1 до 10)
-          format: int32
-          example: 7
+          example: Сумкин
+        firstName:
+          description: Имя клиента
+          type: string
+          example: Фёдор
+        middleName:
+          description: Отчество клиента
+          type: string
+          example: Святославович
+        mainPhone:
+          description: Основной номер телефона клиента
+          type: string
+          example: "+79123456789"
+        optionalPhone:
+          description: Дополнительный номер телефона клиента
+          type: string
+          example: "+71234567890"
+        registrationDate:
+          description: Дата регистрации клиента
+          type: string
+          format: date-time
+          example: 23.12.2023 12:00
     PagePetDto:
       type: object
       properties:

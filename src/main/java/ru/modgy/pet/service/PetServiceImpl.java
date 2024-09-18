@@ -6,7 +6,11 @@ import org.springframework.beans.support.PagedListHolder;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.modgy.exception.ConflictException;
 import ru.modgy.exception.NotFoundException;
+import ru.modgy.owner.dto.OwnerShortDto;
+import ru.modgy.owner.dto.mapper.OwnerMapper;
+import ru.modgy.owner.model.Owner;
 import ru.modgy.pet.dto.NewPetDto;
 import ru.modgy.pet.dto.PetDto;
 import ru.modgy.pet.dto.PetFilterParams;
@@ -17,9 +21,10 @@ import ru.modgy.pet.repository.PetRepository;
 import ru.modgy.utility.EntityService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
 import static ru.modgy.pet.dto.PetDto.getComparator;
 
 @Service
@@ -28,20 +33,23 @@ import static ru.modgy.pet.dto.PetDto.getComparator;
 public class PetServiceImpl implements PetService {
     private final PetRepository petRepository;
     private final PetMapper petMapper;
+    private final OwnerMapper ownerMapper;
     private final EntityService entityService;
 
     @Override
     @Transactional
     public PetDto addPet(Long requesterId, NewPetDto newPetDto) {
         entityService.getUserIfExists(requesterId);
-        //todo метод проверки наличия хозяина питомца, будет дописан после добавления сущности оунеров
-        //findOwnerById(newPetDto.getOwnerId());
-        //todo метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
-        //checkPet(newPetDto);
+        Owner owner = entityService.getOwnerIfExists(newPetDto.getOwnerId());
+        checkPet(newPetDto);
         Pet newPet = petMapper.toPet(newPetDto);
+        newPet.setOwner(owner);
         Pet savedPet = petRepository.save(newPet);
         log.info("PetService: addPet, requesterId={}, petId={}", requesterId, savedPet.getId());
-        return petMapper.toPetDto(savedPet);
+        OwnerShortDto ownerShortDto = ownerMapper.toOwnerShortDto(owner);
+        PetDto petDto = petMapper.toPetDto(savedPet);
+        petDto.setOwnerShortDto(ownerShortDto);
+        return petDto;
     }
 
     @Override
@@ -49,8 +57,10 @@ public class PetServiceImpl implements PetService {
     public PetDto getPetById(Long requesterId, Long petId) {
         entityService.getUserIfExists(requesterId);
         Pet pet = entityService.getPetIfExists(petId);
+        PetDto petDto = petMapper.toPetDto(pet);
+        petDto.setOwnerShortDto(ownerMapper.toOwnerShortDto(pet.getOwner()));
         log.info("PetService: getPetById, requesterId={}, petId={}", requesterId, petId);
-        return petMapper.toPetDto(pet);
+        return petDto;
     }
 
     @Override
@@ -59,8 +69,8 @@ public class PetServiceImpl implements PetService {
         Pet oldPet = entityService.getPetIfExists(petId);
         Pet newPet = petMapper.toPet(updatePetDto);
         newPet.setId(oldPet.getId());
-        //todo метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
-        //checkPet(pet, updatePetDto);
+        newPet.setOwner(oldPet.getOwner());
+        checkPet(oldPet, updatePetDto);
         if (Objects.isNull(updatePetDto.getType())) {
             newPet.setType(oldPet.getType());
         }
@@ -232,7 +242,9 @@ public class PetServiceImpl implements PetService {
         newPet.setRegistrationDate(oldPet.getRegistrationDate());
         Pet savedPet = petRepository.save(newPet);
         log.info("PetService: updatePet, requesterId={}, petId={}, updatePetDto={}", requesterId, petId, updatePetDto);
-        return petMapper.toPetDto(savedPet);
+        PetDto petDto = petMapper.toPetDto(savedPet);
+        petDto.setOwnerShortDto(ownerMapper.toOwnerShortDto(oldPet.getOwner()));
+        return petDto;
 
     }
 
@@ -247,7 +259,6 @@ public class PetServiceImpl implements PetService {
         log.info("PetService: deletePetById, requesterId={}, petId={}", requesterId, petId);
     }
 
-    //метод проверки наличия хозяина питомца, будет дописан после добавления сущности оунеров
     @Override
     @Transactional(readOnly = true)
     public Page<PetDto> getPetsBySearch(Long requesterId, String text, Integer page, Integer size) {
@@ -258,26 +269,43 @@ public class PetServiceImpl implements PetService {
         if (text == null) {
             Pageable pageableIfTextNull =
                     PageRequest.of(0, size, Sort.by(Sort.Order.desc("registrationDate")));
+
             Page<Pet> pets = petRepository.findAll(pageableIfTextNull);
-            List<PetDto> petsDto = pets.stream()
-                    .map(petMapper::toPetDto)
+            Map<Long, Owner> owners = pets.stream()
+                    .collect(Collectors.toMap(Pet::getId, Pet::getOwner));
+
+            List<PetDto> petsDto = petMapper.toListPetDto(pets.getContent());
+            for (PetDto petDto : petsDto) {
+                petDto.setOwnerShortDto(ownerMapper.toOwnerShortDto(owners.get(petDto.getId())));
+            }
+
+            List<PetDto> answer = petsDto
+                    .stream()
                     .sorted(getComparator())
                     .toList();
 
             log.info("PetService: getPetsBySearch, requesterId={}, page={}, size={}", requesterId, page, size);
-            return new PageImpl<>(petsDto, pageableIfTextNull, petsDto.size());
+            return new PageImpl<>(answer, pageableIfTextNull, answer.size());
         } else {
             PetFilterParams params = PetFilterParams.builder()
                     .name(text)
                     .build();
 
             List<Pet> pets = petRepository.findAllPetsByParams(params);
-            List<PetDto> petsDto = petMapper.toListPetDto(pets)
+            Map<Long, Owner> owners = pets.stream()
+                    .collect(Collectors.toMap(Pet::getId, Pet::getOwner));
+
+            List<PetDto> petsDto = petMapper.toListPetDto(pets);
+            for (PetDto petDto : petsDto) {
+                petDto.setOwnerShortDto(ownerMapper.toOwnerShortDto(owners.get(petDto.getId())));
+            }
+
+            List<PetDto> answer = petsDto
                     .stream()
                     .sorted(getComparator())
-                    .collect(toList());
+                    .toList();
 
-            PagedListHolder<PetDto> pagedListHolder = new PagedListHolder<>(petsDto);
+            PagedListHolder<PetDto> pagedListHolder = new PagedListHolder<>(answer);
             pagedListHolder.setPageSize(size);
             pagedListHolder.setPage(page);
 
@@ -286,36 +314,28 @@ public class PetServiceImpl implements PetService {
         }
 
     }
-    //todo метод проверки наличия хозяина питомца, будет дописан после добавления сущности оунеров
-//    private User findOwnerById(long userId) {
-//        return ownerRepository.findById(userId).orElseThrow(() ->
-//                new NotFoundException(String.format("Owner with id = %d not found", userId)));
-//    }
 
-    //метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
-//    private void checkPet(NewPetDto newPetDto) {
-//        try {
-//            Pet pet = petRepository.findByOwnerAndName(newPetDto.getOwnerId(), newPetDto.getName());
-//            if (pet != null) {
-//                throw new ConflictException(String.format("The client with id = %d already has a pet with name = %s.", newPetDto.getOwnerId(), newPetDto.getName()));
-//            }
-//
-//        } catch (NullPointerException exception) {
-//            return;
-//        }
-//
-//    }
-    //todo метод проверки уникальности питомца, будет дописан после добавления сущности оунеров
-//    private void checkPet(Pet oldPet, UpdatePetDto updatePetDto) {
-//        try {
-//            Pet pet = petRepository.findByOwnerAndName(oldPet.getOwner(), updatePetDto.getName());
-//            if (pet != null) {
-//                throw new ConflictException(String.format("The client with id = %d already has a pet with name = %s.", oldPet.getOwner(), updatePetDto.getName()));
-//            }
-//
-//        } catch (NullPointerException exception) {
-//            return;
-//        }
-//
-//    }
+    private void checkPet(NewPetDto newPetDto) {
+        try {
+            Pet pet = petRepository.findByOwnerIdAndName(newPetDto.getOwnerId(), newPetDto.getName());
+            if (pet != null) {
+                throw new ConflictException(String.format("The client with id = %d already has a pet with name = %s.", newPetDto.getOwnerId(), newPetDto.getName()));
+            }
+
+        } catch (NullPointerException exception) {
+            return;
+        }
+    }
+
+    private void checkPet(Pet oldPet, UpdatePetDto updatePetDto) {
+        try {
+            Pet pet = petRepository.findByOwnerIdAndName(oldPet.getOwner().getId(), updatePetDto.getName());
+            if (pet != null) {
+                throw new ConflictException(String.format("The client with id = %d already has a pet with name = %s.", oldPet.getOwner().getId(), updatePetDto.getName()));
+            }
+
+        } catch (NullPointerException exception) {
+            return;
+        }
+    }
 }

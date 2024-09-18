@@ -3,6 +3,7 @@ package ru.modgy.pet.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import ru.modgy.owner.model.Owner;
 import ru.modgy.booking.model.Booking;
 
 import java.time.LocalDate;
@@ -22,10 +23,10 @@ public class Pet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_pets")
     private long id;
-//        @ManyToOne()
-//    @JoinColumn(name = "owner_id_pet", nullable = false)
-//    @Column(name = "owner_id_pet", nullable = false)
-//    private long owner;
+    @ManyToOne()
+    @JoinColumn(name = "owner_id_pets", nullable = false)
+    @ToString.Exclude
+    private Owner owner;
     @Column(name = "type_pets", nullable = false)
     @Enumerated(EnumType.STRING)
     private TypeOfPet type;

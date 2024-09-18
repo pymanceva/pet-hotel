@@ -2,8 +2,11 @@ package ru.modgy.owner.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.modgy.pet.model.Pet;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Getter
@@ -42,4 +45,8 @@ public class Owner {
     private Integer rating;
     @Column(name = "registration_date_owners")
     private LocalDateTime registrationDate;
+    @OneToMany(mappedBy = "owner",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
+    List<Pet> pets = new ArrayList<>();
 }

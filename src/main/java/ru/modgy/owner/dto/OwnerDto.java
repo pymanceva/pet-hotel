@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.modgy.pet.dto.PetDtoForOwner;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @Data
@@ -25,4 +27,5 @@ public class OwnerDto {
     private String source;
     private Integer rating;
     private LocalDateTime registrationDate;
+    private List<PetDtoForOwner> petsDto;
 }

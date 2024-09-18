@@ -2,7 +2,10 @@ package ru.modgy.pet.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import ru.modgy.pet.model.Sex;
 import ru.modgy.pet.model.TypeOfPet;
@@ -15,8 +18,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NewPetDto {
-//todo    @NotNull(message = "Field: owner. Error: must not be blank.")
-//    private long ownerId;
+    @NotNull(message = "Field: owner. Error: must not be blank.")
+    private long ownerId;
     @NotNull(message = "Field: typeOfPet. Error: must not be blank.")
     private TypeOfPet type; // вид животного
     @Length(min = 1, max = 30, message = "validation name size error")
