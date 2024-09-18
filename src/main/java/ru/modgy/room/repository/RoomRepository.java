@@ -23,8 +23,8 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             "(b.checkInDate < :checkOutDate AND b.checkOutDate >= :checkOutDate) OR " +
             "(b.checkInDate >= :checkInDate AND b.checkOutDate <= :checkOutDate)))")
     Optional<List<Room>> findAvailableRoomsByCategoryInDates(@Param("categoryId") Long categoryId,
-                                                    @Param("checkInDate") LocalDate checkInDate,
-                                                    @Param("checkOutDate") LocalDate checkOutDate);
+                                                             @Param("checkInDate") LocalDate checkInDate,
+                                                             @Param("checkOutDate") LocalDate checkOutDate);
 
     Integer deleteRoomById(Long id);
 

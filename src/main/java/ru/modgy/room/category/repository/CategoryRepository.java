@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     int deleteCategoryById(Long id);
+
     int countAllByName(String name);
     @Query("SELECT c FROM Category c " +
             "ORDER BY c.name")
