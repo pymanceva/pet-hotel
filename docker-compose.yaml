@@ -1,13 +1,15 @@
-version: '3.8'
-
 services:
   server:
     build: .
+    image: modji-backend:latest
     container_name: pethotel_server
     ports:
       - "8080:8080"
+    restart: unless-stopped
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+
     environment:
       - 'DB_NAME=pethotel'
       - 'POSTGRES_USER=admin'
@@ -24,3 +26,9 @@ services:
       - 'POSTGRES_DB=pethotel'
       - 'POSTGRES_USER=admin'
       - 'POSTGRES_PASSWORD=admin_pwd'
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
