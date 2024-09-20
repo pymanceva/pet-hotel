@@ -659,6 +659,73 @@ paths:
                 timestamp: '2023-01-01 00:00:00'
               schema:
                 $ref: '#/components/schemas/Error'
+  /bookings/allByPet/pets/{petId}:
+    get:
+      tags:
+        - booking-controller
+      operationId: findAllBookingsByPet
+      description: Поиск всех имеющихся бронирований на пребывание конкретного питомца. Доступно пользователям ROLE_BOSS и ROLE_ADMIN.
+      summary: Поиск всех имеющихся бронирований на пребывание конкретного питомца
+      parameters:
+        - $ref: '#/components/parameters/requesterHeader'
+        - $ref: '#/components/parameters/petId'
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookingDto'
+        '400':
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: BAD_REQUEST
+                reason: Incorrectly made request.
+                message: 'Required request header X-PetHotel-User-Id for method parameter type Long is not present'
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Запрос составлен некорректно.Например, переданы невалидные данные.
+        '403':
+          description: У пользователя с данной ролью нет прав на совершение данного действия.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: FORBIDDEN
+                reason: Operation is denied for this user.
+                message: "User with role=ROLE_FINANCIAL, can't access for this action"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Объект не найден - в БД отсутствует пользователь с id, переданном в header либо питомец с указанным ID.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: NOT_FOUND
+                reason: The required object was not found.
+                message: "user with id=1 is not found"
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error. Все прочие неотлавливаемые исключения.
+          content:
+            application/json:
+              example:
+                error: '[]'
+                status: INTERNAL_SERVER_ERROR
+                reason: Internal Server Error
+                message: [ ]
+                timestamp: '2023-01-01 00:00:00'
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   parameters:
     requesterHeader:
@@ -681,6 +748,14 @@ components:
       name: roomId
       in: path
       description: ID номера, в отношении которого совершается действие
+      required: true
+      schema:
+        type: integer
+        format: int64
+    petId:
+      name: petId
+      in: path
+      description: ID питомца, в отношении которого совершается действие
       required: true
       schema:
         type: integer

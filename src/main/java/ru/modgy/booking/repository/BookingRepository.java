@@ -46,4 +46,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "(b.checkInDate >= :startDate AND b.checkOutDate <= :endDate))")
     Optional<List<Booking>> findAllBookingsInDates(@Param("startDate") LocalDate startDate,
                                                    @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT b FROM Booking b JOIN b.pets p WHERE p.id = :petId")
+    Optional<List<Booking>> findAllBookingsByPet(@Param("petId") Long petId);
 }
