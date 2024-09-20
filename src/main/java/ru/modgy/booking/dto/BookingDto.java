@@ -25,7 +25,7 @@ public class BookingDto {
     private LocalDate checkOutDate;
     private LocalTime checkInTime;
     private LocalTime checkOutTime;
-    private Integer daysOfBooking;
+    private Long daysOfBooking;
     private StatusBooking status;
     private ReasonOfStopBooking reasonOfStop;
     private String reasonOfCancel;
