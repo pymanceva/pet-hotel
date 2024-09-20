@@ -111,4 +111,13 @@ public interface BookingService {
      * @return список всех имеющихся бронирований на пребывание конкретного питомца
      */
     List<BookingDto> findAllBookingsByPet(Long userId, Long petId);
+
+    /**
+     * Поиск всех имеющихся бронирований на пребывание всех питомцев конкретного клиента.
+     *
+     * @param userId    - id пользователя, направляющего запрос
+     * @param ownerId - id клиента, чьи бронирования отбираются
+     * @return список всех имеющихся бронирований на пребывание всех питомцев конкретного клиента
+     */
+    List<BookingDto> findAllBookingsByOwner(Long userId, Long ownerId);
 }

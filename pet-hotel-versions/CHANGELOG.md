@@ -84,3 +84,7 @@ Api: *<https://github.com/pymanceva/pet-hotel/blob/efed8fb9bbd026f8cab858a21672a
 
 **0.0.20: Согласовать ошибку от Бэка для кейса "Пользователь с таким email уже существует в системе"**
 Карточка задачи: *<https://nkiblyk.kaiten.ru/32186763>*
+
+**0.0.21: Добавлена выдача всех бронирований по конкретному питомцу или клиенту**
+Карточка задачи: *<https://nkiblyk.kaiten.ru/space/167883/card/38244014?filter=eyJrZXkiOiJhbmQiLCJ2YWx1ZSI6W3sia2V5IjoiYW5kIiwidmFsdWUiOlt7ImNvbXBhcmlzb24iOiJlcSIsImtleSI6InRhZyIsInZhbHVlIjo0OTA5MDF9XX1dfQ>*
+*<https://nkiblyk.kaiten.ru/space/167883/card/38244001?filter=eyJrZXkiOiJhbmQiLCJ2YWx1ZSI6W3sia2V5IjoiYW5kIiwidmFsdWUiOlt7ImNvbXBhcmlzb24iOiJlcSIsImtleSI6InRhZyIsInZhbHVlIjo0OTA5MDF9XX1dfQ>*

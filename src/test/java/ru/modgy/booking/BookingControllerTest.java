@@ -44,6 +44,7 @@ class BookingControllerTest {
     private final long bookingId = 1L;
     private final long roomId = 1L;
     private final long petId = 1L;
+    private final long ownerId = 1L;
     private final LocalDate checkIn = LocalDate.of(2024, 1, 1);
     private final LocalDate checkOut = LocalDate.of(2024, 1, 2);
 
@@ -335,5 +336,21 @@ class BookingControllerTest {
         verify(bookingService).findAllBookingsByPet(requesterId, petId);
         verify(bookingService, times(1))
                 .findAllBookingsByPet(requesterId, petId);
+    }
+
+    @Test
+    @SneakyThrows
+    void findAllBookingsByOwner() {
+        when(bookingService.findAllBookingsByOwner(anyLong(), anyLong()))
+                .thenReturn(List.of(bookingDto));
+
+        mockMvc.perform(get("/bookings/allByOwner/owners/{ownerId}", ownerId)
+                        .header(requesterHeader, requesterId)
+                        .accept(MediaType.ALL_VALUE))
+                .andExpect(status().isOk());
+
+        verify(bookingService).findAllBookingsByOwner(requesterId, ownerId);
+        verify(bookingService, times(1))
+                .findAllBookingsByOwner(requesterId, ownerId);
     }
 }
