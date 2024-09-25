@@ -282,6 +282,17 @@ public class BookingServiceImpl implements BookingService {
         return bookingDtoList;
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public List<BookingDto> findAllBookingsByOwner(Long userId, Long ownerId) {
+        entityService.getOwnerIfExists(ownerId);
+        List<Booking> foundBookings = bookingRepository.findAllBookingsByOwner(ownerId).orElse(Collections.emptyList());
+        List<BookingDto> bookingDtoList = addOwnerShortDtoInPetDtoList(foundBookings);
+
+        log.info("BookingService: findAllBookingsByOwner, userId={}, petId={}", userId, ownerId);
+        return bookingDtoList;
+    }
+
     private List<Booking> findBookingsForRoomInDates(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
         return bookingRepository.findBookingsForRoomInDates(
                         roomId, checkInDate, checkOutDate)

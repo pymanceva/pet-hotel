@@ -49,4 +49,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("SELECT b FROM Booking b JOIN b.pets p WHERE p.id = :petId")
     Optional<List<Booking>> findAllBookingsByPet(@Param("petId") Long petId);
+
+    @Query("SELECT b FROM Booking b JOIN b.pets p WHERE p.owner.id = :ownerId")
+    Optional<List<Booking>> findAllBookingsByOwner(@Param("ownerId") Long ownerId);
 }
