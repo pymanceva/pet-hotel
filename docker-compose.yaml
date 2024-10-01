@@ -1,34 +1,33 @@
 services:
   server:
     build: .
-    image: modji-backend:latest
+    image: modgy/modgy-back:latest
     container_name: pethotel_server
     ports:
       - "8080:8080"
     restart: unless-stopped
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
 
-    environment:
-      - 'DB_NAME=pethotel'
-      - 'POSTGRES_USER=admin'
-      - 'POSTGRES_PASSWORD=admin_pwd'
-      - 'DB_HOST=pethotel_db'
-      - 'DB_PORT=5432'
 
   db:
     image: postgres:13.7-alpine
     container_name: pethotel_db
     ports:
       - "6541:5432"
-    environment:
-      - 'POSTGRES_DB=pethotel'
-      - 'POSTGRES_USER=admin'
-      - 'POSTGRES_PASSWORD=admin_pwd'
     restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - modgy_postgres_data:/var/lib/postgresql/data/
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U admin" ]
       interval: 5s
       timeout: 5s
       retries: 5
+
+volumes:
+  modgy_postgres_data:
