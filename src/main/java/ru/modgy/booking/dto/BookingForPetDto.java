@@ -4,9 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.modgy.booking.model.ReasonOfStopBooking;
 import ru.modgy.booking.model.StatusBooking;
-import ru.modgy.booking.model.TypesBooking;
 import ru.modgy.room.dto.RoomDto;
 
 import java.time.LocalDate;
@@ -18,14 +16,12 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class BookingForPetDto {
     private Long id;
-    private TypesBooking type;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
     private LocalTime checkInTime;
     private LocalTime checkOutTime;
     private Integer daysOfBooking;
     private StatusBooking status;
-    private ReasonOfStopBooking reasonOfStop;
     private String reasonOfCancel;
     private Double price;
     private Double amount;
