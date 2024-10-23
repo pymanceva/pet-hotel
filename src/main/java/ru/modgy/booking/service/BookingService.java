@@ -102,4 +102,22 @@ public interface BookingService {
      * @return список бронирований в указанные даты с любым статусом, кроме "отменено"
      */
     List<BookingDto> findAllBookingsInDates(Long userId, LocalDate startDate, LocalDate endDate);
+
+    /**
+     * Поиск всех имеющихся бронирований на пребывание конкретного питомца.
+     *
+     * @param userId    - id пользователя, направляющего запрос
+     * @param petId - id питомца, чьи бронирования отбираются
+     * @return список всех имеющихся бронирований на пребывание конкретного питомца
+     */
+    List<BookingDto> findAllBookingsByPet(Long userId, Long petId);
+
+    /**
+     * Поиск всех имеющихся бронирований на пребывание всех питомцев конкретного клиента.
+     *
+     * @param userId    - id пользователя, направляющего запрос
+     * @param ownerId - id клиента, чьи бронирования отбираются
+     * @return список всех имеющихся бронирований на пребывание всех питомцев конкретного клиента
+     */
+    List<BookingDto> findAllBookingsByOwner(Long userId, Long ownerId);
 }

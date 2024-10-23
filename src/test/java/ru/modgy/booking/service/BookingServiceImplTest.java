@@ -144,7 +144,7 @@ class BookingServiceImplTest {
             .type(TypesBooking.TYPE_BOOKING)
             .checkInDate(checkIn)
             .checkOutDate(checkOut)
-            .daysOfBooking(8)
+            .daysOfBooking(8L)
             .status(StatusBooking.STATUS_INITIAL)
             .price(0.0)
             .amount(0.0)
@@ -164,7 +164,7 @@ class BookingServiceImplTest {
             .type(TypesBooking.TYPE_BOOKING)
             .checkInDate(checkIn)
             .checkOutDate(checkOut)
-            .daysOfBooking(2)
+            .daysOfBooking(2L)
             .status(StatusBooking.STATUS_INITIAL)
             .price(1000.00)
             .amount(7000.00)
@@ -465,6 +465,58 @@ class BookingServiceImplTest {
         Assertions.assertEquals(bookingDto.getPets(), result.get(0).getPets());
 
         verify(bookingRepository, times(1)).findAllBookingsInDates(any(), any());
+        verifyNoMoreInteractions(bookingRepository);
+    }
+
+    @Test
+    void findAllBookingsByPet_whenOneBooking_thenReturnedListOfBooking() {
+        when(bookingRepository.findAllBookingsByPet(any())).thenReturn(Optional.of(List.of(booking)));
+        when(bookingMapper.toBookingDto(booking)).thenReturn(bookingDto);
+        when(entityService.getListOfPetsByIds(any())).thenReturn(List.of(pet));
+
+        List<BookingDto> result = bookingService.findAllBookingsByPet(boss.getId(), pet.getId());
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1L, result.get(0).getId());
+        Assertions.assertEquals(bookingDto.getType(), result.get(0).getType());
+        Assertions.assertEquals(bookingDto.getCheckInDate(), result.get(0).getCheckInDate());
+        Assertions.assertEquals(bookingDto.getCheckOutDate(), result.get(0).getCheckOutDate());
+        Assertions.assertEquals(bookingDto.getDaysOfBooking(), result.get(0).getDaysOfBooking());
+        Assertions.assertEquals(bookingDto.getStatus(), result.get(0).getStatus());
+        Assertions.assertEquals(bookingDto.getPrice(), result.get(0).getPrice());
+        Assertions.assertEquals(bookingDto.getAmount(), result.get(0).getAmount());
+        Assertions.assertEquals(bookingDto.getPrepaymentAmount(), result.get(0).getPrepaymentAmount());
+        Assertions.assertEquals(bookingDto.getIsPrepaid(), result.get(0).getIsPrepaid());
+        Assertions.assertEquals(bookingDto.getRoom(), result.get(0).getRoom());
+        Assertions.assertEquals(bookingDto.getPets(), result.get(0).getPets());
+
+        verify(bookingRepository, times(1)).findAllBookingsByPet(any());
+        verifyNoMoreInteractions(bookingRepository);
+    }
+
+    @Test
+    void findAllBookingsByOwner_whenOneBooking_thenReturnedListOfBooking() {
+        when(bookingRepository.findAllBookingsByOwner(any())).thenReturn(Optional.of(List.of(booking)));
+        when(bookingMapper.toBookingDto(booking)).thenReturn(bookingDto);
+        when(entityService.getListOfPetsByIds(any())).thenReturn(List.of(pet));
+
+        List<BookingDto> result = bookingService.findAllBookingsByOwner(boss.getId(), owner.getId());
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1L, result.get(0).getId());
+        Assertions.assertEquals(bookingDto.getType(), result.get(0).getType());
+        Assertions.assertEquals(bookingDto.getCheckInDate(), result.get(0).getCheckInDate());
+        Assertions.assertEquals(bookingDto.getCheckOutDate(), result.get(0).getCheckOutDate());
+        Assertions.assertEquals(bookingDto.getDaysOfBooking(), result.get(0).getDaysOfBooking());
+        Assertions.assertEquals(bookingDto.getStatus(), result.get(0).getStatus());
+        Assertions.assertEquals(bookingDto.getPrice(), result.get(0).getPrice());
+        Assertions.assertEquals(bookingDto.getAmount(), result.get(0).getAmount());
+        Assertions.assertEquals(bookingDto.getPrepaymentAmount(), result.get(0).getPrepaymentAmount());
+        Assertions.assertEquals(bookingDto.getIsPrepaid(), result.get(0).getIsPrepaid());
+        Assertions.assertEquals(bookingDto.getRoom(), result.get(0).getRoom());
+        Assertions.assertEquals(bookingDto.getPets(), result.get(0).getPets());
+
+        verify(bookingRepository, times(1)).findAllBookingsByOwner(any());
         verifyNoMoreInteractions(bookingRepository);
     }
 }

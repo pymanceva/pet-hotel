@@ -10,8 +10,10 @@ import ru.modgy.pet.mapper.PetMapper;
 import ru.modgy.room.category.dto.mapper.CategoryMapper;
 import ru.modgy.room.dto.mapper.RoomMapper;
 
+import java.time.Duration;
 import java.time.LocalDate;
-import java.time.Period;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {RoomMapper.class, CategoryMapper.class, PetMapper.class})
@@ -21,8 +23,10 @@ public interface BookingMapper {
                     "booking.getCheckOutDate()))")
     BookingDto toBookingDto(Booking booking);
 
-    default Integer calculateBookingDays(LocalDate checkInDate, LocalDate checkOutDate) {
-        return Period.between(checkInDate, checkOutDate).plusDays(1).getDays();
+    default Long calculateBookingDays(LocalDate checkInDate, LocalDate checkOutDate) {
+        LocalDateTime start = checkInDate.atTime(LocalTime.MIN);
+        LocalDateTime end = checkOutDate.atTime(LocalTime.MAX);
+        return Duration.between(start, end).toDays() + 1;
     }
 
     @Mapping(target = "id", ignore = true)
