@@ -3,12 +3,14 @@ package ru.modgy.pet.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import ru.modgy.owner.dto.OwnerShortDto;
+import ru.modgy.booking.dto.BookingForPetDto;
 import ru.modgy.pet.model.Sex;
 import ru.modgy.pet.model.TypeOfPet;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.List;
 
 @Getter
 @Setter
@@ -82,6 +84,8 @@ public class PetDto {
     private String additionalData;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
     private LocalDateTime registrationDate;
+    private List<BookingForPetDto> bookings;
+
 
     public static final Comparator<PetDto> PET_COMPARATOR =
             Comparator.comparing((PetDto::getName))

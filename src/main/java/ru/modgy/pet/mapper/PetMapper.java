@@ -11,8 +11,8 @@ import ru.modgy.pet.model.Pet;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.List;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Mapper(componentModel = "spring")
@@ -20,6 +20,7 @@ public interface PetMapper {
 
     @Mapping(target = "ownerShortDto", ignore = true)
     @Mapping(source = "pet.birthDate", target = "age", qualifiedByName = "calculateAge")
+    @Mapping(target = "bookings", conditionQualifiedByName = {"BookingMapper"})
     PetDto toPetDto(Pet pet);
 
     @Named("calculateAge")
@@ -43,11 +44,14 @@ public interface PetMapper {
     }
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "bookings", ignore = true)
     Pet toPet(NewPetDto newPetDto);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "bookings", ignore = true)
     Pet toPet(UpdatePetDto updatePetDto);
 
+    @Mapping(target = "bookings", ignore = true)
     Set<Pet> toPet(Collection<PetDto> pets);
 
     List<PetDto> toListPetDto(List<Pet> pets);

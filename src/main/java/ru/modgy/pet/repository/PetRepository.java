@@ -12,5 +12,4 @@ public interface PetRepository extends JpaRepository<Pet, Long>, SearchPetReposi
     Integer deletePetById(Long id);
 
     Optional<List<Pet>> findAllByIdIn(List<Long> petIds);
-
 }

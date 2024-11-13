@@ -4,9 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import ru.modgy.owner.model.Owner;
+import ru.modgy.booking.model.Booking;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @Getter
@@ -140,6 +142,13 @@ public class Pet {
     @CreationTimestamp
     @Column(name = "registration_date_pets")
     private LocalDateTime registrationDate;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "pets_in_bookings",
+            joinColumns = @JoinColumn(name = "id_pets"),
+            inverseJoinColumns = @JoinColumn(name = "id_bookings")
+    )
+    private List<Booking> bookings;
 }
 
 
